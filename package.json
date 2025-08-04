@@ -1,0 +1,114 @@
+{
+  "name": "leuchtturm-flaschenpost-reservation-system",
+  "version": "1.0.0",
+  "description": "Magazine reservation system built with Astro, Vue.js, and Supabase",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.vue,.astro --fix",
+    "lint:check": "eslint . --ext .js,.jsx,.ts,.tsx,.vue,.astro",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:unit": "vitest run --reporter=verbose --coverage",
+    "test:integration": "vitest run --config vitest.config.integration.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:smoke": "playwright test --grep='@smoke'",
+    "test:performance": "lighthouse-ci autorun",
+    "analyze": "astro build --mode=analyze",
+    "health-check:comprehensive": "node scripts/health-check.js",
+    "db:generate": "supabase gen types typescript --project-id=$PROJECT_ID > src/types/database.ts",
+    "db:migrate": "supabase db push",
+    "db:reset": "supabase db reset",
+    "db:seed": "supabase db seed",
+    "backup:trigger": "node scripts/backup-trigger.js",
+    "backup:restore": "node scripts/backup-restore.js",
+    "test:email": "tsx scripts/test-email.ts",
+    "security:audit": "npm audit --audit-level high",
+    "security:scan": "snyk test",
+    "prepare": "husky install",
+    "postinstall": "is-ci || husky install"
+  },
+  "dependencies": {
+    "@astrojs/netlify": "^5.0.0",
+    "@astrojs/tailwind": "^5.0.0",
+    "@astrojs/vue": "^4.0.0",
+    "@heroicons/vue": "2.2.0",
+    "@supabase/supabase-js": "^2.38.0",
+    "@types/nodemailer": "6.4.17",
+    "astro": "^4.0.0",
+    "nodemailer": "7.0.5",
+    "tailwindcss": "^3.3.0",
+    "vue": "^3.3.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.40.0",
+    "@types/node": "^20.9.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-vue": "4.6.2",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vue/test-utils": "2.4.6",
+    "dotenv": "17.2.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-astro": "^0.29.0",
+    "eslint-plugin-vue": "^9.18.0",
+    "happy-dom": "12.10.3",
+    "husky": "^8.0.3",
+    "is-ci": "^3.0.1",
+    "jsdom": "22.1.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "prettier-plugin-astro": "^0.12.0",
+    "tsx": "4.20.3",
+    "typescript": "^5.2.0",
+    "vitest": "^1.0.0",
+    "vue-tsc": "1.8.27"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,vue,astro}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/leuchtturm-flaschenpost-reservation-system.git"
+  },
+  "keywords": [
+    "astro",
+    "vue",
+    "typescript",
+    "tailwindcss",
+    "supabase",
+    "netlify",
+    "reservation-system",
+    "magazine",
+    "gdpr"
+  ],
+  "author": "Your Organization",
+  "license": "MIT"
+}

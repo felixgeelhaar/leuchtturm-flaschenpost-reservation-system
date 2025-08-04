@@ -1,0 +1,564 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { DatabaseService } from '@/lib/database';
+import { mockUser, mockMagazines, validFormDataPickup, validFormDataShipping } from '../../fixtures/test-data';
+
+// Mock Supabase client
+const mockSupabaseClient = {
+  from: vi.fn(() => ({
+    select: vi.fn(() => ({
+      eq: vi.fn(() => ({
+        single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        gt: vi.fn(() => ({
+          order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+        })),
+      })),
+      order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+    })),
+    insert: vi.fn(() => ({
+      select: vi.fn(() => ({
+        single: vi.fn(() => Promise.resolve({ data: {}, error: null })),
+      })),
+    })),
+    update: vi.fn(() => ({
+      eq: vi.fn(() => Promise.resolve({ data: {}, error: null })),
+    })),
+  })),
+};
+
+vi.mock('@/lib/supabase', () => ({
+  createServerSupabaseClient: () => mockSupabaseClient,
+}));
+
+describe('DatabaseService', () => {
+  let db: DatabaseService;
+  let mockFromChain: any;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    db = new DatabaseService();
+    
+    // Setup mock chain
+    mockFromChain = {
+      select: vi.fn(() => mockFromChain),
+      insert: vi.fn(() => mockFromChain),
+      update: vi.fn(() => mockFromChain),
+      eq: vi.fn(() => mockFromChain),
+      gt: vi.fn(() => mockFromChain),
+      order: vi.fn(() => mockFromChain),
+      single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    };
+    
+    mockSupabaseClient.from.mockReturnValue(mockFromChain);
+  });
+
+  describe('User Operations', () => {
+    it('creates a new user with address', async () => {
+      const userData = {
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        phone: '+49123456789',
+        address: {
+          street: 'Test Street',
+          houseNumber: '123',
+          postalCode: '10115',
+          city: 'Berlin',
+          country: 'DE',
+          addressLine2: 'Apt 5',
+        },
+        consentVersion: '1.0',
+      };
+
+      const expectedDbData = {
+        email: userData.email,
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        phone: userData.phone,
+        street: userData.address.street,
+        house_number: userData.address.houseNumber,
+        address_line2: userData.address.addressLine2,
+        postal_code: userData.address.postalCode,
+        city: userData.address.city,
+        country: userData.address.country,
+        consent_version: userData.consentVersion,
+        data_retention_until: expect.any(String),
+      };
+
+      mockFromChain.single.mockResolvedValue({
+        data: {
+          id: 'user-123',
+          ...expectedDbData,
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+        error: null,
+      });
+
+      await db.createUser(userData);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('users');
+      expect(mockFromChain.insert).toHaveBeenCalledWith(expectedDbData);
+    });
+
+    it('creates a new user without address', async () => {
+      const userData = {
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        consentVersion: '1.0',
+      };
+
+      mockFromChain.single.mockResolvedValue({
+        data: { id: 'user-123', ...userData },
+        error: null,
+      });
+
+      await db.createUser(userData);
+
+      expect(mockFromChain.insert).toHaveBeenCalledWith({
+        email: userData.email,
+        first_name: userData.firstName,
+        last_name: userData.lastName,
+        phone: undefined,
+        street: undefined,
+        house_number: undefined,
+        address_line2: undefined,
+        postal_code: undefined,
+        city: undefined,
+        country: undefined,
+        consent_version: userData.consentVersion,
+        data_retention_until: expect.any(String),
+      });
+    });
+
+    it('handles user creation errors', async () => {
+      const userData = {
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        consentVersion: '1.0',
+      };
+
+      mockFromChain.single.mockResolvedValue({
+        data: null,
+        error: { message: 'Email already exists' },
+      });
+
+      await expect(db.createUser(userData)).rejects.toThrow('Failed to create user: Email already exists');
+    });
+
+    it('gets user by email', async () => {
+      const email = 'test@example.com';
+      
+      mockFromChain.single.mockResolvedValue({
+        data: {
+          id: 'user-123',
+          email: email,
+          first_name: 'Test',
+          last_name: 'User',
+          created_at: '2024-01-01T00:00:00Z',
+          updated_at: '2024-01-01T00:00:00Z',
+        },
+        error: null,
+      });
+
+      const user = await db.getUserByEmail(email);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('users');
+      expect(mockFromChain.eq).toHaveBeenCalledWith('email', email);
+      expect(mockFromChain.eq).toHaveBeenCalledWith('is_active', true);
+      expect(user).toBeDefined();
+      expect(user?.email).toBe(email);
+    });
+
+    it('returns null for non-existent user', async () => {
+      mockFromChain.single.mockResolvedValue({
+        data: null,
+        error: { code: 'PGRST116' }, // No rows returned
+      });
+
+      const user = await db.getUserByEmail('nonexistent@example.com');
+      expect(user).toBeNull();
+    });
+
+    it('updates user activity', async () => {
+      const userId = 'user-123';
+      
+      mockFromChain.eq.mockResolvedValue({ data: {}, error: null });
+
+      await db.updateUserActivity(userId);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('users');
+      expect(mockFromChain.update).toHaveBeenCalledWith({
+        last_activity: expect.any(String),
+      });
+      expect(mockFromChain.eq).toHaveBeenCalledWith('id', userId);
+    });
+  });
+
+  describe('Magazine Operations', () => {
+    it('gets active magazines', async () => {
+      mockFromChain.order.mockResolvedValue({
+        data: [
+          {
+            id: 'mag-123',
+            title: 'Test Magazine',
+            issue_number: '2024-01',
+            publish_date: '2024-01-01',
+            total_copies: 100,
+            available_copies: 95,
+            is_active: true,
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z',
+          },
+        ],
+        error: null,
+      });
+
+      const magazines = await db.getActiveMagazines();
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('magazines');
+      expect(mockFromChain.eq).toHaveBeenCalledWith('is_active', true);
+      expect(mockFromChain.gt).toHaveBeenCalledWith('available_copies', 0);
+      expect(mockFromChain.order).toHaveBeenCalledWith('publish_date', { ascending: false });
+      expect(magazines).toHaveLength(1);
+    });
+
+    it('gets magazine by id', async () => {
+      const magazineId = 'mag-123';
+      
+      mockFromChain.single.mockResolvedValue({
+        data: {
+          id: magazineId,
+          title: 'Test Magazine',
+          issue_number: '2024-01',
+          is_active: true,
+        },
+        error: null,
+      });
+
+      const magazine = await db.getMagazineById(magazineId);
+
+      expect(mockFromChain.eq).toHaveBeenCalledWith('id', magazineId);
+      expect(mockFromChain.eq).toHaveBeenCalledWith('is_active', true);
+      expect(magazine).toBeDefined();
+      expect(magazine?.id).toBe(magazineId);
+    });
+
+    it('returns null for non-existent magazine', async () => {
+      mockFromChain.single.mockResolvedValue({
+        data: null,
+        error: { code: 'PGRST116' },
+      });
+
+      const magazine = await db.getMagazineById('nonexistent');
+      expect(magazine).toBeNull();
+    });
+  });
+
+  describe('Reservation Operations', () => {
+    it('creates reservation with pickup delivery', async () => {
+      // Mock user lookup
+      mockFromChain.single.mockResolvedValueOnce({
+        data: { id: 'user-123' },
+        error: null,
+      });
+
+      // Mock reservation creation
+      mockFromChain.single.mockResolvedValueOnce({
+        data: {
+          id: 'reservation-123',
+          user_id: 'user-123',
+          magazine_id: validFormDataPickup.magazineId,
+          quantity: validFormDataPickup.quantity,
+          delivery_method: 'pickup',
+          pickup_location: validFormDataPickup.pickupLocation,
+          users: { id: 'user-123', email: 'test@example.com' },
+          magazines: { id: 'mag-123', title: 'Test Magazine' },
+        },
+        error: null,
+      });
+
+      const reservation = await db.createReservation(validFormDataPickup);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('users');
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('reservations');
+      
+      expect(mockFromChain.insert).toHaveBeenCalledWith({
+        user_id: 'user-123',
+        magazine_id: validFormDataPickup.magazineId,
+        quantity: validFormDataPickup.quantity,
+        delivery_method: 'pickup',
+        pickup_location: validFormDataPickup.pickupLocation,
+        pickup_date: validFormDataPickup.pickupDate,
+        shipping_street: null,
+        shipping_house_number: null,
+        shipping_address_line2: null,
+        shipping_postal_code: null,
+        shipping_city: null,
+        shipping_country: null,
+        notes: validFormDataPickup.notes,
+        consent_reference: expect.any(String),
+        expires_at: expect.any(String),
+      });
+    });
+
+    it('creates reservation with shipping delivery', async () => {
+      // Mock user lookup
+      mockFromChain.single.mockResolvedValueOnce({
+        data: { id: 'user-123' },
+        error: null,
+      });
+
+      // Mock reservation creation
+      mockFromChain.single.mockResolvedValueOnce({
+        data: {
+          id: 'reservation-123',
+          user_id: 'user-123',
+          delivery_method: 'shipping',
+        },
+        error: null,
+      });
+
+      await db.createReservation(validFormDataShipping);
+
+      expect(mockFromChain.insert).toHaveBeenCalledWith({
+        user_id: 'user-123',
+        magazine_id: validFormDataShipping.magazineId,
+        quantity: validFormDataShipping.quantity,
+        delivery_method: 'shipping',
+        pickup_location: null,
+        pickup_date: validFormDataShipping.pickupDate,
+        shipping_street: validFormDataShipping.address?.street,
+        shipping_house_number: validFormDataShipping.address?.houseNumber,
+        shipping_address_line2: validFormDataShipping.address?.addressLine2,
+        shipping_postal_code: validFormDataShipping.address?.postalCode,
+        shipping_city: validFormDataShipping.address?.city,
+        shipping_country: validFormDataShipping.address?.country,
+        notes: validFormDataShipping.notes,
+        consent_reference: expect.any(String),
+        expires_at: expect.any(String),
+      });
+    });
+
+    it('handles reservation creation for non-existent user', async () => {
+      mockFromChain.single.mockResolvedValue({
+        data: null,
+        error: null,
+      });
+
+      await expect(db.createReservation(validFormDataPickup))
+        .rejects.toThrow('User not found');
+    });
+
+    it('gets user reservations', async () => {
+      const userId = 'user-123';
+      
+      mockFromChain.order.mockResolvedValue({
+        data: [
+          {
+            id: 'reservation-123',
+            user_id: userId,
+            status: 'pending',
+            magazines: { title: 'Test Magazine' },
+          },
+        ],
+        error: null,
+      });
+
+      const reservations = await db.getUserReservations(userId);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('reservations');
+      expect(mockFromChain.eq).toHaveBeenCalledWith('user_id', userId);
+      expect(mockFromChain.order).toHaveBeenCalledWith('created_at', { ascending: false });
+      expect(reservations).toHaveLength(1);
+    });
+
+    it('cancels reservation', async () => {
+      const reservationId = 'reservation-123';
+      const userId = 'user-123';
+      
+      mockFromChain.eq.mockResolvedValue({ data: {}, error: null });
+
+      await db.cancelReservation(reservationId, userId);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('reservations');
+      expect(mockFromChain.update).toHaveBeenCalledWith({ status: 'cancelled' });
+      expect(mockFromChain.eq).toHaveBeenCalledWith('id', reservationId);
+      expect(mockFromChain.eq).toHaveBeenCalledWith('user_id', userId);
+    });
+  });
+
+  describe('GDPR Consent Operations', () => {
+    it('records user consent', async () => {
+      const userId = 'user-123';
+      const consents = {
+        essential: true,
+        functional: false,
+        analytics: true,
+        marketing: false,
+      };
+      const metadata = {
+        ipAddress: '127.0.0.1',
+        userAgent: 'test-agent',
+      };
+
+      mockFromChain.insert.mockResolvedValue({ data: [], error: null });
+
+      await db.recordConsent(userId, consents, metadata);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('user_consents');
+      expect(mockFromChain.insert).toHaveBeenCalledWith([
+        {
+          user_id: userId,
+          consent_type: 'essential',
+          consent_given: true,
+          consent_version: '1.0',
+          ip_address: metadata.ipAddress,
+          user_agent: metadata.userAgent,
+        },
+        {
+          user_id: userId,
+          consent_type: 'functional',
+          consent_given: false,
+          consent_version: '1.0',
+          ip_address: metadata.ipAddress,
+          user_agent: metadata.userAgent,
+        },
+        {
+          user_id: userId,
+          consent_type: 'analytics',
+          consent_given: true,
+          consent_version: '1.0',
+          ip_address: metadata.ipAddress,
+          user_agent: metadata.userAgent,
+        },
+        {
+          user_id: userId,
+          consent_type: 'marketing',
+          consent_given: false,
+          consent_version: '1.0',
+          ip_address: metadata.ipAddress,
+          user_agent: metadata.userAgent,
+        },
+      ]);
+    });
+
+    it('gets user consents', async () => {
+      const userId = 'user-123';
+      
+      mockFromChain.order.mockResolvedValue({
+        data: [
+          {
+            id: 'consent-123',
+            user_id: userId,
+            consent_type: 'essential',
+            consent_given: true,
+            timestamp: '2024-01-01T00:00:00Z',
+          },
+        ],
+        error: null,
+      });
+
+      const consents = await db.getUserConsents(userId);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('user_consents');
+      expect(mockFromChain.eq).toHaveBeenCalledWith('user_id', userId);
+      expect(mockFromChain.order).toHaveBeenCalledWith('timestamp', { ascending: false });
+      expect(consents).toHaveLength(1);
+    });
+
+    it('withdraws consent', async () => {
+      const userId = 'user-123';
+      const consentType = 'marketing';
+      
+      mockFromChain.eq.mockResolvedValue({ data: {}, error: null });
+
+      await db.withdrawConsent(userId, consentType);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('user_consents');
+      expect(mockFromChain.update).toHaveBeenCalledWith({
+        consent_given: false,
+        withdrawal_timestamp: expect.any(String),
+      });
+      expect(mockFromChain.eq).toHaveBeenCalledWith('user_id', userId);
+      expect(mockFromChain.eq).toHaveBeenCalledWith('consent_type', consentType);
+    });
+  });
+
+  describe('Data Processing Logs', () => {
+    it('logs data processing activity', async () => {
+      const logData = {
+        userId: 'user-123',
+        action: 'created' as const,
+        dataType: 'user_data' as const,
+        legalBasis: 'consent' as const,
+        ipAddress: '127.0.0.1',
+        details: 'Test log entry',
+      };
+
+      mockFromChain.insert.mockResolvedValue({ data: {}, error: null });
+
+      await db.logDataProcessing(logData);
+
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('data_processing_logs');
+      expect(mockFromChain.insert).toHaveBeenCalledWith({
+        user_id: logData.userId,
+        action: logData.action,
+        data_type: logData.dataType,
+        legal_basis: logData.legalBasis,
+        ip_address: logData.ipAddress,
+        details: logData.details,
+        processor_id: undefined,
+        timestamp: expect.any(String),
+      });
+    });
+
+    it('handles optional fields in logging', async () => {
+      const logData = {
+        action: 'accessed' as const,
+        dataType: 'reservation' as const,
+        legalBasis: 'legitimate_interest' as const,
+      };
+
+      await db.logDataProcessing(logData);
+
+      expect(mockFromChain.insert).toHaveBeenCalledWith({
+        user_id: undefined,
+        action: logData.action,
+        data_type: logData.dataType,
+        legal_basis: logData.legalBasis,
+        ip_address: undefined,
+        details: undefined,
+        processor_id: undefined,
+        timestamp: expect.any(String),
+      });
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('handles database connection errors', async () => {
+      mockFromChain.single.mockResolvedValue({
+        data: null,
+        error: { message: 'Connection failed' },
+      });
+
+      await expect(db.getUserByEmail('test@example.com'))
+        .rejects.toThrow('Failed to get user: Connection failed');
+    });
+
+    it('handles insert errors', async () => {
+      mockFromChain.single.mockResolvedValue({
+        data: null,
+        error: { message: 'Insert failed' },
+      });
+
+      await expect(db.createUser({
+        email: 'test@example.com',
+        firstName: 'Test',
+        lastName: 'User',
+        consentVersion: '1.0',
+      })).rejects.toThrow('Failed to create user: Insert failed');
+    });
+  });
+});

@@ -1,0 +1,340 @@
+---
+import '@/styles/globals.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  noIndex?: boolean;
+}
+
+const { 
+  title, 
+  description = 'Reservieren Sie Ihr Exemplar des Flaschenpost Magazins - das Magazin für neugierige Eltern und ihre Kinder.',
+  image = '/images/flaschenpost-og-image.jpg',
+  noIndex = false 
+} = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const imageURL = new URL(image, Astro.site);
+---
+
+<!DOCTYPE html>
+<html lang="de" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <!-- Primary Meta Tags -->
+    <title>{title}</title>
+    <meta name="title" content={title} />
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalURL} />
+    
+    <!-- Robots -->
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={imageURL} />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content="Flaschenpost Magazin" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content={description} />
+    <meta property="twitter:image" content={imageURL} />
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#0ea5e9" />
+    <meta name="msapplication-TileColor" content="#0ea5e9" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="/site.webmanifest" />
+    
+    <!-- DNS Prefetch -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Flaschenpost Magazin",
+      "url": Astro.site,
+      "logo": new URL('/images/logo.png', Astro.site),
+      "description": "Das Magazin für neugierige Eltern und ihre Kinder",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+49-123-456789",
+        "contactType": "Customer Service",
+        "areaServed": "DE",
+        "availableLanguage": "German"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "DE",
+        "addressLocality": "Berlin"
+      }
+    })} />
+  </head>
+  
+  <body class="min-h-screen bg-neutral-50 font-sans text-neutral-900">
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">
+      Zum Hauptinhalt springen
+    </a>
+    
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-neutral-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-6">
+          <!-- Logo -->
+          <div class="flex-shrink-0">
+            <a href="/" class="flex items-center focus-visible">
+              <img 
+                src="/images/flaschenpost-logo.svg" 
+                alt="Flaschenpost Magazin Logo"
+                class="h-8 w-auto sm:h-10"
+                width="120"
+                height="40"
+              />
+            </a>
+          </div>
+          
+          <!-- Navigation -->
+          <nav class="hidden sm:flex space-x-8" aria-label="Hauptnavigation">
+            <a 
+              href="/" 
+              class="text-neutral-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors duration-200 focus-visible"
+            >
+              Reservierung
+            </a>
+            <a 
+              href="/about" 
+              class="text-neutral-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors duration-200 focus-visible"
+            >
+              Über uns
+            </a>
+            <a 
+              href="/privacy" 
+              class="text-neutral-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors duration-200 focus-visible"
+            >
+              Datenschutz
+            </a>
+          </nav>
+          
+          <!-- Mobile Menu Button -->
+          <button 
+            id="mobile-menu-button"
+            class="sm:hidden p-2 text-neutral-700 hover:text-primary-600 focus-visible"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+            aria-label="Menü öffnen"
+          >
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <nav 
+          id="mobile-menu" 
+          class="sm:hidden hidden pb-6 space-y-1"
+          aria-label="Mobile Navigation"
+        >
+          <a 
+            href="/" 
+            class="block px-3 py-2 text-base font-medium text-neutral-700 hover:text-primary-600 transition-colors duration-200 focus-visible"
+          >
+            Reservierung
+          </a>
+          <a 
+            href="/about" 
+            class="block px-3 py-2 text-base font-medium text-neutral-700 hover:text-primary-600 transition-colors duration-200 focus-visible"
+          >
+            Über uns
+          </a>
+          <a 
+            href="/privacy" 
+            class="block px-3 py-2 text-base font-medium text-neutral-700 hover:text-primary-600 transition-colors duration-200 focus-visible"
+          >
+            Datenschutz
+          </a>
+        </nav>
+      </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" class="flex-1">
+      <slot />
+    </main>
+    
+    <!-- Footer -->
+    <footer class="bg-neutral-900 text-neutral-300">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Brand -->
+          <div class="space-y-4">
+            <img 
+              src="/images/flaschenpost-logo-white.svg" 
+              alt="Flaschenpost Magazin"
+              class="h-8 w-auto"
+              width="120"
+              height="32"
+            />
+            <p class="text-sm text-neutral-400">
+              Das Magazin für neugierige Eltern und ihre Kinder. 
+              Entdecken, lernen und gemeinsam Spaß haben.
+            </p>
+          </div>
+          
+          <!-- Links -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">
+              Links
+            </h3>
+            <ul class="space-y-2">
+              <li>
+                <a href="/" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                  Reservierung
+                </a>
+              </li>
+              <li>
+                <a href="/about" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                  Über uns
+                </a>
+              </li>
+              <li>
+                <a href="/contact" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                  Kontakt
+                </a>
+              </li>
+            </ul>
+          </div>
+          
+          <!-- Legal -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">
+              Rechtliches
+            </h3>
+            <ul class="space-y-2">
+              <li>
+                <a href="/privacy" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                  Datenschutzerklärung
+                </a>
+              </li>
+              <li>
+                <a href="/terms" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                  Allgemeine Geschäftsbedingungen
+                </a>
+              </li>
+              <li>
+                <a href="/cookies" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                  Cookie-Richtlinie
+                </a>
+              </li>
+              <li>
+                <a href="/imprint" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                  Impressum
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Bottom Bar -->
+        <div class="mt-8 pt-8 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center">
+          <p class="text-sm text-neutral-400">
+            © 2024 Flaschenpost Magazin. Alle Rechte vorbehalten.
+          </p>
+          <div class="mt-4 sm:mt-0 flex space-x-6">
+            <a href="mailto:info@flaschenpost-magazin.de" class="text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+              <span class="sr-only">E-Mail</span>
+              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+    
+    <!-- Scripts -->
+    <script>
+      // Mobile menu toggle
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+      
+      if (mobileMenuButton && mobileMenu) {
+        mobileMenuButton.addEventListener('click', () => {
+          const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+          mobileMenuButton.setAttribute('aria-expanded', (!isExpanded).toString());
+          mobileMenu.classList.toggle('hidden');
+        });
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  /* Custom fonts */
+  @font-face {
+    font-family: 'Inter Variable';
+    src: url('/fonts/Inter-Variable.woff2') format('woff2');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+  
+  /* Smooth scrolling for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Custom focus styles */
+  .focus-visible:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  
+  /* High contrast support */
+  @media (prefers-contrast: high) {
+    .text-neutral-400 {
+      color: #6b7280;
+    }
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    .transition-colors,
+    .transition-all {
+      transition: none;
+    }
+  }
+</style>
