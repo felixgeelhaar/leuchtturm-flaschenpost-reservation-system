@@ -16,7 +16,7 @@ const mockSupabaseClient = {
   lte: vi.fn(() => mockSupabaseClient),
   is: vi.fn(() => mockSupabaseClient),
   single: vi.fn(),
-  order: vi.fn(),
+  order: vi.fn(() => mockSupabaseClient),
   limit: vi.fn(() => mockSupabaseClient),
 };
 
@@ -211,10 +211,16 @@ describe('DatabaseService - Simple Tests', () => {
         updated_at: new Date().toISOString()
       };
 
-      // Mock the sequential calls: getUserByEmail -> createReservation -> logDataProcessing
+      // Mock the sequential calls: getUserByEmail -> insert.select.single -> logDataProcessing
       mockSupabaseClient.single
         .mockResolvedValueOnce({ data: mockUser, error: null })
-        .mockResolvedValueOnce({ data: mockReservation, error: null })
+        .mockResolvedValueOnce({ data: mockReservation, error: null });
+      
+      // Mock the insert.select call for reservation creation
+      mockSupabaseClient.insert.mockReturnValue(mockSupabaseClient);
+      
+      // Mock the insert call for logDataProcessing
+      mockSupabaseClient.insert
         .mockResolvedValueOnce({ data: { id: 'log-123' }, error: null });
 
       const reservation = await db.createReservation(formData);
@@ -243,7 +249,13 @@ describe('DatabaseService - Simple Tests', () => {
       // Mock getUserByEmail to return null (user not found)
       mockSupabaseClient.single.mockResolvedValueOnce({ data: null, error: null });
 
-      await expect(db.createReservation(formData)).rejects.toThrow('User not found');
+      try {
+        await db.createReservation(formData);
+        expect.fail('Expected createReservation to throw an error');
+      } catch (error) {
+        expect(error).toBeInstanceOf(Error);
+        expect((error as Error).message).toBe('User not found');
+      }
     });
   });
 

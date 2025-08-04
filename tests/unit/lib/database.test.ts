@@ -382,7 +382,10 @@ describe('DatabaseService', () => {
       const reservationId = 'reservation-123';
       const userId = 'user-123';
       
-      mockFromChain.eq.mockResolvedValue({ data: {}, error: null });
+      // Mock the promise resolution for the entire chain
+      Object.assign(mockFromChain, {
+        then: vi.fn((onResolve) => onResolve({ data: {}, error: null }))
+      });
 
       await db.cancelReservation(reservationId, userId);
 
@@ -476,7 +479,10 @@ describe('DatabaseService', () => {
       const userId = 'user-123';
       const consentType = 'marketing';
       
-      mockFromChain.eq.mockResolvedValue({ data: {}, error: null });
+      // Mock the promise resolution for the entire chain
+      Object.assign(mockFromChain, {
+        then: vi.fn((onResolve) => onResolve({ data: {}, error: null }))
+      });
 
       await db.withdrawConsent(userId, consentType);
 
@@ -487,6 +493,7 @@ describe('DatabaseService', () => {
       });
       expect(mockFromChain.eq).toHaveBeenCalledWith('user_id', userId);
       expect(mockFromChain.eq).toHaveBeenCalledWith('consent_type', consentType);
+      expect(mockFromChain.is).toHaveBeenCalledWith('withdrawal_timestamp', null);
     });
   });
 
