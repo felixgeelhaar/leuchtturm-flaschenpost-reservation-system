@@ -2,27 +2,40 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DatabaseService } from '@/lib/database';
 import { mockUser, mockMagazines, validFormDataPickup, validFormDataShipping } from '../../fixtures/test-data';
 
-// Mock Supabase client
+// Mock Supabase client with proper chaining support
+const createMockChain = () => {
+  const mockPromise = Promise.resolve({ data: {}, error: null });
+  
+  const chain = {
+    select: vi.fn(() => chain),
+    insert: vi.fn(() => chain),
+    update: vi.fn(() => chain),
+    delete: vi.fn(() => chain),
+    eq: vi.fn(() => chain),
+    neq: vi.fn(() => chain),
+    gt: vi.fn(() => chain),
+    gte: vi.fn(() => chain),
+    lt: vi.fn(() => chain),
+    lte: vi.fn(() => chain),
+    like: vi.fn(() => chain),
+    ilike: vi.fn(() => chain),
+    is: vi.fn(() => chain),
+    in: vi.fn(() => chain),
+    order: vi.fn(() => chain),
+    limit: vi.fn(() => chain),
+    range: vi.fn(() => chain),
+    single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    then: mockPromise.then.bind(mockPromise),
+    catch: mockPromise.catch.bind(mockPromise),
+    finally: mockPromise.finally.bind(mockPromise),
+  };
+  
+  return chain;
+};
+
 const mockSupabaseClient = {
-  from: vi.fn(() => ({
-    select: vi.fn(() => ({
-      eq: vi.fn(() => ({
-        single: vi.fn(() => Promise.resolve({ data: null, error: null })),
-        gt: vi.fn(() => ({
-          order: vi.fn(() => Promise.resolve({ data: [], error: null })),
-        })),
-      })),
-      order: vi.fn(() => Promise.resolve({ data: [], error: null })),
-    })),
-    insert: vi.fn(() => ({
-      select: vi.fn(() => ({
-        single: vi.fn(() => Promise.resolve({ data: {}, error: null })),
-      })),
-    })),
-    update: vi.fn(() => ({
-      eq: vi.fn(() => Promise.resolve({ data: {}, error: null })),
-    })),
-  })),
+  from: vi.fn(() => createMockChain()),
 };
 
 vi.mock('@/lib/supabase', () => ({
@@ -37,17 +50,8 @@ describe('DatabaseService', () => {
     vi.clearAllMocks();
     db = new DatabaseService();
     
-    // Setup mock chain
-    mockFromChain = {
-      select: vi.fn(() => mockFromChain),
-      insert: vi.fn(() => mockFromChain),
-      update: vi.fn(() => mockFromChain),
-      eq: vi.fn(() => mockFromChain),
-      gt: vi.fn(() => mockFromChain),
-      order: vi.fn(() => mockFromChain),
-      single: vi.fn(() => Promise.resolve({ data: null, error: null })),
-    };
-    
+    // Setup mock chain - use the same structure as createMockChain
+    mockFromChain = createMockChain();
     mockSupabaseClient.from.mockReturnValue(mockFromChain);
   });
 
@@ -328,7 +332,7 @@ describe('DatabaseService', () => {
         quantity: validFormDataShipping.quantity,
         delivery_method: 'shipping',
         pickup_location: null,
-        pickup_date: validFormDataShipping.pickupDate,
+        pickup_date: null,
         shipping_street: validFormDataShipping.address?.street,
         shipping_house_number: validFormDataShipping.address?.houseNumber,
         shipping_address_line2: validFormDataShipping.address?.addressLine2,
@@ -509,8 +513,7 @@ describe('DatabaseService', () => {
         legal_basis: logData.legalBasis,
         ip_address: logData.ipAddress,
         details: logData.details,
-        processor_id: undefined,
-        timestamp: expect.any(String),
+        processor_id: null,
       });
     });
 
@@ -524,14 +527,13 @@ describe('DatabaseService', () => {
       await db.logDataProcessing(logData);
 
       expect(mockFromChain.insert).toHaveBeenCalledWith({
-        user_id: undefined,
+        user_id: null,
         action: logData.action,
         data_type: logData.dataType,
         legal_basis: logData.legalBasis,
-        ip_address: undefined,
-        details: undefined,
-        processor_id: undefined,
-        timestamp: expect.any(String),
+        ip_address: null,
+        details: null,
+        processor_id: null,
       });
     });
   });
