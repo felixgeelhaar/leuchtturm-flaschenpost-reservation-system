@@ -2,9 +2,41 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DatabaseService } from '@/lib/database';
 import type { Magazine, ReservationFormData } from '@/types';
 
+// Create mock chain helper function
+const createMockChain = () => {
+  const mockPromise = Promise.resolve({ data: {}, error: null });
+  
+  const chain = {
+    select: vi.fn(() => chain),
+    insert: vi.fn(() => chain),
+    update: vi.fn(() => chain),
+    delete: vi.fn(() => chain),
+    eq: vi.fn(() => chain),
+    neq: vi.fn(() => chain),
+    gt: vi.fn(() => chain),
+    gte: vi.fn(() => chain),
+    lt: vi.fn(() => chain),
+    lte: vi.fn(() => chain),
+    like: vi.fn(() => chain),
+    ilike: vi.fn(() => chain),
+    is: vi.fn(() => chain),
+    in: vi.fn(() => chain),
+    order: vi.fn(() => chain),
+    limit: vi.fn(() => chain),
+    range: vi.fn(() => chain),
+    single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    then: mockPromise.then.bind(mockPromise),
+    catch: mockPromise.catch.bind(mockPromise),
+    finally: mockPromise.finally.bind(mockPromise),
+  };
+  
+  return chain;
+};
+
 // Mock Supabase client with comprehensive method coverage
 const mockSupabaseClient = {
-  from: vi.fn(() => mockSupabaseClient),
+  from: vi.fn(() => createMockChain()),
   select: vi.fn(() => mockSupabaseClient),
   insert: vi.fn(() => mockSupabaseClient),
   update: vi.fn(() => mockSupabaseClient),
@@ -211,17 +243,24 @@ describe('DatabaseService - Simple Tests', () => {
         updated_at: new Date().toISOString()
       };
 
-      // Mock the sequential calls: getUserByEmail -> insert.select.single -> logDataProcessing
-      mockSupabaseClient.single
-        .mockResolvedValueOnce({ data: mockUser, error: null })
-        .mockResolvedValueOnce({ data: mockReservation, error: null });
+      // Mock the sequential calls with different database operations
+      // First call: getUserByEmail
+      const getUserChain = createMockChain();
+      getUserChain.single.mockResolvedValueOnce({ data: mockUser, error: null });
       
-      // Mock the insert.select call for reservation creation
-      mockSupabaseClient.insert.mockReturnValue(mockSupabaseClient);
+      // Second call: createReservation insert
+      const reservationChain = createMockChain();
+      reservationChain.single.mockResolvedValueOnce({ data: mockReservation, error: null });
       
-      // Mock the insert call for logDataProcessing
-      mockSupabaseClient.insert
-        .mockResolvedValueOnce({ data: { id: 'log-123' }, error: null });
+      // Third call: logDataProcessing insert
+      const logChain = createMockChain();
+      logChain.mockResolvedValueOnce({ data: { id: 'log-123' }, error: null });
+
+      // Setup mockSupabaseClient.from to return appropriate chains in sequence
+      mockSupabaseClient.from
+        .mockReturnValueOnce(getUserChain)    // For getUserByEmail
+        .mockReturnValueOnce(reservationChain) // For createReservation
+        .mockReturnValueOnce(logChain);       // For logDataProcessing
 
       const reservation = await db.createReservation(formData);
 
@@ -247,15 +286,11 @@ describe('DatabaseService - Simple Tests', () => {
       };
 
       // Mock getUserByEmail to return null (user not found)
-      mockSupabaseClient.single.mockResolvedValueOnce({ data: null, error: null });
+      const getUserChain = createMockChain();
+      getUserChain.single.mockResolvedValueOnce({ data: null, error: null });
+      mockSupabaseClient.from.mockReturnValueOnce(getUserChain);
 
-      try {
-        await db.createReservation(formData);
-        expect.fail('Expected createReservation to throw an error');
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error);
-        expect((error as Error).message).toBe('User not found');
-      }
+      await expect(db.createReservation(formData)).rejects.toThrow('User not found');
     });
   });
 
