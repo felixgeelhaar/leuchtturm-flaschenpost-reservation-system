@@ -303,28 +303,8 @@ CREATE POLICY processing_logs_admin_only ON data_processing_logs
 CREATE POLICY magazines_public_read ON magazines
     FOR SELECT USING (is_active = TRUE);
 
--- Insert sample data for development
-INSERT INTO magazines (id, title, issue_number, publish_date, description, total_copies, available_copies, cover_image_url) VALUES
-(
-    uuid_generate_v4(),
-    'Flaschenpost',
-    '2024-01',
-    '2024-02-01',
-    'Das Magazin für neugierige Eltern und ihre Kinder. Diese Ausgabe behandelt spannende Experimente für zu Hause.',
-    100,
-    95,
-    '/images/flaschenpost-2024-01-cover.jpg'
-),
-(
-    uuid_generate_v4(),
-    'Flaschenpost',
-    '2024-02',
-    '2024-03-01',
-    'Frühlingsausgabe mit Gartenprojekten und Naturentdeckungen für die ganze Familie.',
-    100,
-    100,
-    '/images/flaschenpost-2024-02-cover.jpg'
-);
+-- NO SAMPLE DATA IN PRODUCTION
+-- Magazines should be added manually through the Supabase dashboard or admin interface
 
 -- Create database views for common queries
 CREATE VIEW active_magazines AS
