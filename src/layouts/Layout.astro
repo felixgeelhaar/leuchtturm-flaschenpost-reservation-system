@@ -61,6 +61,13 @@ const imageURL = new URL(image, Astro.site);
     
     <!-- Preload Critical Resources -->
     <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/images/leuchtturm-logo-large.svg" as="image" />
+    
+    <!-- Resource Hints -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    {import.meta.env.PUBLIC_SUPABASE_URL && (
+      <link rel="preconnect" href={new URL(import.meta.env.PUBLIC_SUPABASE_URL).origin} />
+    )}
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#0ea5e9" />
@@ -72,8 +79,34 @@ const imageURL = new URL(image, Astro.site);
     <!-- Manifest -->
     <link rel="manifest" href="/site.webmanifest" />
     
-    <!-- DNS Prefetch -->
-    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <!-- Critical CSS inlining -->
+    <style>
+      /* Critical above-the-fold styles */
+      body { 
+        font-family: Inter, system-ui, sans-serif; 
+        margin: 0; 
+        background: #fafafa;
+      }
+      .nautical-bg {
+        background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%);
+      }
+      /* Skip link styles */
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        z-index: 999;
+        padding: 8px 16px;
+        background: #1d4ed8;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        border-radius: 0 0 4px 4px;
+      }
+      .skip-link:focus {
+        left: 6px;
+        top: 6px;
+      }
+    </style>
     
     <!-- Structured Data -->
     <script type="application/ld+json" set:html={JSON.stringify({
@@ -197,6 +230,7 @@ const imageURL = new URL(image, Astro.site);
               class="h-8 w-auto"
               width="120"
               height="32"
+              loading="lazy"
             />
             <p class="text-sm text-neutral-400">
               Das Magazin für neugierige Eltern und ihre Kinder. 

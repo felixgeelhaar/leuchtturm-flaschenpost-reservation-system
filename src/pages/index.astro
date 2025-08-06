@@ -71,6 +71,8 @@ const totalPrice = getTotalPrice();
             width="600"
             height="400"
             loading="eager"
+            fetchpriority="high"
+            decoding="async"
           />
           <!-- Optional: Add magazine cover as overlay -->
           {images.magazineCover && (
@@ -218,9 +220,9 @@ const totalPrice = getTotalPrice();
         </p>
       </div>
 
-      <ErrorBoundary client:load>
+      <ErrorBoundary client:visible>
         <ReservationForm 
-          client:load 
+          client:visible
           magazines={magazines}
         />
       </ErrorBoundary>
