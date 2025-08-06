@@ -22,6 +22,55 @@ main {
   min-height: auto !important;
 }
 
+/* Fix for scrolling issues - ensure form doesn't move */
+#reservation-form {
+  position: static !important;
+}
+
+/* Prevent animated elements from interfering with scroll */
+.bubbles .bubble,
+.floating,
+.floating-slow,
+.floating-delayed,
+.seagull {
+  pointer-events: none !important;
+  will-change: transform;
+}
+
+/* Ensure sections have proper positioning */
+section {
+  position: static !important;
+}
+
+/* Fix footer positioning to ensure scroll works */
+footer {
+  position: static !important;
+  margin-top: 2rem;
+  padding-bottom: 2rem; /* Extra space for scrolling */
+}
+
+/* Add bottom padding to main to ensure footer is reachable */
+main {
+  padding-bottom: 2rem;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .bubbles .bubble,
+  .floating,
+  .floating-slow,
+  .floating-delayed,
+  .ship-rock,
+  .seagull,
+  .fish,
+  [class*="animation"],
+  [class*="animate"] {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Custom CSS Variables */
 :root {
   --font-inter: 'Inter Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
