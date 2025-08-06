@@ -2,6 +2,7 @@
 import Layout from '@/layouts/Layout.astro';
 import ReservationForm from '@/components/ReservationForm.vue';
 import ConsentBanner from '@/components/ConsentBanner.vue';
+import ErrorBoundary from '@/components/ErrorBoundary.vue';
 import { DatabaseService } from '@/lib/database';
 import { kindergarten, magazine, homepage, faq, images, getFormattedPrice, getTotalPrice } from '@/config/content';
 
@@ -203,11 +204,13 @@ const totalPrice = getTotalPrice();
         </p>
       </div>
       
-      <ReservationForm 
-        client:load 
-        magazines={magazines}
-        transition:persist
-      />
+      <ErrorBoundary client:load>
+        <ReservationForm 
+          client:load 
+          magazines={magazines}
+          transition:persist
+        />
+      </ErrorBoundary>
     </div>
   </section>
 

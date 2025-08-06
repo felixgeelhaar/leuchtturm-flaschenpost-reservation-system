@@ -7,7 +7,6 @@
 
 import { z } from "zod";
 import "dotenv/config";
-console.log(process.env);
 // =============================================================================
 // ENVIRONMENT SCHEMAS
 // =============================================================================
@@ -331,6 +330,15 @@ export function validateRequiredEnvVars() {
     "CSRF_SECRET",
   ];
 
+  const productionRequiredVars = [
+    "SMTP_HOST",
+    "SMTP_USER",
+    "SMTP_PASS", 
+    "SMTP_FROM",
+    "PRIVACY_CONTACT_EMAIL",
+    "COOKIE_DOMAIN",
+  ];
+
   // Check public vars
   for (const varName of requiredVars) {
     if (!import.meta.env[varName] && !process.env[varName]) {
@@ -345,6 +353,44 @@ export function validateRequiredEnvVars() {
         throw new Error(
           `Required server environment variable ${varName} is not set`,
         );
+      }
+    }
+    
+    // Additional production validation
+    for (const varName of productionRequiredVars) {
+      if (!process.env[varName]) {
+        throw new Error(
+          `Required production environment variable ${varName} is not set`,
+        );
+      }
+    }
+    
+    // Validate secret lengths for security
+    const secrets = ["JWT_SECRET", "SESSION_SECRET", "ENCRYPTION_KEY", "CSRF_SECRET"];
+    for (const secretName of secrets) {
+      const secret = process.env[secretName];
+      if (secret && secret.length < 32) {
+        throw new Error(
+          `${secretName} must be at least 32 characters long for security`,
+        );
+      }
+    }
+    
+    // Validate URLs format
+    const urls = ["PUBLIC_SUPABASE_URL", "SITE_URL"];
+    for (const urlName of urls) {
+      const url = process.env[urlName] || import.meta.env?.[urlName];
+      if (url && !url.match(/^https?:\/\//)) {
+        throw new Error(`${urlName} must be a valid HTTP/HTTPS URL`);
+      }
+    }
+    
+    // Validate email format
+    const emails = ["SMTP_FROM", "PRIVACY_CONTACT_EMAIL"];
+    for (const emailName of emails) {
+      const email = process.env[emailName];
+      if (email && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        throw new Error(`${emailName} must be a valid email address`);
       }
     }
   }

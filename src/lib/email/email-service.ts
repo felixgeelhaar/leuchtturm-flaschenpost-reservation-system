@@ -28,7 +28,7 @@ export class EmailService {
 
   constructor(config?: EmailConfig) {
     // Use environment variables for configuration
-    const emailConfig = config || {
+    const emailConfig2 = config || {
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
       secure: process.env.SMTP_SECURE === 'true',
@@ -36,17 +36,17 @@ export class EmailService {
         user: process.env.SMTP_USER || '',
         pass: process.env.SMTP_PASS || '',
       },
-      from: process.env.SMTP_FROM || emailConfig.senderEmail,
+      from: process.env.SMTP_FROM || 'noreply@example.com',
     };
 
-    this.fromAddress = emailConfig.from;
+    this.fromAddress = emailConfig2.from;
 
     // Create transporter
     this.transporter = nodemailer.createTransport({
-      host: emailConfig.host,
-      port: emailConfig.port,
-      secure: emailConfig.secure,
-      auth: emailConfig.auth,
+      host: emailConfig2.host,
+      port: emailConfig2.port,
+      secure: emailConfig2.secure,
+      auth: emailConfig2.auth,
       // Additional options for better deliverability
       pool: true,
       maxConnections: 5,

@@ -53,9 +53,8 @@ const imageURL = new URL(image, Astro.site);
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={imageURL} />
     
-    <!-- Security Headers -->
+    <!-- Security Headers (X-Frame-Options should be set via HTTP header, not meta tag) -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
     
@@ -261,13 +260,21 @@ const imageURL = new URL(image, Astro.site);
         });
       }
     </script>
+    
+    <!-- Error Handling Setup -->
+    <script>
+      import { setupGlobalErrorHandlers } from '@/lib/error-handling';
+      
+      // Initialize global error handlers
+      setupGlobalErrorHandlers();
+    </script>
   </body>
 </html>
 
 <style>
   /* Custom fonts */
   @font-face {
-    font-family: 'Inter Variable';
+    font-family: 'Inter';
     src: url('/fonts/Inter-Variable.woff2') format('woff2');
     font-weight: 100 900;
     font-style: normal;

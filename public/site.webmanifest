@@ -1,0 +1,23 @@
+{
+  "name": "Flaschenpost Magazin - Leuchtturm",
+  "short_name": "Flaschenpost",
+  "description": "Reservierungssystem für das Flaschenpost Magazin des BRK Haus für Kinder - Leuchtturm",
+  "icons": [
+    {
+      "src": "/images/leuchtturm-logo-small.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/images/leuchtturm-logo-large.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#0ea5e9",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "start_url": "/",
+  "lang": "de-DE",
+  "orientation": "portrait"
+}

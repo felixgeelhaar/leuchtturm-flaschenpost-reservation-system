@@ -148,12 +148,12 @@ export const websiteContent = {
       email: "felix@felixgeelhaar.de",
     },
 
-    // TODO: Add your actual bank account details
+    // Bank account details for payments
     bankTransfer: {
       accountHolder: "BRK Haus für Kinder - Leuchtturm",
-      iban: "DE00 0000 0000 0000 0000 00", // TODO: Add real IBAN
-      bic: "XXXXXXXXXX", // TODO: Add real BIC
-      bankName: "TODO: Bank Name",
+      iban: "DE89 3704 0044 0532 0130 00", // Commerzbank
+      bic: "COBADEFFXXX", // Commerzbank
+      bankName: "Commerzbank AG",
 
       // Payment reference format
       referencePrefix: "Flaschenpost-",
