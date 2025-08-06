@@ -48,7 +48,6 @@ export const websiteContent = {
         'Jahresrückblick mit den Highlights des Kindergartenjahres',
         'Unsere Vorschulkinder – Vorstellung der Kinder, die nun in die Schule kommen',
         'Abschiedsseite vom Elternbeirat',
-        '',
       ],
 
       // Number of pages
