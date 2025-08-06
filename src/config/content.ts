@@ -169,8 +169,8 @@ export const websiteContent = {
   email: {
     // TODO: Update email settings
     senderName: "Kindergarten Leuchtturm",
-    senderEmail: "leuchtturm-elternbeirat@gmail.com", // TODO: Add your domain
-    replyToEmail: "leuchtturm-elternbeirat@gmail.com", // TODO: Where should replies go?
+    senderEmail: process.env.SMTP_FROM || "noreply@your-domain.de",
+    replyToEmail: process.env.SMTP_FROM || "noreply@your-domain.de",
 
     // Email signature
     signature: {

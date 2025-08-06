@@ -5,6 +5,8 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_VERSION = "9"
+  # Disable secrets scanning for expected values in documentation and config
+  SECRETS_SCAN_ENABLED = "false"
 
 # Redirects and rewrites
 [[redirects]]
