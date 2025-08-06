@@ -199,7 +199,7 @@ export class BackupManager {
    * Perform backup operation
    */
   public async performBackup(
-    type: 'database' | 'files' | 'config' | 'full'
+    type: 'database' | 'files' | 'config' | 'full',
   ): Promise<BackupMetadata> {
     if (this.isRunning) {
       throw new Error('Backup already in progress');
@@ -714,7 +714,7 @@ export class DisasterRecoveryManager {
    */
   public async executeRecovery(
     procedureId?: string,
-    options: { dryRun?: boolean; skipSteps?: string[] } = {}
+    options: { dryRun?: boolean; skipSteps?: string[] } = {},
   ): Promise<void> {
     const { dryRun = false, skipSteps = [] } = options;
 
@@ -741,7 +741,7 @@ export class DisasterRecoveryManager {
 
   private async executeProcedure(
     procedure: RecoveryProcedure,
-    options: { dryRun: boolean; skipSteps: string[] }
+    options: { dryRun: boolean; skipSteps: string[] },
   ): Promise<void> {
     monitoring.logger.info(`Executing recovery procedure: ${procedure.name}`, {
       extra: { procedureId: procedure.id, estimatedTime: procedure.estimatedTime },

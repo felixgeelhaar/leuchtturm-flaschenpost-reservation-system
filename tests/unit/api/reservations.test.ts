@@ -5,15 +5,25 @@ const mockUser = {
   email: 'test@example.com',
   firstName: 'Test',
   lastName: 'User',
-  phone: '+49123456789',
-  createdAt: '2024-01-01T00:00:00Z'
+  consentVersion: '1.0',
+  consentTimestamp: '2024-01-01T00:00:00Z',
+  lastActivity: '2024-01-01T00:00:00Z',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
 };
 
 const mockMagazines = [{
   id: '123e4567-e89b-12d3-a456-426614174000',
   title: 'Test Magazine',
   issueNumber: '2024-01',
-  availableCopies: 10
+  publishDate: '2024-01-01T00:00:00Z',
+  description: 'Test Magazine',
+  coverImageUrl: 'https://example.com/cover.jpg',
+  availableCopies: 10,
+  totalCopies: 100,
+  isActive: true,
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
 }];
 
 const validFormDataPickup = {
@@ -28,8 +38,8 @@ const validFormDataPickup = {
     essential: true,
     functional: false,
     analytics: false,
-    marketing: false
-  }
+    marketing: false,
+  },
 };
 
 const validFormDataShipping = {
@@ -44,14 +54,14 @@ const validFormDataShipping = {
     houseNumber: '123',
     postalCode: '10115',
     city: 'Berlin',
-    country: 'DE'
+    country: 'DE',
   },
   consents: { 
     essential: true,
     functional: false,
     analytics: false,
-    marketing: false
-  }
+    marketing: false,
+  },
 };
 
 // Create mock database methods
@@ -166,7 +176,6 @@ describe('/api/reservations', () => {
         email: testData.email,
         firstName: testData.firstName,
         lastName: testData.lastName,
-        phone: testData.phone,
         address: undefined,
         consentVersion: '1.0',
       });
@@ -177,7 +186,7 @@ describe('/api/reservations', () => {
         expect.objectContaining({
           ipAddress: '192.168.1.100',
           userAgent: 'test-agent',
-        })
+        }),
       );
       expect(mockDb.logDataProcessing).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -185,7 +194,7 @@ describe('/api/reservations', () => {
           action: 'reservation_created',
           dataType: 'reservation',
           legalBasis: 'consent',
-        })
+        }),
       );
     });
 
@@ -211,7 +220,7 @@ describe('/api/reservations', () => {
         email: validFormDataShipping.email,
         firstName: validFormDataShipping.firstName,
         lastName: validFormDataShipping.lastName,
-        phone: validFormDataShipping.phone,
+        // phone removed from form data
         address: validFormDataShipping.address,
         consentVersion: '1.0',
       });
@@ -465,28 +474,7 @@ describe('/api/reservations', () => {
       expect(response.headers.get('X-Frame-Options')).toBe('DENY');
     });
 
-    it('validates phone number format', async () => {
-      const invalidPhoneData = {
-        ...validFormDataPickup,
-        phone: '0123456789', // starts with 0, should be invalid
-      };
-
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.113',
-        },
-        body: JSON.stringify(invalidPhoneData),
-      });
-
-      const response = await POST({ request } as any);
-      const result = await response.json();
-
-      expect(response.status).toBe(400);
-      expect(result.success).toBe(false);
-      expect(result.errors.some((e: any) => e.field === 'phone')).toBe(true);
-    });
+    // Phone validation test removed - phone field no longer in form
 
     it('validates quantity limits', async () => {
       const invalidQuantityData = {
@@ -722,7 +710,7 @@ describe('/api/reservations', () => {
         validFormDataPickup.consents,
         expect.objectContaining({
           ipAddress: 'unknown',
-        })
+        }),
       );
     });
 
@@ -750,7 +738,7 @@ describe('/api/reservations', () => {
       expect(mockDb.createReservation).toHaveBeenCalledWith(
         expect.objectContaining({
           notes: 'Important delivery instructions',
-        })
+        }),
       );
     });
 
@@ -876,7 +864,7 @@ describe('/api/reservations', () => {
           dataType: 'processing_log',
           legalBasis: 'legitimate_interest',
           details: expect.stringContaining('Database error'),
-        })
+        }),
       );
     });
 
@@ -1051,7 +1039,7 @@ describe('/api/reservations', () => {
       expect(mockDb.logDataProcessing).toHaveBeenCalledWith(
         expect.objectContaining({
           ipAddress: 'unknown',
-        })
+        }),
       );
     });
   });

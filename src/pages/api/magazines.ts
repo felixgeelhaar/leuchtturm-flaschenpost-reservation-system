@@ -19,7 +19,7 @@ export const GET: APIRoute = async ({ request }) => {
         dataType: 'user_data', // magazines are public but we log access
         legalBasis: 'legitimate_interest',
         ipAddress: clientIP,
-        details: JSON.stringify({ endpoint: '/api/magazines' })
+        details: JSON.stringify({ endpoint: '/api/magazines' }),
       });
 
       magazines = await db.getActiveMagazines();
@@ -33,7 +33,7 @@ export const GET: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: true,
         data: magazines,
-        count: magazines.length
+        count: magazines.length,
       }),
       {
         status: 200,
@@ -41,9 +41,9 @@ export const GET: APIRoute = async ({ request }) => {
           'Content-Type': 'application/json',
           'Cache-Control': 'public, max-age=300', // Cache for 5 minutes
           'X-Content-Type-Options': 'nosniff',
-          'X-Frame-Options': 'DENY'
-        }
-      }
+          'X-Frame-Options': 'DENY',
+        },
+      },
     );
 
   } catch (error) {
@@ -53,14 +53,14 @@ export const GET: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Failed to fetch magazines',
-        message: 'Es ist ein Fehler beim Laden der Magazin-Ausgaben aufgetreten.'
+        message: 'Es ist ein Fehler beim Laden der Magazin-Ausgaben aufgetreten.',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+          'Content-Type': 'application/json',
+        },
+      },
     );
   }
 };

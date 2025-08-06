@@ -7,7 +7,7 @@ import type {
   ConsentRecord, 
   DataProcessingLog,
   ReservationFormData,
-  ConsentData 
+  ConsentData, 
 } from '@/types';
 
 // Server-side database operations
@@ -44,7 +44,7 @@ export class DatabaseService {
         city: userData.address?.city,
         country: userData.address?.country,
         consent_version: userData.consentVersion,
-        data_retention_until: this.calculateRetentionDate()
+        data_retention_until: this.calculateRetentionDate(),
       })
       .select()
       .single();
@@ -143,7 +143,7 @@ export class DatabaseService {
         shipping_country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
         notes: formData.notes || null,
         consent_reference: consentReference,
-        expires_at: expiresAt.toISOString()
+        expires_at: expiresAt.toISOString(),
       })
       .select(`
         *,
@@ -174,8 +174,8 @@ export class DatabaseService {
       details: JSON.stringify({ 
         reservationId: data.id,
         magazineId: formData.magazineId,
-        quantity: formData.quantity 
-      })
+        quantity: formData.quantity, 
+      }),
     });
 
     return this.mapReservationFromDB(data);
@@ -215,7 +215,7 @@ export class DatabaseService {
       action: 'reservation_cancelled',
       dataType: 'reservation',
       legalBasis: 'user_request',
-      details: JSON.stringify({ reservationId })
+      details: JSON.stringify({ reservationId }),
     });
   }
 
@@ -223,7 +223,7 @@ export class DatabaseService {
   async recordConsent(
     userId: string, 
     consents: ConsentData, 
-    metadata: { ipAddress?: string; userAgent?: string }
+    metadata: { ipAddress?: string; userAgent?: string },
   ): Promise<void> {
     const consentRecords = Object.entries(consents).map(([type, given]) => ({
       user_id: userId,
@@ -231,7 +231,7 @@ export class DatabaseService {
       consent_given: given,
       consent_version: '1.0',
       ip_address: metadata.ipAddress || null,
-      user_agent: metadata.userAgent || null
+      user_agent: metadata.userAgent || null,
     }));
 
     const { error } = await this.supabase
@@ -246,7 +246,7 @@ export class DatabaseService {
       dataType: 'consent',
       legalBasis: 'consent',
       ipAddress: metadata.ipAddress,
-      details: JSON.stringify(consents)
+      details: JSON.stringify(consents),
     });
   }
 
@@ -266,7 +266,7 @@ export class DatabaseService {
       .from('user_consents')
       .update({ 
         consent_given: false,
-        withdrawal_timestamp: new Date().toISOString()
+        withdrawal_timestamp: new Date().toISOString(),
       })
       .eq('user_id', userId)
       .eq('consent_type', consentType)
@@ -279,7 +279,7 @@ export class DatabaseService {
       action: 'consent_withdrawn',
       dataType: 'consent',
       legalBasis: 'user_request',
-      details: JSON.stringify({ consentType })
+      details: JSON.stringify({ consentType }),
     });
   }
 
@@ -311,7 +311,7 @@ export class DatabaseService {
       exportDate: new Date().toISOString(),
       userData: userData ? this.mapUserFromDB(userData) : null,
       reservations: reservations?.map(this.mapReservationFromDB) || [],
-      consents: consents?.map(this.mapConsentFromDB) || []
+      consents: consents?.map(this.mapConsentFromDB) || [],
     };
 
     // Log the data export
@@ -320,7 +320,7 @@ export class DatabaseService {
       action: 'exported',
       dataType: 'user_data',
       legalBasis: 'user_request',
-      details: JSON.stringify({ exportSize: JSON.stringify(exportData).length })
+      details: JSON.stringify({ exportSize: JSON.stringify(exportData).length }),
     });
 
     return exportData;
@@ -339,7 +339,7 @@ export class DatabaseService {
       .from('data_processing_logs')
       .update({ 
         user_id: null,
-        details: JSON.stringify({ anonymized: true, reason })
+        details: JSON.stringify({ anonymized: true, reason }),
       })
       .eq('user_id', userId);
 
@@ -356,7 +356,7 @@ export class DatabaseService {
       action: 'deleted',
       dataType: 'user_data',
       legalBasis: 'user_request',
-      details: JSON.stringify({ originalUserId: userId, reason })
+      details: JSON.stringify({ originalUserId: userId, reason }),
     });
   }
 
@@ -379,7 +379,7 @@ export class DatabaseService {
         legal_basis: log.legalBasis,
         processor_id: log.processorId || null,
         ip_address: log.ipAddress || null,
-        details: log.details || null
+        details: log.details || null,
       });
 
     if (error) {
@@ -406,7 +406,7 @@ export class DatabaseService {
       consentVersion: data.consent_version,
       consentTimestamp: data.consent_timestamp,
       dataRetentionUntil: data.data_retention_until,
-      lastActivity: data.last_activity
+      lastActivity: data.last_activity,
     };
   }
 
@@ -422,7 +422,7 @@ export class DatabaseService {
       coverImageUrl: data.cover_image_url,
       isActive: data.is_active,
       createdAt: data.created_at,
-      updatedAt: data.updated_at
+      updatedAt: data.updated_at,
     };
   }
 
@@ -450,7 +450,7 @@ export class DatabaseService {
       consentReference: data.consent_reference,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
-      expiresAt: data.expires_at
+      expiresAt: data.expires_at,
     };
   }
 
@@ -464,7 +464,7 @@ export class DatabaseService {
       timestamp: data.timestamp,
       ipAddress: data.ip_address,
       userAgent: data.user_agent,
-      withdrawalTimestamp: data.withdrawal_timestamp
+      withdrawalTimestamp: data.withdrawal_timestamp,
     };
   }
 
@@ -512,7 +512,7 @@ export class DatabaseService {
     return {
       expiredReservations: expiredReservations?.length || 0,
       deletedUsers: deletedUsersCount,
-      cleanedLogs: cleanedLogs?.length || 0
+      cleanedLogs: cleanedLogs?.length || 0,
     };
   }
 }

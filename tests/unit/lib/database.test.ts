@@ -7,14 +7,25 @@ const mockUser = {
   firstName: 'Test',
   lastName: 'User',
   phone: '+49123456789',
-  createdAt: '2024-01-01T00:00:00Z'
+  consentVersion: '1.0',
+  consentTimestamp: '2024-01-01T00:00:00Z',
+  lastActivity: '2024-01-01T00:00:00Z',
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
 };
 
 const mockMagazines = [{
   id: '123e4567-e89b-12d3-a456-426614174000',
   title: 'Test Magazine',
   issueNumber: '2024-01',
-  availableCopies: 10
+  publishDate: '2024-01-01T00:00:00Z',
+  description: 'Test Magazine',
+  coverImageUrl: 'https://example.com/cover.jpg',
+  availableCopies: 10,
+  totalCopies: 100,
+  isActive: true,
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: '2024-01-01T00:00:00Z',
 }];
 
 const validFormDataPickup = {
@@ -23,9 +34,9 @@ const validFormDataPickup = {
   email: 'john@example.com',
   magazineId: '123e4567-e89b-12d3-a456-426614174000',
   quantity: 1,
-  deliveryMethod: 'pickup',
+  deliveryMethod: 'pickup' as const,
   pickupLocation: 'Berlin Mitte',
-  consents: { essential: true, functional: false, analytics: false, marketing: false }
+  consents: { essential: true, functional: false, analytics: false, marketing: false },
 };
 
 const validFormDataShipping = {
@@ -34,22 +45,23 @@ const validFormDataShipping = {
   email: 'jane@example.com',
   magazineId: '123e4567-e89b-12d3-a456-426614174000',
   quantity: 2,
-  deliveryMethod: 'shipping',
+  deliveryMethod: 'shipping' as const,
+  pickupLocation: '',
   address: {
     street: 'Test Street',
     houseNumber: '123',
     postalCode: '10115',
     city: 'Berlin',
-    country: 'DE'
+    country: 'DE',
   },
-  consents: { essential: true, functional: false, analytics: false, marketing: false }
+  consents: { essential: true, functional: false, analytics: false, marketing: false },
 };
 
 // Mock Supabase client with proper chaining support
-const createMockChain = () => {
+const createMockChain = (): any => {
   const mockPromise = Promise.resolve({ data: {}, error: null });
   
-  const chain = {
+  const chain: any = {
     select: vi.fn(() => chain),
     insert: vi.fn(() => chain),
     update: vi.fn(() => chain),
@@ -340,7 +352,7 @@ describe('DatabaseService', () => {
           pickup_location: validFormDataPickup.pickupLocation,
           consent_reference: expect.any(String),
           expires_at: expect.any(String),
-        })
+        }),
       );
     });
 
@@ -376,7 +388,7 @@ describe('DatabaseService', () => {
           shipping_country: validFormDataShipping.address?.country,
           consent_reference: expect.any(String),
           expires_at: expect.any(String),
-        })
+        }),
       );
     });
 
@@ -419,7 +431,7 @@ describe('DatabaseService', () => {
       
       // Mock the promise resolution for the entire chain
       Object.assign(mockFromChain, {
-        then: vi.fn((onResolve) => onResolve({ data: {}, error: null }))
+        then: vi.fn((onResolve) => onResolve({ data: {}, error: null })),
       });
 
       await db.cancelReservation(reservationId, userId);
@@ -516,7 +528,7 @@ describe('DatabaseService', () => {
       
       // Mock the promise resolution for the entire chain
       Object.assign(mockFromChain, {
-        then: vi.fn((onResolve) => onResolve({ data: {}, error: null }))
+        then: vi.fn((onResolve) => onResolve({ data: {}, error: null })),
       });
 
       await db.withdrawConsent(userId, consentType);

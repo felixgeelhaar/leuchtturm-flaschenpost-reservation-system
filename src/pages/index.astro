@@ -24,8 +24,12 @@ const totalPrice = getTotalPrice();
   title={`${magazine.title} reservieren - ${kindergarten.name}`}
   description={magazine.currentIssue.description}
 >
-  <!-- Hero Section -->
-  <section class="relative bg-gradient-to-br from-primary-50 to-secondary-50 py-12 sm:py-16 lg:py-20 overflow-hidden">
+  <!-- Hero Section with Nautical Theme -->
+  <section class="relative bg-gradient-to-br from-white via-sky-50 to-blue-50 py-12 sm:py-16 lg:py-20">
+    <!-- Floating decorative elements -->
+    <div class="absolute top-10 left-10 text-6xl opacity-20 floating-slow">⚓</div>
+    <div class="absolute bottom-10 right-10 text-6xl opacity-20 floating-delayed">🐚</div>
+    <div class="absolute top-20 right-20 seagull">🦅</div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <!-- Content -->
@@ -44,7 +48,7 @@ const totalPrice = getTotalPrice();
           <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <a 
               href="#reservation-form" 
-              class="btn-primary btn-lg w-full sm:w-auto"
+              class="btn-nautical btn-lg w-full sm:w-auto text-white"
               onclick="document.getElementById('reservation-form').scrollIntoView({ behavior: 'smooth' })"
             >
               {homepage.hero.ctaText}
@@ -58,8 +62,8 @@ const totalPrice = getTotalPrice();
           </div>
         </div>
         
-        <!-- Hero Image -->
-        <div class="relative">
+        <!-- Hero Image with nautical decoration -->
+        <div class="relative ship-rock">
           <img 
             src={images.heroImage}
             alt={`${magazine.title} Magazin`}
@@ -86,8 +90,10 @@ const totalPrice = getTotalPrice();
     </div>
   </section>
 
-  <!-- About Section -->
-  <section id="about-magazine" class="py-16 lg:py-20 bg-white">
+  <!-- About Section with beach theme -->
+  <section id="about-magazine" class="py-16 lg:py-20 bg-gradient-to-b from-white to-yellow-50/30 relative">
+    <!-- Beach decorations -->
+    <div class="absolute bottom-0 left-0 right-0 h-32 treasure-map-bg opacity-10"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
@@ -100,8 +106,8 @@ const totalPrice = getTotalPrice();
       
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         {homepage.about.features.map((feature) => (
-          <div class="text-center">
-            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div class="text-center nautical-card p-6">
+            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 porthole">
               <svg class="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
               </svg>
@@ -116,8 +122,8 @@ const totalPrice = getTotalPrice();
         ))}
       </div>
       
-      <!-- Magazine Details -->
-      <div class="mt-16 p-8 bg-neutral-50 rounded-lg">
+      <!-- Magazine Details with message bottle style -->
+      <div class="mt-16 p-8 message-bottle rounded-lg">
         <h3 class="text-2xl font-bold text-neutral-900 mb-6">
           {magazine.title} - {magazine.currentIssue.issueNumber}
         </h3>
@@ -162,8 +168,10 @@ const totalPrice = getTotalPrice();
     </div>
   </section>
 
-  <!-- Process Section -->
-  <section class="py-16 lg:py-20 bg-neutral-50">
+  <!-- Process Section with compass theme -->
+  <section class="py-16 lg:py-20 bg-gradient-to-b from-yellow-50/30 to-sky-50 relative">
+    <!-- Compass decoration -->
+    <div class="absolute top-10 right-10 compass-rose opacity-20"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
@@ -175,7 +183,7 @@ const totalPrice = getTotalPrice();
         {homepage.process.steps.map((step) => (
           <div class="relative">
             <div class="text-center">
-              <div class="w-16 h-16 bg-primary-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold life-ring">
                 {step.number}
               </div>
               <h3 class="text-xl font-semibold text-neutral-900 mb-2">
@@ -192,8 +200,14 @@ const totalPrice = getTotalPrice();
   </section>
   
 
-  <!-- Reservation Form Section -->
-  <section id="reservation-form" class="py-16 lg:py-20 bg-white">
+  <!-- Reservation Form Section with lighthouse theme -->
+  <section id="reservation-form" class="py-16 lg:py-20 bg-white relative bubbles">
+    <!-- Bubble animations -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
@@ -203,19 +217,24 @@ const totalPrice = getTotalPrice();
           Füllen Sie das Formular aus, um Ihr Exemplar des {magazine.title} Magazins zu reservieren.
         </p>
       </div>
-      
+
       <ErrorBoundary client:load>
         <ReservationForm 
           client:load 
           magazines={magazines}
-          transition:persist
         />
       </ErrorBoundary>
     </div>
   </section>
 
-  <!-- FAQ Section -->
-  <section class="py-16 lg:py-20 bg-neutral-50">
+  <!-- FAQ Section with wave animations -->
+  <section class="py-16 lg:py-20 bg-gradient-to-b from-sky-50 to-white relative">
+    <!-- Wave decoration at bottom -->
+    <div class="wave-container absolute bottom-0 left-0 right-0">
+      <div class="wave wave-1"></div>
+      <div class="wave wave-2"></div>
+      <div class="wave wave-3"></div>
+    </div>
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
@@ -228,7 +247,7 @@ const totalPrice = getTotalPrice();
       
       <div class="space-y-6">
         {faq.map((item) => (
-          <details class="card p-6">
+          <details class="nautical-card p-6">
             <summary class="font-semibold text-lg text-neutral-900 cursor-pointer hover:text-primary-600 transition-colors">
               {item.question}
             </summary>
@@ -241,8 +260,14 @@ const totalPrice = getTotalPrice();
     </div>
   </section>
 
-  <!-- Info Section -->
-  <section class="py-12 bg-white border-t border-neutral-200">
+  <!-- Info Section with lighthouse beacon -->
+  <section class="py-12 bg-gradient-to-b from-white to-sky-50 border-t border-sky-200 relative">
+    <!-- Lighthouse beacon effect -->
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 lighthouse-beacon opacity-10">
+      <svg class="w-96 h-96" viewBox="0 0 100 100">
+        <use href="/images/nautical-icons.svg#lighthouse"></use>
+      </svg>
+    </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center">
         <div class="space-y-2">

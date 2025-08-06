@@ -1,5 +1,6 @@
 ---
 import '@/styles/globals.css';
+import '@/styles/nautical-theme.css';
 import { kindergarten, images } from '@/config/content';
 
 export interface Props {
@@ -97,23 +98,25 @@ const imageURL = new URL(image, Astro.site);
     })} />
   </head>
   
-  <body class="min-h-screen bg-neutral-50 font-sans text-neutral-900">
+  <body class="bg-neutral-50 font-sans text-neutral-900 nautical-bg">
     <!-- Skip Link for Accessibility -->
     <a href="#main-content" class="skip-link">
       Zum Hauptinhalt springen
     </a>
     
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-neutral-200">
+    <!-- Header with nautical theme -->
+    <header class="bg-white shadow-sm border-b border-primary-200 relative overflow-hidden">
+      <!-- Wave decoration at top -->
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-300 via-primary-400 to-primary-300"></div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-6">
-          <!-- Logo -->
+          <!-- Logo with lighthouse beacon effect -->
           <div class="flex-shrink-0">
-            <a href="/" class="flex items-center focus-visible">
+            <a href="/" class="flex items-center focus-visible lighthouse-beacon">
               <img 
                 src={images.kindergartenLogo} 
                 alt={`${kindergarten.name} Logo`}
-                class="h-8 w-auto sm:h-10"
+                class="h-10 w-auto sm:h-12 floating"
                 width="120"
                 height="40"
               />
@@ -124,13 +127,13 @@ const imageURL = new URL(image, Astro.site);
           <nav class="hidden sm:flex space-x-8" aria-label="Hauptnavigation">
             <a 
               href="#reservation-form" 
-              class="text-neutral-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors duration-200 focus-visible"
+              class="text-ocean-dark hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200 focus-visible hover:transform hover:scale-105"
             >
               Reservierung
             </a>
             <a 
               href="#about-magazine" 
-              class="text-neutral-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors duration-200 focus-visible"
+              class="text-ocean-dark hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200 focus-visible hover:transform hover:scale-105"
             >
               Über das Magazin
             </a>
@@ -177,8 +180,13 @@ const imageURL = new URL(image, Astro.site);
       <slot />
     </main>
     
-    <!-- Footer -->
-    <footer class="bg-neutral-900 text-neutral-300">
+    <!-- Footer with wave pattern -->
+    <footer class="bg-gradient-to-b from-primary-800 to-primary-950 text-white relative">
+      <!-- Wave decoration at top -->
+      <div class="wave-container absolute -top-1 left-0 right-0">
+        <div class="wave wave-1"></div>
+        <div class="wave wave-2"></div>
+      </div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <!-- Brand -->
@@ -229,7 +237,7 @@ const imageURL = new URL(image, Astro.site);
         </div>
         
         <!-- Bottom Bar -->
-        <div class="mt-8 pt-8 border-t border-neutral-800 flex flex-col sm:flex-row justify-between items-center">
+        <div class="mt-8 pt-8 border-t border-primary-700 flex flex-col sm:flex-row justify-between items-center rope-border">
           <p class="text-sm text-neutral-400">
             © 2024 Flaschenpost Magazin. Alle Rechte vorbehalten.
           </p>

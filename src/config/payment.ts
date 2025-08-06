@@ -45,7 +45,7 @@ Verwendungszweck: Reservierung {{reservationId}}
 Das Magazin wird nach Zahlungseingang versandt.
 
 Mit freundlichen Grüßen
-BRK Haus für Kinder - Leuchtturm`
+BRK Haus für Kinder - Leuchtturm`,
     },
     bankTransfer: {
       subject: 'Ihre Flaschenpost Magazin Reservierung - Zahlungsinformationen',
@@ -66,7 +66,7 @@ Verwendungszweck: {{reference}}{{reservationId}}
 Das Magazin wird nach Zahlungseingang versandt.
 
 Mit freundlichen Grüßen
-BRK Haus für Kinder - Leuchtturm`
+BRK Haus für Kinder - Leuchtturm`,
     },
     confirmation: {
       subject: 'Ihre Flaschenpost Magazin Reservierung - Bestätigung',
@@ -79,9 +79,9 @@ Abholort: BRK Haus für Kinder - Leuchtturm
 Das Abholdatum wird Ihnen rechtzeitig mitgeteilt.
 
 Mit freundlichen Grüßen
-BRK Haus für Kinder - Leuchtturm`
-    }
-  }
+BRK Haus für Kinder - Leuchtturm`,
+    },
+  },
 };
 
 // Helper function to generate payment reference
@@ -93,7 +93,7 @@ export function generatePaymentReference(reservationId: string): string {
 export function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('de-DE', {
     style: 'currency',
-    currency: 'EUR'
+    currency: 'EUR',
   }).format(amount);
 }
 

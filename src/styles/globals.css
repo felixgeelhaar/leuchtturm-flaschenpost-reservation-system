@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure scrolling is enabled */
+html {
+  overflow-x: hidden;
+  overflow-y: auto !important;
+}
+
+body {
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  min-height: 100vh;
+}
+
 /* Custom CSS Variables */
 :root {
   --font-inter: 'Inter Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

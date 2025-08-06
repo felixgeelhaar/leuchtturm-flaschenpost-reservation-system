@@ -39,7 +39,7 @@ console.log('- Rotate keys regularly\n');
 const readline = require('readline');
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 rl.question('Create a .env.production file with these keys? (y/N): ', (answer) => {

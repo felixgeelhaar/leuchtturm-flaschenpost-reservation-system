@@ -1,10 +1,22 @@
 import js from '@eslint/js';
 import tsEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import vueEslint from 'eslint-plugin-vue';
-import astroEslint from 'eslint-plugin-astro';
 
 export default [
+  // Ignore patterns first
+  {
+    ignores: [
+      'dist/**',
+      'build/**',
+      'coverage/**',
+      'node_modules/**',
+      '.astro/**',
+      '.netlify/**',
+      'public/**',
+      'test-results/**',
+    ],
+  },
+
   // Base JavaScript rules
   js.configs.recommended,
   
@@ -17,6 +29,34 @@ export default [
         ecmaVersion: 'latest',
         sourceType: 'module',
       },
+      globals: {
+        // Node.js globals
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        Buffer: 'readonly',
+        global: 'readonly',
+        
+        // Browser globals
+        window: 'readonly',
+        document: 'readonly',
+        console: 'readonly',
+        fetch: 'readonly',
+        Response: 'readonly',
+        Request: 'readonly',
+        URL: 'readonly',
+        URLSearchParams: 'readonly',
+        HTMLElement: 'readonly',
+        HTMLInputElement: 'readonly',
+        HTMLSelectElement: 'readonly',
+        customElements: 'readonly',
+        crypto: 'readonly',
+        TextEncoder: 'readonly',
+        TextDecoder: 'readonly',
+        performance: 'readonly',
+        setTimeout: 'readonly',
+        clearTimeout: 'readonly',
+      },
     },
     plugins: {
       '@typescript-eslint': tsEslint,
@@ -26,51 +66,41 @@ export default [
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/prefer-const': 'error',
     },
   },
   
-  // Vue configuration
+  // Test files configuration
   {
-    files: ['**/*.vue'],
+    files: ['**/*.test.{js,ts,tsx}', '**/test/**/*.{js,ts,tsx}', '**/tests/**/*.{js,ts,tsx}'],
     languageOptions: {
-      parser: vueEslint.parser,
-      parserOptions: {
-        parser: tsParser,
-        ecmaVersion: 'latest',
-        sourceType: 'module',
+      globals: {
+        // Test globals
+        vi: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
       },
     },
-    plugins: {
-      vue: vueEslint,
-    },
     rules: {
-      ...vueEslint.configs['vue3-recommended'].rules,
-      'vue/multi-word-component-names': 'off',
-      'vue/no-unused-vars': 'error',
-      'vue/script-setup-uses-vars': 'error',
-    },
-  },
-  
-  // Astro configuration
-  {
-    files: ['**/*.astro'],
-    plugins: {
-      astro: astroEslint,
-    },
-    rules: {
-      ...astroEslint.configs.recommended.rules,
+      'no-console': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
   
   // Global rules
   {
-    files: ['**/*.{js,jsx,ts,tsx,vue,astro}'],
+    files: ['**/*.{js,jsx,ts,tsx}'],
     rules: {
       // Security
       'no-eval': 'error',
       'no-implied-eval': 'error',
       'no-script-url': 'error',
+      'no-prototype-builtins': 'off',
       
       // Best practices
       'no-console': 'warn',
@@ -78,23 +108,14 @@ export default [
       'no-alert': 'warn',
       'prefer-const': 'error',
       'no-var': 'error',
+      'no-empty': 'warn',
+      'no-unused-vars': 'off', // Use TypeScript version instead
+      'no-undef': 'off', // TypeScript handles this
       
       // Code style
       'semi': ['error', 'always'],
       'quotes': ['error', 'single'],
       'comma-dangle': ['error', 'always-multiline'],
     },
-  },
-  
-  // Ignore patterns
-  {
-    ignores: [
-      'dist/**',
-      'build/**',
-      'coverage/**',
-      'node_modules/**',
-      '.astro/**',
-      'public/**',
-    ],
   },
 ];

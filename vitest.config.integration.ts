@@ -20,7 +20,7 @@ export default defineConfig({
     environment: 'happy-dom',
     setupFiles: ['./tests/setup.ts'],
     include: [
-      'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'
+      'tests/integration/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
     ],
     exclude: [
       'node_modules',
@@ -28,7 +28,7 @@ export default defineConfig({
       '.astro',
       'tests/e2e/**/*',
       'tests/unit/**/*',
-      'dimensional-debris/**/*'
+      'dimensional-debris/**/*',
     ],
     coverage: {
       provider: 'v8',
@@ -42,16 +42,16 @@ export default defineConfig({
         'coverage/',
         '**/*.d.ts',
         '**/*.config.*',
-        '**/types/**'
+        '**/types/**',
       ],
       thresholds: {
         global: {
           branches: 70,
           functions: 70,
           lines: 70,
-          statements: 70
-        }
-      }
+          statements: 70,
+        },
+      },
     },
     testTimeout: 15000,
     hookTimeout: 15000,
@@ -62,14 +62,14 @@ export default defineConfig({
       SUPABASE_ANON_KEY: 'test-anon-key',
       SUPABASE_SERVICE_ROLE_KEY: 'test-service-role-key',
       VITE_SUPABASE_URL: 'https://test.supabase.co',
-      VITE_SUPABASE_ANON_KEY: 'test-anon-key'
+      VITE_SUPABASE_ANON_KEY: 'test-anon-key',
     },
     reporter: ['verbose', 'json'],
     outputFile: {
-      json: './coverage/integration-test-results.json'
-    }
+      json: './coverage/integration-test-results.json',
+    },
   },
   optimizeDeps: {
-    include: ['vue', '@vue/test-utils', 'zod']
-  }
+    include: ['vue', '@vue/test-utils', 'zod'],
+  },
 });

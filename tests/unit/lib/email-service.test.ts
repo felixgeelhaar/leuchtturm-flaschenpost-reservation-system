@@ -93,11 +93,11 @@ Erhalt: ${isShipping ? 'Versand nach Hause' : 'Abholung vor Ort'}`;
       text += `\n\nLieferadresse:\n${reservation.shippingAddress.street} ${reservation.shippingAddress.houseNumber}\n${reservation.shippingAddress.postalCode} ${reservation.shippingAddress.city}`;
     }
 
-    text += `\n\nMit freundlichen Grüßen,\nIhr Flaschenpost Team`;
+    text += '\n\nMit freundlichen Grüßen,\nIhr Flaschenpost Team';
 
     try {
       await this.mockTransporter.sendMail({
-        from: `"Flaschenpost Magazin" <noreply@test.com>`,
+        from: '"Flaschenpost Magazin" <noreply@test.com>',
         to: user.email,
         subject,
         html,
@@ -214,15 +214,16 @@ vi.mock('@/lib/email/email-service', () => ({
 const EmailService = MockEmailService;
 
 describe('EmailService', () => {
-  let emailService: EmailService;
+  let emailService: InstanceType<typeof EmailService>;
 
   const mockUser: User = {
     id: 'user-123',
     email: 'test@example.com',
     firstName: 'Test',
     lastName: 'User',
-    phone: '+49123456789',
     consentVersion: '1.0',
+    consentTimestamp: new Date().toISOString(),
+    lastActivity: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -231,13 +232,11 @@ describe('EmailService', () => {
     id: 'mag-123',
     title: 'Flaschenpost',
     issueNumber: '2024-01',
+    publishDate: new Date().toISOString(),
     description: 'Test Magazine',
     coverImageUrl: 'https://example.com/cover.jpg',
     availableCopies: 50,
     totalCopies: 100,
-    releaseDate: new Date().toISOString(),
-    reservationStartDate: new Date().toISOString(),
-    reservationEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     isActive: true,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -249,9 +248,11 @@ describe('EmailService', () => {
     magazineId: mockMagazine.id,
     quantity: 2,
     status: 'pending',
+    reservationDate: new Date().toISOString(),
     deliveryMethod: 'pickup',
     pickupLocation: 'Berlin Mitte',
-    pickupDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+    pickupDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    consentReference: 'consent-ref-123',
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -263,6 +264,7 @@ describe('EmailService', () => {
     magazineId: mockMagazine.id,
     quantity: 1,
     status: 'pending',
+    reservationDate: new Date().toISOString(),
     deliveryMethod: 'shipping',
     shippingAddress: {
       street: 'Test Street',
@@ -271,6 +273,7 @@ describe('EmailService', () => {
       city: 'Berlin',
       country: 'DE',
     },
+    consentReference: 'consent-ref-456',
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -327,7 +330,7 @@ describe('EmailService', () => {
           subject: 'Ihre Reservierung für Flaschenpost - Ausgabe 2024-01',
           html: expect.stringContaining('Reservierung bestätigt'),
           text: expect.stringContaining('Reservierung bestätigt'),
-        })
+        }),
       );
     });
 
@@ -342,7 +345,7 @@ describe('EmailService', () => {
         expect.objectContaining({
           html: expect.stringContaining('Lieferadresse'),
           text: expect.stringContaining('Lieferadresse'),
-        })
+        }),
       );
     });
 
@@ -378,7 +381,7 @@ describe('EmailService', () => {
           reservation: mockReservationPickup,
           user: mockUser,
           magazine: mockMagazine,
-        })
+        }),
       ).rejects.toThrow('Email konnte nicht gesendet werden');
     });
   });
@@ -396,7 +399,7 @@ describe('EmailService', () => {
           subject: 'Reservierung storniert: Flaschenpost - 2024-01',
           html: expect.stringContaining('Reservierung storniert'),
           text: expect.stringContaining('Reservierung storniert'),
-        })
+        }),
       );
     });
 
@@ -409,7 +412,7 @@ describe('EmailService', () => {
           reservation: mockReservationPickup,
           user: mockUser,
           magazine: mockMagazine,
-        })
+        }),
       ).resolves.not.toThrow();
     });
   });
@@ -427,7 +430,7 @@ describe('EmailService', () => {
           subject: 'Erinnerung: Abholung Flaschenpost - 2024-01',
           html: expect.stringContaining('Erinnerung'),
           text: expect.stringContaining('Erinnerung'),
-        })
+        }),
       );
     });
 

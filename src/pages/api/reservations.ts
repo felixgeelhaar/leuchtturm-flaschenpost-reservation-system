@@ -13,7 +13,7 @@ const addressSchema = z.object({
   postalCode: z.string().min(4, 'Postleitzahl muss mindestens 4 Zeichen lang sein').max(20, 'Postleitzahl ist zu lang').trim(),
   city: z.string().min(1, 'Stadt ist erforderlich').max(100, 'Stadt ist zu lang').trim(),
   country: z.string().length(2, 'Ungültiger Ländercode').refine(val => ['DE', 'AT', 'CH'].includes(val), 'Land wird nicht unterstützt'),
-  addressLine2: z.string().max(200, 'Adresszusatz ist zu lang').optional().transform(val => val?.trim() || undefined)
+  addressLine2: z.string().max(200, 'Adresszusatz ist zu lang').optional().transform(val => val?.trim() || undefined),
 }).optional();
 
 // Validation schema for reservation data
@@ -45,7 +45,7 @@ const reservationSchema = z.object({
     .min(1, 'Mindestens 1 Exemplar erforderlich')
     .max(5, 'Maximal 5 Exemplare pro Reservierung'),
   deliveryMethod: z.enum(['pickup', 'shipping'], {
-    errorMap: () => ({ message: 'Ungültige Liefermethode' })
+    errorMap: () => ({ message: 'Ungültige Liefermethode' }),
   }),
   pickupLocation: z.string()
     .max(200, 'Abholort ist zu lang')
@@ -68,8 +68,8 @@ const reservationSchema = z.object({
     essential: z.boolean().refine(val => val === true, 'Erforderliche Einwilligung muss erteilt werden'),
     functional: z.boolean(),
     analytics: z.boolean(),
-    marketing: z.boolean()
-  })
+    marketing: z.boolean(),
+  }),
 }).refine((data) => {
   // If pickup method, pickupLocation is required
   if (data.deliveryMethod === 'pickup') {
@@ -78,7 +78,7 @@ const reservationSchema = z.object({
   return true;
 }, {
   message: 'Bitte wählen Sie einen Abholort',
-  path: ['pickupLocation']
+  path: ['pickupLocation'],
 }).refine((data) => {
   // If shipping method, address is required
   if (data.deliveryMethod === 'shipping') {
@@ -92,7 +92,7 @@ const reservationSchema = z.object({
   return true;
 }, {
   message: 'Lieferadresse ist bei Versand erforderlich',
-  path: ['address']
+  path: ['address'],
 });
 
 // Rate limiting (simple in-memory implementation)
@@ -130,15 +130,15 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Rate limit exceeded',
-          message: 'Zu viele Anfragen. Bitte versuchen Sie es in 15 Minuten erneut.'
+          message: 'Zu viele Anfragen. Bitte versuchen Sie es in 15 Minuten erneut.',
         }),
         {
           status: 429,
           headers: {
             'Content-Type': 'application/json',
-            'Retry-After': '900' // 15 minutes
-          }
-        }
+            'Retry-After': '900', // 15 minutes
+          },
+        },
       );
     }
 
@@ -149,12 +149,12 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Invalid content type',
-          message: 'Content-Type muss application/json sein.'
+          message: 'Content-Type muss application/json sein.',
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -167,12 +167,12 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Invalid JSON',
-          message: 'Ungültiger JSON-Body.'
+          message: 'Ungültiger JSON-Body.',
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -181,7 +181,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (!validationResult.success) {
       const errors = validationResult.error.errors.map(err => ({
         field: err.path.join('.'),
-        message: err.message
+        message: err.message,
       }));
 
       return new Response(
@@ -189,12 +189,12 @@ export const POST: APIRoute = async ({ request }) => {
           success: false,
           error: 'Validation failed',
           message: 'Eingabedaten sind ungültig.',
-          errors
+          errors,
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -207,12 +207,12 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Magazine not found',
-          message: 'Die gewählte Magazin-Ausgabe ist nicht verfügbar.'
+          message: 'Die gewählte Magazin-Ausgabe ist nicht verfügbar.',
         }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' }
-        }
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -221,12 +221,12 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Insufficient copies',
-          message: `Nur noch ${magazine.availableCopies} Exemplare verfügbar.`
+          message: `Nur noch ${magazine.availableCopies} Exemplare verfügbar.`,
         }),
         {
           status: 409,
-          headers: { 'Content-Type': 'application/json' }
-        }
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -240,13 +240,13 @@ export const POST: APIRoute = async ({ request }) => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         address: formData.deliveryMethod === 'shipping' ? formData.address : undefined,
-        consentVersion: '1.0'
+        consentVersion: '1.0',
       });
 
       // Record initial consent
       await db.recordConsent(user.id, formData.consents, {
         ipAddress: clientIP,
-        userAgent
+        userAgent,
       });
     } else {
       // Update existing user activity
@@ -261,7 +261,7 @@ export const POST: APIRoute = async ({ request }) => {
           !latestConsent.consentGiven) {
         await db.recordConsent(user.id, formData.consents, {
           ipAddress: clientIP,
-          userAgent
+          userAgent,
         });
       }
     }
@@ -284,8 +284,8 @@ export const POST: APIRoute = async ({ request }) => {
       details: JSON.stringify({
         reservationId: reservation.id,
         magazineTitle: magazine.title,
-        quantity: formData.quantity
-      })
+        quantity: formData.quantity,
+      }),
     });
 
     return new Response(
@@ -297,19 +297,19 @@ export const POST: APIRoute = async ({ request }) => {
           expiresAt: reservation.expiresAt,
           magazine: {
             title: magazine.title,
-            issueNumber: magazine.issueNumber
-          }
+            issueNumber: magazine.issueNumber,
+          },
         },
-        message: 'Reservierung erfolgreich erstellt!'
+        message: 'Reservierung erfolgreich erstellt!',
       }),
       {
         status: 201,
         headers: {
           'Content-Type': 'application/json',
           'X-Content-Type-Options': 'nosniff',
-          'X-Frame-Options': 'DENY'
-        }
-      }
+          'X-Frame-Options': 'DENY',
+        },
+      },
     );
 
   } catch (error) {
@@ -323,8 +323,8 @@ export const POST: APIRoute = async ({ request }) => {
       details: JSON.stringify({
         error: error instanceof Error ? error.message : 'Unknown error',
         endpoint: '/api/reservations',
-        method: 'POST'
-      })
+        method: 'POST',
+      }),
     }).catch(logError => {
       console.error('Failed to log error:', logError);
     });
@@ -333,12 +333,12 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Internal server error',
-        message: 'Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.'
+        message: 'Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.',
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
+        headers: { 'Content-Type': 'application/json' },
+      },
     );
   }
 };
@@ -347,13 +347,13 @@ export const POST: APIRoute = async ({ request }) => {
 async function sendConfirmationEmail(
   user: any, 
   reservation: any, 
-  magazine: any
+  magazine: any,
 ): Promise<void> {
   try {
     await emailService.sendReservationConfirmation({
       reservation,
       user,
-      magazine
+      magazine,
     });
     
     // Confirmation email sent successfully
@@ -379,21 +379,21 @@ export const GET: APIRoute = async ({ request, url }) => {
       dataType: 'reservation',
       legalBasis: 'legitimate_interest',
       ipAddress: clientIP,
-      details: JSON.stringify({ endpoint: '/api/reservations', method: 'GET' })
+      details: JSON.stringify({ endpoint: '/api/reservations', method: 'GET' }),
     });
 
     return new Response(
       JSON.stringify({
         success: true,
         data: [],
-        message: 'Authentication required for this endpoint'
+        message: 'Authentication required for this endpoint',
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+          'Content-Type': 'application/json',
+        },
+      },
     );
 
   } catch (error) {
@@ -403,14 +403,14 @@ export const GET: APIRoute = async ({ request, url }) => {
       JSON.stringify({
         success: false,
         error: 'Internal server error',
-        message: 'Es ist ein Fehler beim Laden der Reservierungen aufgetreten.'
+        message: 'Es ist ein Fehler beim Laden der Reservierungen aufgetreten.',
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+          'Content-Type': 'application/json',
+        },
+      },
     );
   }
 };

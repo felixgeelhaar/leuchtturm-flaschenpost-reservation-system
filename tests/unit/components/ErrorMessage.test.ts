@@ -6,7 +6,7 @@ describe('ErrorMessage Component', () => {
   describe('Rendering', () => {
     it('should not render when no error is provided', () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: '' }
+        props: { error: '' },
       });
 
       expect(wrapper.find('[role="alert"]').exists()).toBe(false);
@@ -15,7 +15,7 @@ describe('ErrorMessage Component', () => {
 
     it('should not render when error is null', () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: null }
+        props: { error: null },
       });
 
       expect(wrapper.find('[role="alert"]').exists()).toBe(false);
@@ -23,7 +23,7 @@ describe('ErrorMessage Component', () => {
 
     it('should not render when error is undefined', () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: undefined }
+        props: { error: undefined },
       });
 
       expect(wrapper.find('[role="alert"]').exists()).toBe(false);
@@ -32,7 +32,7 @@ describe('ErrorMessage Component', () => {
     it('should render error message when error is provided', () => {
       const errorMessage = 'This field is required';
       const wrapper = mount(ErrorMessage, {
-        props: { error: errorMessage }
+        props: { error: errorMessage },
       });
 
       const errorElement = wrapper.find('[role="alert"]');
@@ -43,7 +43,7 @@ describe('ErrorMessage Component', () => {
 
     it('should have correct CSS classes for styling', () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: 'Test error' }
+        props: { error: 'Test error' },
       });
 
       const errorElement = wrapper.find('[role="alert"]');
@@ -57,7 +57,7 @@ describe('ErrorMessage Component', () => {
   describe('Accessibility', () => {
     it('should have proper ARIA attributes', () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: 'Validation error' }
+        props: { error: 'Validation error' },
       });
 
       const errorElement = wrapper.find('[role="alert"]');
@@ -67,7 +67,7 @@ describe('ErrorMessage Component', () => {
 
     it('should be announced to screen readers', () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: 'Field validation failed' }
+        props: { error: 'Field validation failed' },
       });
 
       const errorElement = wrapper.find('[role="alert"]');
@@ -79,16 +79,16 @@ describe('ErrorMessage Component', () => {
     it('should accept string error prop', () => {
       const errorMessage = 'String error message';
       const wrapper = mount(ErrorMessage, {
-        props: { error: errorMessage }
+        props: { error: errorMessage },
       });
 
-      expect(wrapper.props('error')).toBe(errorMessage);
+      expect((wrapper.props() as any).error).toBe(errorMessage);
       expect(wrapper.text()).toContain(errorMessage);
     });
 
     it('should handle empty string gracefully', () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: '' }
+        props: { error: '' },
       });
 
       expect(wrapper.find('[role="alert"]').exists()).toBe(false);
@@ -96,7 +96,7 @@ describe('ErrorMessage Component', () => {
 
     it('should handle whitespace-only strings', () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: '   ' }
+        props: { error: '   ' },
       });
 
       // Whitespace-only strings should be treated as valid errors
@@ -107,7 +107,7 @@ describe('ErrorMessage Component', () => {
   describe('Reactivity', () => {
     it('should show error when prop changes from empty to error', async () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: '' }
+        props: { error: '' },
       });
 
       expect(wrapper.find('[role="alert"]').exists()).toBe(false);
@@ -121,7 +121,7 @@ describe('ErrorMessage Component', () => {
 
     it('should hide error when prop changes from error to empty', async () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: 'Initial error' }
+        props: { error: 'Initial error' },
       });
 
       expect(wrapper.find('[role="alert"]').exists()).toBe(true);
@@ -133,7 +133,7 @@ describe('ErrorMessage Component', () => {
 
     it('should update error message when prop changes', async () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: 'First error' }
+        props: { error: 'First error' },
       });
 
       expect(wrapper.text()).toContain('First error');
@@ -149,7 +149,7 @@ describe('ErrorMessage Component', () => {
     it('should handle very long error messages', () => {
       const longError = 'This is a very long error message that might cause layout issues if not handled properly. '.repeat(10);
       const wrapper = mount(ErrorMessage, {
-        props: { error: longError }
+        props: { error: longError },
       });
 
       const errorElement = wrapper.find('[role="alert"]');
@@ -160,7 +160,7 @@ describe('ErrorMessage Component', () => {
     it('should handle special characters in error messages', () => {
       const specialCharError = 'Error with special chars: <>&"\'';
       const wrapper = mount(ErrorMessage, {
-        props: { error: specialCharError }
+        props: { error: specialCharError },
       });
 
       const errorElement = wrapper.find('[role="alert"]');
@@ -171,7 +171,7 @@ describe('ErrorMessage Component', () => {
     it('should handle HTML in error messages safely', () => {
       const htmlError = '<script>alert("xss")</script>Safe error message';
       const wrapper = mount(ErrorMessage, {
-        props: { error: htmlError }
+        props: { error: htmlError },
       });
 
       const errorElement = wrapper.find('[role="alert"]');
@@ -186,7 +186,7 @@ describe('ErrorMessage Component', () => {
   describe('Performance', () => {
     it('should not cause unnecessary re-renders', async () => {
       const wrapper = mount(ErrorMessage, {
-        props: { error: 'Test error' }
+        props: { error: 'Test error' },
       });
 
       const initialHtml = wrapper.html();

@@ -28,7 +28,7 @@ export interface ImageOptimizationOptions {
  */
 export function getOptimizedImageProps(
   src: string,
-  options: ImageOptimizationOptions
+  options: ImageOptimizationOptions,
 ): Record<string, any> {
   const {
     width = 800,
@@ -73,7 +73,7 @@ export class LazyLoader {
           rootMargin: '50px 0px',
           threshold: 0.01,
           ...options,
-        }
+        },
       );
     }
   }
@@ -142,7 +142,7 @@ export class LazyLoader {
  */
 export async function dynamicImport<T = any>(
   importFn: () => Promise<T>,
-  fallback?: T
+  fallback?: T,
 ): Promise<T> {
   try {
     const module = await importFn();
@@ -486,7 +486,7 @@ export class PerformanceMonitor {
 
   private measureCLS(): void {
     let clsValue = 0;
-    let clsEntries: any[] = [];
+    const clsEntries: any[] = [];
 
     const observer = new PerformanceObserver((list) => {
       const entries = list.getEntries();

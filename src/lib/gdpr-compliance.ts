@@ -13,7 +13,7 @@ export class GDPRComplianceManager {
       ipAddress?: string; 
       userAgent?: string; 
       timestamp?: string 
-    } = {}
+    } = {},
   ): Promise<void> {
     const consentData = {
       userId,
@@ -21,7 +21,7 @@ export class GDPRComplianceManager {
       version: this.CONSENT_VERSION,
       timestamp: metadata.timestamp || new Date().toISOString(),
       ipAddress: metadata.ipAddress || this.getClientIP(),
-      userAgent: metadata.userAgent || navigator.userAgent
+      userAgent: metadata.userAgent || navigator.userAgent,
     };
 
     // Store consent in database
@@ -29,9 +29,9 @@ export class GDPRComplianceManager {
       const response = await fetch('/api/gdpr/consent', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(consentData)
+        body: JSON.stringify(consentData),
       });
 
       if (!response.ok) {
@@ -49,19 +49,19 @@ export class GDPRComplianceManager {
 
   static async withdrawConsent(
     userId: string, 
-    consentType: keyof ConsentData
+    consentType: keyof ConsentData,
   ): Promise<void> {
     try {
       const response = await fetch('/api/gdpr/consent/withdraw', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
           consentType,
-          timestamp: new Date().toISOString()
-        })
+          timestamp: new Date().toISOString(),
+        }),
       });
 
       if (!response.ok) {
@@ -110,7 +110,7 @@ export class GDPRComplianceManager {
       const consentData = {
         consents,
         version: this.CONSENT_VERSION,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
 
       localStorage.setItem('gdpr-consent', JSON.stringify(consentData));
@@ -133,12 +133,12 @@ export class GDPRComplianceManager {
       const response = await fetch('/api/gdpr/export-data', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
-          requestTimestamp: new Date().toISOString()
-        })
+          requestTimestamp: new Date().toISOString(),
+        }),
       });
 
       if (!response.ok) {
@@ -154,19 +154,19 @@ export class GDPRComplianceManager {
 
   static async requestDataDeletion(
     userId: string, 
-    reason: string = 'user_request'
+    reason: string = 'user_request',
   ): Promise<void> {
     try {
       const response = await fetch('/api/gdpr/delete-data', {
         method: 'DELETE',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
           reason,
-          requestTimestamp: new Date().toISOString()
-        })
+          requestTimestamp: new Date().toISOString(),
+        }),
       });
 
       if (!response.ok) {
@@ -185,19 +185,19 @@ export class GDPRComplianceManager {
 
   static async requestDataRectification(
     userId: string, 
-    updates: Partial<User>
+    updates: Partial<User>,
   ): Promise<void> {
     try {
       const response = await fetch('/api/gdpr/rectify-data', {
         method: 'PATCH',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
           updates,
-          requestTimestamp: new Date().toISOString()
-        })
+          requestTimestamp: new Date().toISOString(),
+        }),
       });
 
       if (!response.ok) {
@@ -222,15 +222,15 @@ export class GDPRComplianceManager {
       const response = await fetch('/api/gdpr/log-processing', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...logEntry,
           timestamp: new Date().toISOString(),
           ipAddress: this.getClientIP(),
           userAgent: navigator.userAgent,
-          details: logEntry.details ? JSON.stringify(logEntry.details) : null
-        })
+          details: logEntry.details ? JSON.stringify(logEntry.details) : null,
+        }),
       });
 
       if (!response.ok) {
@@ -253,7 +253,7 @@ export class GDPRComplianceManager {
       secure?: boolean;
       sameSite?: 'strict' | 'lax' | 'none';
       httpOnly?: boolean;
-    } = {}
+    } = {},
   ): void {
     const consent = this.getLocalConsent();
     
@@ -303,7 +303,7 @@ export class GDPRComplianceManager {
 
     const cookies = document.cookie.split(';');
     
-    for (let cookie of cookies) {
+    for (const cookie of cookies) {
       const [cookieName, cookieValue] = cookie.trim().split('=');
       if (decodeURIComponent(cookieName) === name) {
         return decodeURIComponent(cookieValue);
@@ -388,7 +388,7 @@ export class GDPRComplianceManager {
       'gtag': 'analytics',
       'marketing': 'marketing',
       'ads': 'marketing',
-      'facebook': 'marketing'
+      'facebook': 'marketing',
     };
 
     // Check if cookie name contains any of the mapped types
@@ -404,7 +404,7 @@ export class GDPRComplianceManager {
 
   private static hasConsentForCookieType(
     consent: ConsentData | null, 
-    cookieType: keyof ConsentData
+    cookieType: keyof ConsentData,
   ): boolean {
     if (!consent) {
       // Only allow essential cookies without explicit consent
@@ -446,20 +446,20 @@ export class GDPRComplianceManager {
   static validateDataProcessing(
     action: string, 
     dataType: string, 
-    legalBasis: string
+    legalBasis: string,
   ): boolean {
     const validActions = [
       'created', 'updated', 'accessed', 'exported', 'deleted',
       'consent_given', 'consent_withdrawn', 'reservation_created',
-      'reservation_updated', 'reservation_cancelled'
+      'reservation_updated', 'reservation_cancelled',
     ];
 
     const validDataTypes = [
-      'user_data', 'reservation', 'consent', 'processing_log'
+      'user_data', 'reservation', 'consent', 'processing_log',
     ];
 
     const validLegalBases = [
-      'consent', 'contract', 'legitimate_interest', 'user_request'
+      'consent', 'contract', 'legitimate_interest', 'user_request',
     ];
 
     return (
@@ -492,13 +492,13 @@ export class GDPRComplianceManager {
       const response = await fetch('/api/gdpr/report-breach', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...breachDetails,
           timestamp: new Date().toISOString(),
-          reportedBy: 'system'
-        })
+          reportedBy: 'system',
+        }),
       });
 
       if (!response.ok) {

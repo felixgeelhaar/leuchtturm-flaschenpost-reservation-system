@@ -152,7 +152,6 @@ describe('Type Validation and Guards', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
-        phone: '+49123456789',
         magazineId: 'mag-123',
         quantity: 1,
         deliveryMethod: 'pickup',
@@ -298,9 +297,7 @@ describe('Type Validation and Guards', () => {
           errors.push('email too long');
         }
         
-        if (data.phone && data.phone.length > 20) {
-          errors.push('phone too long');
-        }
+        // Phone field removed from form
         
         if (data.notes && data.notes.length > 500) {
           errors.push('notes too long');
@@ -313,7 +310,6 @@ describe('Type Validation and Guards', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
-        phone: '+49123456789',
         magazineId: 'mag-123',
         quantity: 1,
         deliveryMethod: 'pickup',
@@ -326,7 +322,6 @@ describe('Type Validation and Guards', () => {
         firstName: 'J', // Too short
         lastName: 'D', // Too short
         email: 'a'.repeat(255) + '@example.com', // Too long
-        phone: '+49' + '1'.repeat(20), // Too long
         magazineId: 'mag-123',
         quantity: 1,
         deliveryMethod: 'pickup',
@@ -345,7 +340,7 @@ describe('Type Validation and Guards', () => {
       expect(invalidResult.errors).toContain('firstName length invalid');
       expect(invalidResult.errors).toContain('lastName length invalid');
       expect(invalidResult.errors).toContain('email too long');
-      expect(invalidResult.errors).toContain('phone too long');
+      // Phone field removed from form
       expect(invalidResult.errors).toContain('notes too long');
     });
   });
@@ -357,7 +352,7 @@ describe('Type Validation and Guards', () => {
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email.toLowerCase(),
-          phone: formData.phone || null,
+          // phone: formData.phone || null, // Phone field removed
           magazine_id: formData.magazineId,
           quantity: formData.quantity,
           delivery_method: formData.deliveryMethod,
@@ -376,7 +371,6 @@ describe('Type Validation and Guards', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'JOHN@EXAMPLE.COM',
-        phone: '+49123456789',
         magazineId: 'mag-123',
         quantity: 2,
         deliveryMethod: 'shipping',

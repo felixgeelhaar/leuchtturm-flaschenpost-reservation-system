@@ -258,7 +258,7 @@ export class EmailService {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
-            day: 'numeric'
+            day: 'numeric',
           })}</dd>
         ` : ''}
       ` : ''}
@@ -415,7 +415,7 @@ Betrag: ${formatCurrency(calculateTotalCost(true))}
 Verwendungszweck: ${generatePaymentReference(reservation.id)}\n`;
       }
       
-      text += `\nWICHTIG: Das Magazin wird erst nach Zahlungseingang versandt.\n`;
+      text += '\nWICHTIG: Das Magazin wird erst nach Zahlungseingang versandt.\n';
     }
 
     if (!isShipping && reservation.pickupLocation) {

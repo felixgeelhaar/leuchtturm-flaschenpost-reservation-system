@@ -1,11 +1,14 @@
 <template>
   <div class="form-container py-8">
-    <div class="card">
-      <div class="card-header">
-        <h2 class="text-2xl font-bold text-neutral-900">
+    <div class="nautical-card ship-rock">
+      <div class="card-header bg-gradient-to-r from-primary-50 to-secondary-50">
+        <h2 class="text-2xl font-bold text-primary-800 flex items-center gap-2">
+          <svg class="w-8 h-8" viewBox="0 0 100 100">
+            <use href="/images/nautical-icons.svg#anchor"></use>
+          </svg>
           {{ forms.reservation.title }}
         </h2>
-        <p class="mt-2 text-neutral-600">
+        <p class="mt-2 text-primary-600">
           {{ forms.reservation.subtitle }}
         </p>
       </div>
@@ -50,7 +53,8 @@
             </option>
           </select>
           <ErrorMessage :error="formErrors.magazineId" />
-          <div v-if="selectedMagazine" class="mt-3 p-4 bg-neutral-50 rounded-form">
+          <div v-if="selectedMagazine" class="mt-3 p-4 bg-gradient-to-br from-secondary-50 to-primary-50 rounded-form border-2 border-primary-200 relative">
+            <div class="absolute top-2 right-2 text-2xl opacity-30">🐚</div>
             <h4 class="text-sm font-medium text-neutral-900">{{ selectedMagazine.title }}</h4>
             <p class="text-sm text-neutral-600 mt-1">{{ selectedMagazine.description }}</p>
             <p class="text-xs text-neutral-500 mt-2">
@@ -59,9 +63,12 @@
           </div>
         </div>
 
-        <!-- Personal Information -->
-        <fieldset class="space-y-4">
-          <legend class="text-lg font-medium text-neutral-900 mb-4">
+        <!-- Personal Information with nautical decoration -->
+        <fieldset class="space-y-4 relative">
+          <legend class="text-lg font-medium text-primary-800 mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6" viewBox="0 0 100 100">
+              <use href="/images/nautical-icons.svg#ship-wheel"></use>
+            </svg>
             Persönliche Angaben
           </legend>
 
@@ -125,9 +132,12 @@
 
         </fieldset>
 
-        <!-- Reservation Details -->
-        <fieldset class="space-y-4">
-          <legend class="text-lg font-medium text-neutral-900 mb-4">
+        <!-- Reservation Details with compass theme -->
+        <fieldset class="space-y-4 relative">
+          <legend class="text-lg font-medium text-primary-800 mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6" viewBox="0 0 100 100">
+              <use href="/images/nautical-icons.svg#compass"></use>
+            </svg>
             Reservierungsdetails
           </legend>
 
@@ -155,23 +165,22 @@
               </label>
               <select
                 id="deliveryMethod"
-                v-model="formData.deliveryMethod"
+                v-model="deliveryMethod"
                 :class="getFieldClass('deliveryMethod')"
                 required
-                @change="onDeliveryMethodChange"
               >
                 <option value="pickup">Abholung vor Ort</option>
                 <option value="shipping">Versand nach Hause</option>
               </select>
               <ErrorMessage :error="formErrors.deliveryMethod" />
               <p class="form-help">
-                {{ formData.deliveryMethod === 'pickup' ? 'Kostenlose Abholung vor Ort.' : `Versandkostenpauschale: ${formatCurrency(shippingCost)} (Vorauszahlung erforderlich)` }}
+                {{ deliveryMethod === 'pickup' ? 'Kostenlose Abholung vor Ort.' : `Versandkostenpauschale: ${formatCurrency(shippingCost)} (Vorauszahlung erforderlich)` }}
               </p>
             </div>
           </div>
 
           <!-- Pickup Location (only shown for pickup) -->
-          <div v-if="formData.deliveryMethod === 'pickup'">
+          <div v-show="deliveryMethod === 'pickup'">
             <label for="pickupLocation" class="form-label form-label-required">
               Abholort
             </label>
@@ -194,7 +203,7 @@
                 <span>Magazin (1 Exemplar):</span>
                 <span class="font-medium">{{ formatCurrency(magazinePrice) }}</span>
               </div>
-              <div v-if="formData.deliveryMethod === 'shipping'" class="flex justify-between text-sm">
+              <div v-show="deliveryMethod === 'shipping'" class="flex justify-between text-sm">
                 <span>Versandkostenpauschale:</span>
                 <span class="font-medium">{{ formatCurrency(shippingCost) }}</span>
               </div>
@@ -205,42 +214,46 @@
                 </div>
               </div>
             </div>
-            <div v-if="formData.deliveryMethod === 'shipping'" class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded">
+            <div v-show="deliveryMethod === 'shipping'" class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded">
               <p class="text-xs text-amber-800">
                 <strong>Hinweis:</strong> Der Gesamtbetrag muss vor dem Versand bezahlt werden.
                 Sie erhalten nach der Reservierung eine E-Mail mit den Zahlungsinformationen.
               </p>
             </div>
-            <div v-else class="mt-3 p-3 bg-green-50 border border-green-200 rounded">
+            <div v-show="deliveryMethod === 'pickup'" class="mt-3 p-3 bg-green-50 border border-green-200 rounded">
               <p class="text-xs text-green-800">
                 <strong>Abholung:</strong> Barzahlung bei Abholung möglich.
               </p>
             </div>
           </div>
+        </fieldset>
 
-          <!-- Payment Method Selection (only shown for shipping) -->
-          <div v-if="formData.deliveryMethod === 'shipping'">
-            <label for="paymentMethod" class="form-label form-label-required">
-              Gewünschte Zahlungsart
-            </label>
-            <select
-              id="paymentMethod"
-              v-model="formData.paymentMethod"
-              :class="getFieldClass('paymentMethod')"
-              required
-            >
-              <option value="">Bitte wählen...</option>
-              <option value="paypal">PayPal</option>
-            </select>
-            <ErrorMessage :error="formErrors.paymentMethod" />
-            <p class="form-help">
-              Sie erhalten einen PayPal-Zahlungslink per E-Mail nach der Reservierung.
-            </p>
-          </div>
+        <!-- Payment Method Selection (only shown for shipping) -->
+        <div v-show="deliveryMethod === 'shipping'" class="space-y-2">
+          <label for="paymentMethod" class="form-label form-label-required">
+            Gewünschte Zahlungsart
+          </label>
+          <select
+            id="paymentMethod"
+            v-model="formData.paymentMethod"
+            :class="getFieldClass('paymentMethod')"
+            required
+          >
+            <option value="">Bitte wählen...</option>
+            <option value="paypal">PayPal</option>
+          </select>
+          <ErrorMessage :error="formErrors.paymentMethod" />
+          <p class="form-help">
+            Sie erhalten einen PayPal-Zahlungslink per E-Mail nach der Reservierung.
+          </p>
+        </div>
 
-          <!-- Shipping Address (only shown for shipping) -->
-          <fieldset v-if="formData.deliveryMethod === 'shipping'" class="space-y-4 p-4 border border-neutral-200 rounded-form bg-neutral-50">
-            <legend class="text-lg font-medium text-neutral-900 mb-4 px-2">
+        <!-- Shipping Address with sailing ship theme -->
+        <fieldset v-show="deliveryMethod === 'shipping'" class="space-y-4 p-4 border-2 border-primary-300 rounded bg-gradient-to-br from-primary-50 to-white">
+            <legend class="text-lg font-medium text-primary-800 mb-4 px-2 flex items-center gap-2">
+              <svg class="w-6 h-6" viewBox="0 0 100 100">
+                <use href="/images/nautical-icons.svg#sailing-ship"></use>
+              </svg>
               Lieferadresse
             </legend>
             
@@ -354,28 +367,31 @@
             </div>
           </fieldset>
 
-          <div>
-            <label for="notes" class="form-label">
-              Anmerkungen (optional)
-            </label>
-            <textarea
-              id="notes"
-              v-model="formData.notes"
-              :class="getFieldClass('notes')"
-              rows="3"
-              maxlength="500"
-              placeholder="Besondere Wünsche oder Anmerkungen..."
-            />
-            <ErrorMessage :error="formErrors.notes" />
-            <div class="text-xs text-neutral-500 mt-1">
-              {{ (formData.notes || '').length }}/500 Zeichen
-            </div>
+        <!-- Notes field -->
+        <div>
+          <label for="notes" class="form-label">
+            Anmerkungen (optional)
+          </label>
+          <textarea
+            id="notes"
+            v-model="formData.notes"
+            :class="getFieldClass('notes')"
+            rows="3"
+            maxlength="500"
+            placeholder="Besondere Wünsche oder Anmerkungen..."
+          />
+          <ErrorMessage :error="formErrors.notes" />
+          <div class="text-xs text-neutral-500 mt-1">
+            {{ (formData.notes || '').length }}/500 Zeichen
           </div>
-        </fieldset>
+        </div>
 
-        <!-- GDPR Consent -->
-        <fieldset class="space-y-4 p-4 border border-neutral-200 rounded-form bg-neutral-50">
-          <legend class="text-lg font-medium text-neutral-900 mb-4 px-2">
+        <!-- GDPR Consent with life preserver theme -->
+        <fieldset class="space-y-4 p-4 border-2 border-seafoam-300 rounded-form bg-gradient-to-br from-seafoam-50 to-white relative">
+          <legend class="text-lg font-medium text-seafoam-700 mb-4 px-2 flex items-center gap-2">
+            <svg class="w-6 h-6" viewBox="0 0 100 100">
+              <use href="/images/nautical-icons.svg#life-preserver"></use>
+            </svg>
             Datenschutz
           </legend>
 
@@ -413,31 +429,40 @@
             class="btn-secondary order-2 sm:order-1"
             :disabled="isSubmitting"
           >
+            <svg class="w-5 h-5" viewBox="0 0 100 100">
+              <use href="/images/nautical-icons.svg#wave"></use>
+            </svg>
             Zurücksetzen
           </button>
           <button
             type="submit"
-            class="btn-primary order-1 sm:order-2"
+            class="btn-nautical btn-lighthouse order-1 sm:order-2 flex items-center justify-center gap-2"
             :disabled="isSubmitting || !isFormValid"
           >
             <span v-if="isSubmitting" class="flex items-center">
-              <div class="loading-sm mr-2"></div>
+              <div class="ship-wheel-loader mr-2"></div>
               Wird verarbeitet...
             </span>
-            <span v-else>
+            <span v-else class="flex items-center gap-2">
+              <svg class="w-5 h-5" viewBox="0 0 100 100">
+                <use href="/images/nautical-icons.svg#lighthouse"></use>
+              </svg>
               Reservierung absenden
             </span>
           </button>
         </div>
 
-        <!-- Success Message -->
+        <!-- Success Message with treasure chest theme -->
         <div
           v-if="showSuccess"
-          class="alert-success"
+          class="alert-success nautical-card relative overflow-hidden"
         >
+          <div class="absolute top-2 right-2 text-4xl opacity-30">🏝️</div>
           <div class="flex">
             <div class="flex-shrink-0">
-              <CheckCircleIcon class="h-5 w-5 text-success-400" aria-hidden="true" />
+              <svg class="h-8 w-8 text-success-600" viewBox="0 0 100 100">
+                <use href="/images/nautical-icons.svg#treasure-chest"></use>
+              </svg>
             </div>
             <div class="ml-3">
               <h3 class="text-sm font-medium text-success-800">
@@ -460,7 +485,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue';
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue';
 import { z } from 'zod';
 import type { Magazine, ReservationFormData, ConsentData, FormErrors } from '@/types';
 import ErrorMessage from './ErrorMessage.vue';
@@ -489,6 +514,9 @@ const availableMagazines = ref<Magazine[]>(props.magazines || []);
 // Pricing configuration
 const magazinePrice = ref(paymentConfig.magazinePrice);
 const shippingCost = ref(paymentConfig.shippingCost);
+
+// Separate ref for delivery method to ensure reactivity
+const deliveryMethod = ref('pickup');
 
 // Form data
 const formData = reactive<ReservationFormData>({
@@ -599,7 +627,7 @@ const isFormValid = computed(() => {
 });
 
 const totalCost = computed(() => {
-  const isShipping = formData.deliveryMethod === 'shipping';
+  const isShipping = deliveryMethod.value === 'shipping';
   return calculateTotalCost(isShipping);
 });
 
@@ -634,16 +662,22 @@ const updateQuantityOptions = () => {
   formData.quantity = 1;
 };
 
-// Handle delivery method changes
-const onDeliveryMethodChange = () => {
+// Watch for delivery method changes
+watch(deliveryMethod, async (newValue) => {
+  // Sync with formData
+  formData.deliveryMethod = newValue;
+  
+  // Force DOM update
+  await nextTick();
+  
   // Clear pickup location when switching to shipping
-  if (formData.deliveryMethod === 'shipping') {
+  if (newValue === 'shipping') {
     formData.pickupLocation = '';
     formData.pickupDate = '';
   }
   
   // Clear address when switching to pickup
-  if (formData.deliveryMethod === 'pickup') {
+  if (newValue === 'pickup') {
     formData.address = {
       street: '',
       houseNumber: '',
@@ -656,7 +690,7 @@ const onDeliveryMethodChange = () => {
   }
   
   // Clear validation errors for switched fields
-  if (formData.deliveryMethod === 'shipping') {
+  if (newValue === 'shipping') {
     delete formErrors.pickupLocation;
     delete formErrors.pickupDate;
   } else {
@@ -666,7 +700,7 @@ const onDeliveryMethodChange = () => {
     delete formErrors['address.city'];
     delete formErrors.paymentMethod;
   }
-};
+});
 
 const handleSubmit = async () => {
   if (!validateForm()) {
@@ -716,7 +750,6 @@ const handleSubmit = async () => {
     }, 100);
     
   } catch (error) {
-    console.error('Reservation submission error:', error);
     serverError.value = error instanceof Error ? error.message : 'Ein unerwarteter Fehler ist aufgetreten.';
     
     // Scroll to error message
@@ -732,6 +765,7 @@ const handleSubmit = async () => {
 };
 
 const resetForm = () => {
+  deliveryMethod.value = 'pickup';
   Object.keys(formData).forEach(key => {
     if (key === 'quantity') {
       (formData as any)[key] = 1;
@@ -800,7 +834,7 @@ const fetchMagazines = async () => {
       availableMagazines.value = result.data || [];
     }
   } catch (error) {
-    console.error('Failed to fetch magazines:', error);
+    // Silently fail - the form will handle the empty state
   }
 };
 </script>

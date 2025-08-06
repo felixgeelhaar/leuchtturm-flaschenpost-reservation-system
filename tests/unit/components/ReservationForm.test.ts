@@ -8,14 +8,28 @@ const mockMagazines = [
     id: '123e4567-e89b-12d3-a456-426614174000',
     title: 'Flaschenpost',
     issueNumber: '2024-01',
-    availableCopies: 10
+    publishDate: '2024-01-01T00:00:00Z',
+    description: 'Test Magazine',
+    coverImageUrl: 'https://example.com/cover.jpg',
+    availableCopies: 10,
+    totalCopies: 100,
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   },
   {
     id: '223e4567-e89b-12d3-a456-426614174001',
     title: 'Flaschenpost',
     issueNumber: '2024-02',
-    availableCopies: 5
-  }
+    publishDate: '2024-02-01T00:00:00Z',
+    description: 'Test Magazine',
+    coverImageUrl: 'https://example.com/cover2.jpg',
+    availableCopies: 5,
+    totalCopies: 100,
+    isActive: true,
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+  },
 ];
 
 const validFormDataPickup = {
@@ -26,7 +40,7 @@ const validFormDataPickup = {
   quantity: 1,
   deliveryMethod: 'pickup',
   pickupLocation: '',  // Pickup location is hardcoded in component
-  consents: { essential: true }
+  consents: { essential: true },
 };
 
 const validFormDataShipping = {
@@ -42,9 +56,9 @@ const validFormDataShipping = {
     houseNumber: '123',
     postalCode: '10115',
     city: 'Berlin',
-    country: 'DE'
+    country: 'DE',
   },
-  consents: { essential: true }
+  consents: { essential: true },
 };
 
 const mockApiResponse = {
@@ -52,9 +66,9 @@ const mockApiResponse = {
   data: {
     id: 'res-123',
     status: 'pending',
-    expiresAt: '2024-12-31T00:00:00Z'
+    expiresAt: '2024-12-31T00:00:00Z',
   },
-  message: 'Reservierung erfolgreich erstellt!'
+  message: 'Reservierung erfolgreich erstellt!',
 };
 
 // Mock fetch globally
@@ -211,8 +225,8 @@ describe('ReservationForm.vue', () => {
       // Pickup location is pre-filled and readonly, so it should be valid
       const pickupInput = wrapper.find('input[id="pickupLocation"]');
       expect(pickupInput.exists()).toBe(true);
-      expect(pickupInput.element.disabled).toBe(true);
-      expect(pickupInput.element.value).toContain('Leuchtturm');
+      expect((pickupInput.element as HTMLInputElement).disabled).toBe(true);
+      expect((pickupInput.element as HTMLInputElement).value).toContain('Leuchtturm');
     });
 
     it('validates address fields when delivery method is shipping', async () => {
@@ -266,7 +280,7 @@ describe('ReservationForm.vue', () => {
       await wrapper.find('#postalCode').setValue('10115');
       await wrapper.find('#city').setValue('Berlin');
       await wrapper.find('#country').setValue('DE');
-      await wrapper.find('#consent-essential').setChecked(true);
+      await wrapper.find('#consent-essential').setValue(true);
       await nextTick();
       
       // Add payment method for shipping
@@ -342,7 +356,7 @@ describe('ReservationForm.vue', () => {
       await nextTick();
 
       const newStreetInput = wrapper.find('input[id="street"]');
-      expect(newStreetInput.element.value).toBe('');
+      expect((newStreetInput.element as HTMLInputElement).value).toBe('');
     });
   });
 
@@ -363,9 +377,9 @@ describe('ReservationForm.vue', () => {
       const emailInput = wrapper.find('input[id="email"]');
       const essentialConsent = wrapper.find('input[id="consent-essential"]');
       
-      expect(firstNameInput.element.value).toBe('');
-      expect(emailInput.element.value).toBe('');
-      expect(essentialConsent.element.checked).toBe(false);
+      expect((firstNameInput.element as HTMLInputElement).value).toBe('');
+      expect((emailInput.element as HTMLInputElement).value).toBe('');
+      expect((essentialConsent.element as HTMLInputElement).checked).toBe(false);
     });
   });
 
@@ -383,8 +397,8 @@ describe('ReservationForm.vue', () => {
       const quantityInput = wrapper.find('input[id="quantity"]');
       
       // Quantity should be fixed to 1 exemplar and disabled
-      expect(quantityInput.element.disabled).toBe(true);
-      expect(quantityInput.element.value).toBe('1 Exemplar');
+      expect((quantityInput.element as HTMLInputElement).disabled).toBe(true);
+      expect((quantityInput.element as HTMLInputElement).value).toBe('1 Exemplar');
     });
 
     it('shows magazine details when selected', async () => {
@@ -398,7 +412,7 @@ describe('ReservationForm.vue', () => {
 
       expect(wrapper.text()).toContain(mockMagazines[0].title);
       // Check that the magazine was selected
-      expect(magazineSelect.element.value).toBe(mockMagazines[0].id);
+      expect((magazineSelect.element as HTMLSelectElement).value).toBe(mockMagazines[0].id);
     });
   });
 

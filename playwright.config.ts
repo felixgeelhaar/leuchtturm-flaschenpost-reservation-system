@@ -13,7 +13,7 @@ export default defineConfig({
     ['html', { outputFolder: 'test-results/html' }],
     ['json', { outputFile: 'test-results/results.json' }],
     ['junit', { outputFile: 'test-results/junit.xml' }],
-    ['list']
+    ['list'],
   ],
   
   use: {
@@ -22,7 +22,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     actionTimeout: 15 * 1000,
-    navigationTimeout: 30 * 1000
+    navigationTimeout: 30 * 1000,
   },
 
   projects: [
@@ -57,20 +57,19 @@ export default defineConfig({
       NODE_ENV: 'test',
       SUPABASE_URL: 'https://test.supabase.co',
       SUPABASE_ANON_KEY: 'test-anon-key',
-      SUPABASE_SERVICE_ROLE_KEY: 'test-service-role-key'
-    }
+      SUPABASE_SERVICE_ROLE_KEY: 'test-service-role-key',
+    },
   },
 
   expect: {
     timeout: 10 * 1000,
     toHaveScreenshot: {
-      mode: 'local',
-      threshold: 0.2
-    }
+      threshold: 0.2,
+    },
   },
 
   timeout: 30 * 1000,
   
   globalSetup: './tests/e2e/global-setup.ts',
-  globalTeardown: './tests/e2e/global-teardown.ts'
+  globalTeardown: './tests/e2e/global-teardown.ts',
 });

@@ -6,7 +6,7 @@ const db = new DatabaseService();
 
 const exportRequestSchema = z.object({
   userId: z.string().uuid('Ungültige Benutzer-ID'),
-  requestTimestamp: z.string().datetime('Ungültiger Zeitstempel')
+  requestTimestamp: z.string().datetime('Ungültiger Zeitstempel'),
 });
 
 export const POST: APIRoute = async ({ request }) => {
@@ -19,12 +19,12 @@ export const POST: APIRoute = async ({ request }) => {
         JSON.stringify({
           success: false,
           error: 'Validation failed',
-          message: 'Ungültige Eingabedaten.'
+          message: 'Ungültige Eingabedaten.',
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        }
+          headers: { 'Content-Type': 'application/json' },
+        },
       );
     }
 
@@ -41,15 +41,15 @@ export const POST: APIRoute = async ({ request }) => {
         contactEmail: 'datenschutz@flaschenpost-magazin.de',
         purpose: 'GDPR Article 20 - Right to data portability',
         format: 'JSON',
-        language: 'de-DE'
+        language: 'de-DE',
       },
       personalData: exportData.userData,
       reservations: exportData.reservations,
       consents: exportData.consents,
       legalNotice: {
         de: 'Diese Daten wurden auf Ihre Anfrage gemäß Art. 20 DSGVO exportiert. Die Daten werden in einem strukturierten, gängigen und maschinenlesbaren Format bereitgestellt.',
-        en: 'This data has been exported upon your request under Article 20 GDPR. The data is provided in a structured, commonly used and machine-readable format.'
-      }
+        en: 'This data has been exported upon your request under Article 20 GDPR. The data is provided in a structured, commonly used and machine-readable format.',
+      },
     };
 
     // Convert to JSON string for download
@@ -63,8 +63,8 @@ export const POST: APIRoute = async ({ request }) => {
         'Content-Disposition': `attachment; filename="datenexport-${userId}-${new Date().toISOString().split('T')[0]}.json"`,
         'Content-Length': buffer.length.toString(),
         'X-Content-Type-Options': 'nosniff',
-        'X-Frame-Options': 'DENY'
-      }
+        'X-Frame-Options': 'DENY',
+      },
     });
 
   } catch (error) {
@@ -74,12 +74,12 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         success: false,
         error: 'Internal server error',
-        message: 'Fehler beim Exportieren der Daten.'
+        message: 'Fehler beim Exportieren der Daten.',
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      }
+        headers: { 'Content-Type': 'application/json' },
+      },
     );
   }
 };

@@ -413,11 +413,11 @@ class PerformanceTracker {
             this.logger.info('SPA navigation performance', {
               extra: { 
                 navigationDuration: duration,
-                url: event.destination.url 
+                url: event.destination.url, 
               },
               tags: { category: 'performance', type: 'spa-navigation' },
             });
-          }
+          },
         });
       });
     }

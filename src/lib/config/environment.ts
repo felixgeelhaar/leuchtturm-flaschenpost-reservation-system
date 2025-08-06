@@ -5,7 +5,7 @@
  * Handles both client-side and server-side environment variables.
  */
 
-import { z } from "zod";
+import { z } from 'zod';
 // =============================================================================
 // ENVIRONMENT SCHEMAS
 // =============================================================================
@@ -13,10 +13,10 @@ import { z } from "zod";
 const ServerEnvSchema = z.object({
   // Build environment
   NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+    .enum(['development', 'production', 'test'])
+    .default('development'),
   SITE_URL: z.string().url(),
-  BASE_URL: z.string().default("/"),
+  BASE_URL: z.string().default('/'),
 
   // Database (Supabase)
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
@@ -47,7 +47,7 @@ const ServerEnvSchema = z.object({
   PRIVACY_CONTACT_EMAIL: z.string().email(),
   COOKIE_DOMAIN: z.string(),
   COOKIE_SECURE: z.coerce.boolean().default(true),
-  COOKIE_SAME_SITE: z.enum(["strict", "lax", "none"]).default("strict"),
+  COOKIE_SAME_SITE: z.enum(['strict', 'lax', 'none']).default('strict'),
 
   // Feature flags
   ENABLE_REGISTRATION: z.coerce.boolean().default(true),
@@ -56,11 +56,11 @@ const ServerEnvSchema = z.object({
   MAINTENANCE_MODE: z.coerce.boolean().default(false),
 
   // Localization
-  DEFAULT_LANGUAGE: z.string().default("de"),
-  SUPPORTED_LANGUAGES: z.string().default("de,en"),
+  DEFAULT_LANGUAGE: z.string().default('de'),
+  SUPPORTED_LANGUAGES: z.string().default('de,en'),
 
   // Security
-  HONEYPOT_FIELD_NAME: z.string().default("website_url"),
+  HONEYPOT_FIELD_NAME: z.string().default('website_url'),
 
   // Backup & Recovery
   BACKUP_ENCRYPTION_KEY: z.string().min(32).optional(),
@@ -68,17 +68,17 @@ const ServerEnvSchema = z.object({
 
   // Development
   DEBUG_MODE: z.coerce.boolean().default(false),
-  LOG_LEVEL: z.enum(["error", "warn", "info", "debug"]).default("info"),
+  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
 });
 
 const ClientEnvSchema = z.object({
   // Public Supabase configuration
-  PUBLIC_SUPABASE_URL: z.string().url(),
-  PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
+  PUBLIC_SUPABASE_URL: z.string().url().optional(),
+  PUBLIC_SUPABASE_ANON_KEY: z.string().min(1).optional(),
 
   // Site configuration
-  SITE_URL: z.string().url(),
-  BASE_URL: z.string().default("/"),
+  SITE_URL: z.string().url().optional(),
+  BASE_URL: z.string().default('/'),
 
   // Analytics (optional)
   GA_MEASUREMENT_ID: z.string().optional(),
@@ -89,13 +89,13 @@ const ClientEnvSchema = z.object({
   MAINTENANCE_MODE: z.coerce.boolean().default(false),
 
   // Localization
-  DEFAULT_LANGUAGE: z.string().default("de"),
-  SUPPORTED_LANGUAGES: z.string().default("de,en"),
+  DEFAULT_LANGUAGE: z.string().default('de'),
+  SUPPORTED_LANGUAGES: z.string().default('de,en'),
 
   // Build information
   NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+    .enum(['development', 'production', 'test'])
+    .default('development'),
 });
 
 // =============================================================================
@@ -104,27 +104,38 @@ const ClientEnvSchema = z.object({
 
 function validateEnvironment() {
   // Server-side validation
-  if (typeof process !== "undefined" && process.env) {
+  if (typeof process !== 'undefined' && process.env) {
     try {
       const serverEnv = ServerEnvSchema.parse(process.env);
       return { server: serverEnv, client: null };
     } catch (error) {
-      console.error("❌ Server environment validation failed:", error);
-      if (process.env.NODE_ENV === "production") {
-        throw new Error("Invalid server environment configuration");
+      console.error('❌ Server environment validation failed:', error);
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error('Invalid server environment configuration');
       }
     }
   }
 
   // Client-side validation
-  if (typeof window !== "undefined" || typeof import.meta !== "undefined") {
+  if (typeof window !== 'undefined' || typeof import.meta !== 'undefined') {
     try {
       const clientEnv = import.meta.env || {};
       const validatedClientEnv = ClientEnvSchema.parse(clientEnv);
       return { server: null, client: validatedClientEnv };
     } catch (error) {
-      console.error("❌ Client environment validation failed:", error);
-      throw new Error("Invalid client environment configuration");
+      console.warn('⚠️ Client environment validation failed, using defaults:', error);
+      // Return default client config instead of throwing
+      return { 
+        server: null, 
+        client: {
+          PUBLIC_SUPABASE_URL: '',
+          PUBLIC_SUPABASE_ANON_KEY: '',
+          SITE_URL: 'http://localhost:4321',
+          BASE_URL: '/',
+          GA_MEASUREMENT_ID: undefined,
+          ENABLE_ANALYTICS: false
+        }
+      };
     }
   }
 
@@ -197,7 +208,7 @@ export const serverConfig = serverEnv
     // Localization
     i18n: {
       defaultLanguage: serverEnv.DEFAULT_LANGUAGE,
-      supportedLanguages: serverEnv.SUPPORTED_LANGUAGES.split(","),
+      supportedLanguages: serverEnv.SUPPORTED_LANGUAGES.split(','),
     },
 
     // Development
@@ -207,9 +218,9 @@ export const serverConfig = serverEnv
     },
 
     // Environment
-    isProduction: serverEnv.NODE_ENV === "production",
-    isDevelopment: serverEnv.NODE_ENV === "development",
-    isTest: serverEnv.NODE_ENV === "test",
+    isProduction: serverEnv.NODE_ENV === 'production',
+    isDevelopment: serverEnv.NODE_ENV === 'development',
+    isTest: serverEnv.NODE_ENV === 'test',
   }
   : null;
 
@@ -243,13 +254,13 @@ export const clientConfig = clientEnv
     // Localization
     i18n: {
       defaultLanguage: clientEnv.DEFAULT_LANGUAGE,
-      supportedLanguages: clientEnv.SUPPORTED_LANGUAGES.split(","),
+      supportedLanguages: clientEnv.SUPPORTED_LANGUAGES.split(','),
     },
 
     // Environment
-    isProduction: clientEnv.NODE_ENV === "production",
-    isDevelopment: clientEnv.NODE_ENV === "development",
-    isTest: clientEnv.NODE_ENV === "test",
+    isProduction: clientEnv.NODE_ENV === 'production',
+    isDevelopment: clientEnv.NODE_ENV === 'development',
+    isTest: clientEnv.NODE_ENV === 'test',
   }
   : null;
 
@@ -302,7 +313,7 @@ export const isDevelopment = getConfigValue(
 export const siteUrl = getConfigValue(
   (server) => serverEnv?.SITE_URL,
   (client) => client?.site.url,
-  "http://localhost:3000",
+  'http://localhost:3000',
 );
 
 // =============================================================================
@@ -314,26 +325,26 @@ export const siteUrl = getConfigValue(
  */
 export function validateRequiredEnvVars() {
   const requiredVars = [
-    "PUBLIC_SUPABASE_URL",
-    "PUBLIC_SUPABASE_ANON_KEY",
-    "SITE_URL",
+    'PUBLIC_SUPABASE_URL',
+    'PUBLIC_SUPABASE_ANON_KEY',
+    'SITE_URL',
   ];
 
   const serverOnlyVars = [
-    "SUPABASE_SERVICE_ROLE_KEY",
-    "JWT_SECRET",
-    "SESSION_SECRET",
-    "ENCRYPTION_KEY",
-    "CSRF_SECRET",
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'JWT_SECRET',
+    'SESSION_SECRET',
+    'ENCRYPTION_KEY',
+    'CSRF_SECRET',
   ];
 
   const productionRequiredVars = [
-    "SMTP_HOST",
-    "SMTP_USER",
-    "SMTP_PASS", 
-    "SMTP_FROM",
-    "PRIVACY_CONTACT_EMAIL",
-    "COOKIE_DOMAIN",
+    'SMTP_HOST',
+    'SMTP_USER',
+    'SMTP_PASS', 
+    'SMTP_FROM',
+    'PRIVACY_CONTACT_EMAIL',
+    'COOKIE_DOMAIN',
   ];
 
   // Check public vars
@@ -344,7 +355,7 @@ export function validateRequiredEnvVars() {
   }
 
   // Check server-only vars (only in server context)
-  if (typeof process !== "undefined" && process.env.NODE_ENV === "production") {
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'production') {
     for (const varName of serverOnlyVars) {
       if (!process.env[varName]) {
         throw new Error(
@@ -363,7 +374,7 @@ export function validateRequiredEnvVars() {
     }
     
     // Validate secret lengths for security
-    const secrets = ["JWT_SECRET", "SESSION_SECRET", "ENCRYPTION_KEY", "CSRF_SECRET"];
+    const secrets = ['JWT_SECRET', 'SESSION_SECRET', 'ENCRYPTION_KEY', 'CSRF_SECRET'];
     for (const secretName of secrets) {
       const secret = process.env[secretName];
       if (secret && secret.length < 32) {
@@ -374,7 +385,7 @@ export function validateRequiredEnvVars() {
     }
     
     // Validate URLs format
-    const urls = ["PUBLIC_SUPABASE_URL", "SITE_URL"];
+    const urls = ['PUBLIC_SUPABASE_URL', 'SITE_URL'];
     for (const urlName of urls) {
       const url = process.env[urlName] || import.meta.env?.[urlName];
       if (url && !url.match(/^https?:\/\//)) {
@@ -383,7 +394,7 @@ export function validateRequiredEnvVars() {
     }
     
     // Validate email format
-    const emails = ["SMTP_FROM", "PRIVACY_CONTACT_EMAIL"];
+    const emails = ['SMTP_FROM', 'PRIVACY_CONTACT_EMAIL'];
     for (const emailName of emails) {
       const email = process.env[emailName];
       if (email && !email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {

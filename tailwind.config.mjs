@@ -3,33 +3,75 @@ export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
   theme: {
     extend: {
-      // Brand Colors for Flaschenpost Magazine
+      // Nautical Theme Colors for Leuchtturm (Lighthouse)
       colors: {
+        // Ocean Blues - Primary palette
         primary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          50: '#e6f7ff',  // ocean-light
+          100: '#b3e5fc', // ocean-soft
+          200: '#81d4fa', // lighter ocean
+          300: '#4fc3f7', // ocean-medium
+          400: '#29b6f6', // ocean-deep
+          500: '#03a9f4', // standard ocean
+          600: '#0288d1', // ocean-dark
+          700: '#0277bd', // deeper ocean
+          800: '#01579b', // ocean-night
+          900: '#014a7c', // deepest ocean
+          950: '#003859', // abyss
         },
+        // Sandy Beach - Warm accent colors
         secondary: {
-          50: '#fef7ee',
-          100: '#fdedd7',
-          200: '#fbd8ae',
-          300: '#f8bc7a',
-          400: '#f59545',
-          500: '#f37220',
-          600: '#e45516',
-          700: '#bd3f14',
-          800: '#973218',
-          900: '#7c2a17',
-          950: '#43130a',
+          50: '#fff8e1',  // sand-light
+          100: '#ffe0b2', // sand-warm
+          200: '#ffcc80', // sand-golden
+          300: '#ffb74d', // sand-sunset
+          400: '#ffa726', // warm sand
+          500: '#ff9800', // sand-deep
+          600: '#fb8c00', // darker sand
+          700: '#f57c00', // burnt sand
+          800: '#ef6c00', // deep sand
+          900: '#e65100', // darkest sand
+          950: '#bf360c', // earth
+        },
+        // Lighthouse Red - Alert/Feature colors
+        lighthouse: {
+          50: '#ffebee',
+          100: '#ffcdd2',
+          200: '#ef9a9a',
+          300: '#e57373',
+          400: '#ef5350', // lighthouse-red
+          500: '#f44336',
+          600: '#e53935',
+          700: '#d32f2f',
+          800: '#c62828',
+          900: '#b71c1c',
+          beam: '#fff59d', // lighthouse-beam yellow
+        },
+        // Sea Foam - Success/Nature colors
+        seafoam: {
+          50: '#e0f2f1',  // seafoam-light
+          100: '#b2dfdb',
+          200: '#80cbc4', // seafoam-medium
+          300: '#4db6ac',
+          400: '#26a69a', // seafoam-deep
+          500: '#009688',
+          600: '#00897b',
+          700: '#00796b',
+          800: '#00695c',
+          900: '#004d40',
+        },
+        // Ship Wood - Neutral/Brown tones
+        wood: {
+          50: '#efebe9',  // wood-light
+          100: '#d7ccc8',
+          200: '#bcaaa4',
+          300: '#a1887f',
+          400: '#8d6e63', // wood-medium
+          500: '#795548',
+          600: '#6d4c41',
+          700: '#5d4037', // wood-dark
+          800: '#4e342e',
+          900: '#3e2723',
         },
         neutral: {
           50: '#f9fafb',

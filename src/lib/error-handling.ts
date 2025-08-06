@@ -181,7 +181,7 @@ export class ErrorHandler {
       statusCode: 500,
       userMessage: 'Ein unerwarteter Fehler ist aufgetreten.',
       context,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
 
     // Categorize based on error message or type
@@ -214,7 +214,7 @@ export class ErrorHandler {
       message: error.message,
       statusCode: error.statusCode,
       context: error.context,
-      stack: error.stack
+      stack: error.stack,
     };
 
     if (isProduction) {
@@ -244,7 +244,7 @@ export class ErrorHandler {
         url: typeof window !== 'undefined' ? window.location.href : 'server',
         userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
         timestamp: error.timestamp || new Date().toISOString(),
-        context: error.context
+        context: error.context,
       };
 
       // Send to monitoring service (implement based on your choice)
@@ -269,7 +269,7 @@ export class ErrorHandler {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(report)
+        body: JSON.stringify(report),
       });
 
       if (!response.ok) {
@@ -301,8 +301,8 @@ export class ErrorHandler {
         detail: {
           message: error.userMessage,
           code: error.code,
-          statusCode: error.statusCode
-        }
+          statusCode: error.statusCode,
+        },
       }));
     }
   }
@@ -313,7 +313,7 @@ export class ErrorHandler {
   async retry<T>(
     operation: () => Promise<T>,
     maxRetries: number = this.maxRetries,
-    baseDelay: number = this.retryDelay
+    baseDelay: number = this.retryDelay,
   ): Promise<T> {
     let lastError: Error;
     

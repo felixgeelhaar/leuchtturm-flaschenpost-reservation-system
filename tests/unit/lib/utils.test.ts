@@ -170,10 +170,10 @@ describe('Utility Functions', () => {
           profile: {
             name: 'John Doe',
             address: {
-              city: 'Berlin'
-            }
-          }
-        }
+              city: 'Berlin',
+            },
+          },
+        },
       };
 
       expect(safeGet(testObj, 'user.profile.name')).toBe('John Doe');
@@ -266,7 +266,7 @@ describe('Utility Functions', () => {
         } catch (error) {
           return {
             success: false,
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
           };
         }
       };
@@ -275,10 +275,14 @@ describe('Utility Functions', () => {
       const errorResult = await safeAsyncOperation(true);
 
       expect(successResult.success).toBe(true);
-      expect(successResult.data).toBe('Operation completed');
+      if (successResult.success) {
+        expect((successResult as { success: true; data: string }).data).toBe('Operation completed');
+      }
 
       expect(errorResult.success).toBe(false);
-      expect(errorResult.error).toBe('Async operation failed');
+      if (!errorResult.success) {
+        expect((errorResult as { success: false; error: string }).error).toBe('Async operation failed');
+      }
     });
   });
 });

@@ -27,11 +27,11 @@ async function testEmailService() {
       postalCode: '10115',
       city: 'Berlin',
       country: 'DE',
-      addressLine2: 'Apartment 5'
+      addressLine2: 'Apartment 5',
     },
     consentVersion: '1.0',
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   const testMagazine: Magazine = {
@@ -47,7 +47,7 @@ async function testEmailService() {
     reservationEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     isActive: true,
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   const testReservationPickup: Reservation = {
@@ -62,7 +62,7 @@ async function testEmailService() {
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     notes: 'Bitte um Rückruf vor Abholung',
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   const testReservationShipping: Reservation = {
@@ -75,7 +75,7 @@ async function testEmailService() {
     shippingAddress: testUser.address,
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   };
 
   try {
@@ -95,7 +95,7 @@ async function testEmailService() {
     await emailService.sendReservationConfirmation({
       reservation: testReservationPickup,
       user: testUser,
-      magazine: testMagazine
+      magazine: testMagazine,
     });
     console.log('✅ Pickup confirmation email sent!\n');
 
@@ -104,7 +104,7 @@ async function testEmailService() {
     await emailService.sendReservationConfirmation({
       reservation: testReservationShipping,
       user: testUser,
-      magazine: testMagazine
+      magazine: testMagazine,
     });
     console.log('✅ Shipping confirmation email sent!\n');
 
@@ -113,7 +113,7 @@ async function testEmailService() {
     await emailService.sendReservationCancellation({
       reservation: testReservationPickup,
       user: testUser,
-      magazine: testMagazine
+      magazine: testMagazine,
     });
     console.log('✅ Cancellation email sent!\n');
 
@@ -122,7 +122,7 @@ async function testEmailService() {
     await emailService.sendPickupReminder({
       reservation: testReservationPickup,
       user: testUser,
-      magazine: testMagazine
+      magazine: testMagazine,
     });
     console.log('✅ Pickup reminder email sent!\n');
 
