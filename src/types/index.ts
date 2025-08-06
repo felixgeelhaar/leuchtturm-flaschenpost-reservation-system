@@ -60,13 +60,13 @@ export interface ReservationFormData {
   firstName: string;
   lastName: string;
   email: string;
-  phone?: string;
   address?: Address;
   magazineId: string;
   quantity: number;
   pickupLocation: string;
   pickupDate?: string;
   deliveryMethod: 'pickup' | 'shipping';
+  paymentMethod?: 'paypal' | '';
   notes?: string;
   consents: ConsentData;
 }

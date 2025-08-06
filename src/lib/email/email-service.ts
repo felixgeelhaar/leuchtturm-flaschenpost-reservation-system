@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 import type { Reservation, Magazine, User } from '@/types';
+import { paymentConfig, generatePaymentReference, formatCurrency, calculateTotalCost } from '@/config/payment';
+import { kindergarten, magazine as magazineConfig, email as emailConfig } from '@/config/content';
 
 // Email configuration interface
 interface EmailConfig {
@@ -34,7 +36,7 @@ export class EmailService {
         user: process.env.SMTP_USER || '',
         pass: process.env.SMTP_PASS || '',
       },
-      from: process.env.SMTP_FROM || 'noreply@flaschenpost-magazin.de',
+      from: process.env.SMTP_FROM || emailConfig.senderEmail,
     };
 
     this.fromAddress = emailConfig.from;
@@ -74,20 +76,20 @@ export class EmailService {
   async sendReservationConfirmation(data: ReservationEmailData): Promise<void> {
     const { reservation, user, magazine } = data;
     
-    const subject = `Ihre Reservierung für ${magazine.title} - Ausgabe ${magazine.issueNumber}`;
+    const subject = emailConfig.subjects.reservation;
     const html = this.generateReservationEmailHTML(data);
     const text = this.generateReservationEmailText(data);
 
     try {
       const info = await this.transporter.sendMail({
-        from: `"Flaschenpost Magazin" <${this.fromAddress}>`,
+        from: `"${emailConfig.senderName}" <${this.fromAddress}>`,
         to: user.email,
         subject,
         text,
         html,
         headers: {
           'X-Priority': '3',
-          'X-Mailer': 'Flaschenpost Reservation System',
+          'X-Mailer': `${kindergarten.name} Reservation System`,
         },
       });
 
@@ -110,7 +112,7 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail({
-        from: `"Flaschenpost Magazin" <${this.fromAddress}>`,
+        from: `"${emailConfig.senderName}" <${this.fromAddress}>`,
         to: user.email,
         subject,
         text,
@@ -138,7 +140,7 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail({
-        from: `"Flaschenpost Magazin" <${this.fromAddress}>`,
+        from: `"${emailConfig.senderName}" <${this.fromAddress}>`,
         to: user.email,
         subject,
         text,
@@ -282,7 +284,50 @@ export class EmailService {
     <h3 style="color: #0066cc;">Was passiert als Nächstes?</h3>
     
     ${isShipping ? `
-      <p>Wir werden Ihr Magazin schnellstmöglich versenden. Sie erhalten eine weitere E-Mail mit den Versandinformationen, sobald Ihre Bestellung unterwegs ist.</p>
+      <div style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 15px; margin: 20px 0;">
+        <h4 style="margin: 0 0 10px 0; color: #856404;">Zahlungsinformationen</h4>
+        <div style="margin: 10px 0;">
+          <table style="width: 100%; font-size: 14px;">
+            <tr>
+              <td>Magazin (1 Exemplar):</td>
+              <td style="text-align: right;">${formatCurrency(paymentConfig.magazinePrice)}</td>
+            </tr>
+            <tr>
+              <td>Versandkostenpauschale:</td>
+              <td style="text-align: right;">${formatCurrency(paymentConfig.shippingCost)}</td>
+            </tr>
+            <tr style="border-top: 1px solid #dee2e6;">
+              <td style="padding-top: 5px;"><strong>Gesamtbetrag:</strong></td>
+              <td style="text-align: right; padding-top: 5px;"><strong>${formatCurrency(calculateTotalCost(true))}</strong></td>
+            </tr>
+          </table>
+        </div>
+        
+        ${reservation.paymentMethod === 'paypal' ? `
+          <p style="margin: 10px 0;">Sie haben PayPal als Zahlungsart gewählt.</p>
+          <p style="margin: 10px 0;">Bitte zahlen Sie den Gesamtbetrag über folgenden Link:</p>
+          <a href="${paymentConfig.paypal.paypalMeLink}/${calculateTotalCost(true)}EUR" 
+             style="display: inline-block; padding: 10px 20px; background-color: #0070ba; color: white; text-decoration: none; border-radius: 4px; margin: 10px 0;">
+            Mit PayPal bezahlen
+          </a>
+          <p style="margin: 10px 0; font-size: 14px;">Verwendungszweck: ${generatePaymentReference(reservation.id)}</p>
+        ` : `
+          <p style="margin: 10px 0;">Sie haben Überweisung als Zahlungsart gewählt.</p>
+          <p style="margin: 10px 0;">Bitte überweisen Sie den Gesamtbetrag auf folgendes Konto:</p>
+          <div style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0;">
+            <strong>Kontoinhaber:</strong> ${paymentConfig.bankTransfer.accountHolder}<br>
+            <strong>IBAN:</strong> ${paymentConfig.bankTransfer.iban}<br>
+            <strong>BIC:</strong> ${paymentConfig.bankTransfer.bic}<br>
+            <strong>Bank:</strong> ${paymentConfig.bankTransfer.bankName}<br>
+            <strong>Betrag:</strong> ${formatCurrency(calculateTotalCost(true))}<br>
+            <strong>Verwendungszweck:</strong> ${generatePaymentReference(reservation.id)}
+          </div>
+        `}
+        
+        <p style="margin: 10px 0 0 0; font-size: 14px; color: #856404;">
+          <strong>Wichtig:</strong> Das Magazin wird erst nach Zahlungseingang versandt.
+        </p>
+      </div>
     ` : `
       <p>Ihr Magazin liegt ab dem ${reservation.pickupDate ? 
         new Date(reservation.pickupDate).toLocaleDateString('de-DE') : 
@@ -305,7 +350,8 @@ export class EmailService {
       
       <p style="margin-top: 30px;">
         Mit freundlichen Grüßen,<br>
-        <strong>Ihr Flaschenpost Team</strong>
+        <strong>${emailConfig.signature.name}</strong><br>
+        ${emailConfig.signature.role}
       </p>
       
       <p style="font-size: 12px; color: #999; margin-top: 30px;">
@@ -342,6 +388,36 @@ Magazin: ${magazine.title} - Ausgabe ${magazine.issueNumber}
 Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
 Erhalt: ${isShipping ? 'Versand nach Hause' : 'Abholung vor Ort'}
 `;
+
+    if (isShipping) {
+      text += `
+\nZAHLUNGSINFORMATIONEN:
+---------------------------------
+Magazin (1 Exemplar): ${formatCurrency(paymentConfig.magazinePrice)}
+Versandkostenpauschale: ${formatCurrency(paymentConfig.shippingCost)}
+---------------------------------
+GESAMTBETRAG: ${formatCurrency(calculateTotalCost(true))}
+
+`;
+      
+      if (reservation.paymentMethod === 'paypal') {
+        text += `Zahlungsart: PayPal
+Bitte zahlen Sie über folgenden Link:
+${paymentConfig.paypal.paypalMeLink}/${calculateTotalCost(true)}EUR
+Verwendungszweck: ${generatePaymentReference(reservation.id)}\n`;
+      } else {
+        text += `Zahlungsart: Überweisung
+
+Kontoinhaber: ${paymentConfig.bankTransfer.accountHolder}
+IBAN: ${paymentConfig.bankTransfer.iban}
+BIC: ${paymentConfig.bankTransfer.bic}
+Bank: ${paymentConfig.bankTransfer.bankName}
+Betrag: ${formatCurrency(calculateTotalCost(true))}
+Verwendungszweck: ${generatePaymentReference(reservation.id)}\n`;
+      }
+      
+      text += `\nWICHTIG: Das Magazin wird erst nach Zahlungseingang versandt.\n`;
+    }
 
     if (!isShipping && reservation.pickupLocation) {
       text += `\nAbholort: ${reservation.pickupLocation}`;
@@ -384,7 +460,8 @@ Samstag: 10:00 - 14:00 Uhr`;
 - Bei Fragen wenden Sie sich bitte an unseren Kundenservice.
 
 Mit freundlichen Grüßen,
-Ihr Flaschenpost Team
+${emailConfig.signature.name}
+${emailConfig.signature.role}
 
 --
 Datenschutz ist uns wichtig. Ihre Daten werden gemäß unserer Datenschutzerklärung verarbeitet.
@@ -443,7 +520,8 @@ Reservierungs-ID: ${reservation.id}
 Falls Sie dies nicht veranlasst haben oder Fragen haben, kontaktieren Sie bitte unseren Kundenservice.
 
 Mit freundlichen Grüßen,
-Ihr Flaschenpost Team
+${emailConfig.signature.name}
+${emailConfig.signature.role}
     `;
   }
 
@@ -512,7 +590,8 @@ Samstag: 10:00 - 14:00 Uhr
 Bitte bringen Sie diese E-Mail oder Ihre Reservierungs-ID zur Abholung mit.
 
 Mit freundlichen Grüßen,
-Ihr Flaschenpost Team
+${emailConfig.signature.name}
+${emailConfig.signature.role}
     `;
   }
 }

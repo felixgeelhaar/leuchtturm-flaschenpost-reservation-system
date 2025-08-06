@@ -1,5 +1,58 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { validFormDataPickup, validFormDataShipping, mockMagazines, mockUser } from '../../fixtures/test-data';
+// Using inline test data instead of mock fixtures
+const mockUser = {
+  id: 'user-123',
+  email: 'test@example.com',
+  firstName: 'Test',
+  lastName: 'User',
+  phone: '+49123456789',
+  createdAt: '2024-01-01T00:00:00Z'
+};
+
+const mockMagazines = [{
+  id: '123e4567-e89b-12d3-a456-426614174000',
+  title: 'Test Magazine',
+  issueNumber: '2024-01',
+  availableCopies: 10
+}];
+
+const validFormDataPickup = {
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john@example.com',
+  magazineId: '123e4567-e89b-12d3-a456-426614174000',
+  quantity: 1,
+  deliveryMethod: 'pickup',
+  pickupLocation: 'Berlin Mitte',
+  consents: { 
+    essential: true,
+    functional: false,
+    analytics: false,
+    marketing: false
+  }
+};
+
+const validFormDataShipping = {
+  firstName: 'Jane',
+  lastName: 'Smith',
+  email: 'jane@example.com',
+  magazineId: '123e4567-e89b-12d3-a456-426614174000',
+  quantity: 2,
+  deliveryMethod: 'shipping',
+  address: {
+    street: 'Test Street',
+    houseNumber: '123',
+    postalCode: '10115',
+    city: 'Berlin',
+    country: 'DE'
+  },
+  consents: { 
+    essential: true,
+    functional: false,
+    analytics: false,
+    marketing: false
+  }
+};
 
 // Create mock database methods
 const mockDb = {
@@ -196,7 +249,7 @@ describe('/api/reservations', () => {
         magazineId: '',
         quantity: 0,
         deliveryMethod: 'pickup',
-        consents: { essential: false },
+        consents: { essential: false, functional: false, analytics: false, marketing: false },
       };
 
       const request = new Request('http://localhost/api/reservations', {

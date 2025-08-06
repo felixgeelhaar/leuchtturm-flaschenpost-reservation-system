@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simple lighthouse matching hero image style -->
+  <!-- Base -->
+  <rect x="8" y="24" width="8" height="6" fill="white"/>
+  
+  <!-- Tower (white background) -->
+  <rect x="10" y="10" width="4" height="14" fill="white"/>
+  
+  <!-- Red stripes -->
+  <rect x="10" y="12" width="4" height="2.5" fill="#ef4444"/>
+  <rect x="10" y="16.5" width="4" height="2.5" fill="#ef4444"/>
+  <rect x="10" y="21" width="4" height="2.5" fill="#ef4444"/>
+  
+  <!-- Lantern room (red) -->
+  <rect x="9" y="8" width="6" height="4" fill="#ef4444"/>
+  
+  <!-- Simple roof (white) -->
+  <polygon points="8,8 12,4 16,8" fill="white"/>
+  
+  <!-- No light beams -->
+  
+  <!-- Simple wave -->
+  <path d="M2 28 Q8 26 14 28 T26 28" stroke="white" stroke-width="1" fill="none"/>
+  
+  <!-- Text -->
+  <text x="32" y="14" font-family="system-ui, -apple-system, sans-serif" font-size="11" font-weight="600" fill="white">
+    Flaschenpost
+  </text>
+  <text x="32" y="26" font-family="system-ui, -apple-system, sans-serif" font-size="8" font-weight="400" fill="white" opacity="0.8">
+    Magazin
+  </text>
+</svg>

@@ -3,10 +3,10 @@
     <div class="card">
       <div class="card-header">
         <h2 class="text-2xl font-bold text-neutral-900">
-          Flaschenpost Magazin reservieren
+          {{ forms.reservation.title }}
         </h2>
         <p class="mt-2 text-neutral-600">
-          Reservieren Sie Ihr Exemplar des Flaschenpost Magazins. Alle Felder mit * sind Pflichtfelder.
+          {{ forms.reservation.subtitle }}
         </p>
       </div>
 
@@ -18,7 +18,7 @@
             </div>
             <div class="ml-3">
               <h3 class="text-sm font-medium text-error-800">
-                Fehler beim Absenden
+                {{ forms.reservation.errorTitle }}
               </h3>
               <div class="mt-2 text-sm text-error-700">
                 {{ serverError }}
@@ -123,24 +123,6 @@
             </p>
           </div>
 
-          <div>
-            <label for="phone" class="form-label">
-              Telefonnummer (optional)
-            </label>
-            <input
-              id="phone"
-              v-model="formData.phone"
-              type="tel"
-              :class="getFieldClass('phone')"
-              placeholder="+49 123 456789"
-              maxlength="20"
-              autocomplete="tel"
-            />
-            <ErrorMessage :error="formErrors.phone" />
-            <p class="form-help">
-              Nur für Rückfragen zur Abholung.
-            </p>
-          </div>
         </fieldset>
 
         <!-- Reservation Details -->
@@ -151,26 +133,19 @@
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label for="quantity" class="form-label form-label-required">
+              <label for="quantity" class="form-label">
                 Anzahl Exemplare
               </label>
-              <select
+              <input
                 id="quantity"
-                v-model.number="formData.quantity"
-                :class="getFieldClass('quantity')"
-                required
-              >
-                <option
-                  v-for="n in maxQuantity"
-                  :key="n"
-                  :value="n"
-                >
-                  {{ n }} {{ n === 1 ? 'Exemplar' : 'Exemplare' }}
-                </option>
-              </select>
-              <ErrorMessage :error="formErrors.quantity" />
+                type="text"
+                value="1 Exemplar"
+                class="form-field bg-neutral-100"
+                disabled
+                readonly
+              />
               <p class="form-help">
-                Maximal 5 Exemplare pro Reservierung.
+                Pro Familie kann 1 Exemplar reserviert werden.
               </p>
             </div>
 
@@ -190,7 +165,7 @@
               </select>
               <ErrorMessage :error="formErrors.deliveryMethod" />
               <p class="form-help">
-                {{ formData.deliveryMethod === 'pickup' ? 'Kostenlose Abholung an einem unserer Standorte.' : 'Wir senden Ihnen das Magazin kostenfrei zu.' }}
+                {{ formData.deliveryMethod === 'pickup' ? 'Kostenlose Abholung vor Ort.' : `Versandkostenpauschale: ${formatCurrency(shippingCost)} (Vorauszahlung erforderlich)` }}
               </p>
             </div>
           </div>
@@ -200,20 +175,67 @@
             <label for="pickupLocation" class="form-label form-label-required">
               Abholort
             </label>
-            <select
+            <input
               id="pickupLocation"
-              v-model="formData.pickupLocation"
-              :class="getFieldClass('pickupLocation')"
-              :required="formData.deliveryMethod === 'pickup'"
+              type="text"
+              value="BRK Haus für Kinder - Leuchtturm"
+              class="form-field bg-neutral-100"
+              disabled
+              readonly
+            />
+            <ErrorMessage :error="formErrors.pickupLocation" />
+          </div>
+
+          <!-- Cost Summary -->
+          <div class="p-4 bg-primary-50 border border-primary-200 rounded-form">
+            <h4 class="text-lg font-medium text-primary-900 mb-3">Kostenübersicht</h4>
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span>Magazin (1 Exemplar):</span>
+                <span class="font-medium">{{ formatCurrency(magazinePrice) }}</span>
+              </div>
+              <div v-if="formData.deliveryMethod === 'shipping'" class="flex justify-between text-sm">
+                <span>Versandkostenpauschale:</span>
+                <span class="font-medium">{{ formatCurrency(shippingCost) }}</span>
+              </div>
+              <div class="pt-2 mt-2 border-t border-primary-200">
+                <div class="flex justify-between">
+                  <span class="font-medium">Gesamtbetrag:</span>
+                  <span class="text-lg font-bold text-primary-900">{{ formatCurrency(totalCost) }}</span>
+                </div>
+              </div>
+            </div>
+            <div v-if="formData.deliveryMethod === 'shipping'" class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded">
+              <p class="text-xs text-amber-800">
+                <strong>Hinweis:</strong> Der Gesamtbetrag muss vor dem Versand bezahlt werden.
+                Sie erhalten nach der Reservierung eine E-Mail mit den Zahlungsinformationen.
+              </p>
+            </div>
+            <div v-else class="mt-3 p-3 bg-green-50 border border-green-200 rounded">
+              <p class="text-xs text-green-800">
+                <strong>Abholung:</strong> Barzahlung bei Abholung möglich.
+              </p>
+            </div>
+          </div>
+
+          <!-- Payment Method Selection (only shown for shipping) -->
+          <div v-if="formData.deliveryMethod === 'shipping'">
+            <label for="paymentMethod" class="form-label form-label-required">
+              Gewünschte Zahlungsart
+            </label>
+            <select
+              id="paymentMethod"
+              v-model="formData.paymentMethod"
+              :class="getFieldClass('paymentMethod')"
+              required
             >
               <option value="">Bitte wählen...</option>
-              <option value="Berlin Mitte">Berlin Mitte</option>
-              <option value="Hamburg Zentrum">Hamburg Zentrum</option>
-              <option value="München Innenstadt">München Innenstadt</option>
-              <option value="Köln Zentrum">Köln Zentrum</option>
-              <option value="Frankfurt Zentrum">Frankfurt Zentrum</option>
+              <option value="paypal">PayPal</option>
             </select>
-            <ErrorMessage :error="formErrors.pickupLocation" />
+            <ErrorMessage :error="formErrors.paymentMethod" />
+            <p class="form-help">
+              Sie erhalten einen PayPal-Zahlungslink per E-Mail nach der Reservierung.
+            </p>
           </div>
 
           <!-- Shipping Address (only shown for shipping) -->
@@ -233,7 +255,7 @@
                   type="text"
                   :class="getFieldClass('address.street')"
                   placeholder="Musterstraße"
-                  :required="formData.deliveryMethod === 'shipping'"
+                  required
                   maxlength="200"
                   autocomplete="street-address"
                 />
@@ -250,7 +272,7 @@
                   type="text"
                   :class="getFieldClass('address.houseNumber')"
                   placeholder="123"
-                  :required="formData.deliveryMethod === 'shipping'"
+                  required
                   maxlength="20"
                 />
                 <ErrorMessage :error="formErrors['address.houseNumber']" />
@@ -286,7 +308,7 @@
                   type="text"
                   :class="getFieldClass('address.postalCode')"
                   placeholder="12345"
-                  :required="formData.deliveryMethod === 'shipping'"
+                  required
                   maxlength="20"
                   autocomplete="postal-code"
                 />
@@ -303,7 +325,7 @@
                   type="text"
                   :class="getFieldClass('address.city')"
                   placeholder="Berlin"
-                  :required="formData.deliveryMethod === 'shipping'"
+                  required
                   maxlength="100"
                   autocomplete="address-level2"
                 />
@@ -319,7 +341,7 @@
                 id="country"
                 v-model="formData.address.country"
                 :class="getFieldClass('address.country')"
-                :required="formData.deliveryMethod === 'shipping'"
+                required
               >
                 <option value="DE">Deutschland</option>
                 <option value="AT">Österreich</option>
@@ -331,24 +353,6 @@
               </p>
             </div>
           </fieldset>
-
-          <div>
-            <label for="pickupDate" class="form-label">
-              Gewünschtes Abholdatum (optional)
-            </label>
-            <input
-              id="pickupDate"
-              v-model="formData.pickupDate"
-              type="date"
-              :class="getFieldClass('pickupDate')"
-              :min="minPickupDate"
-              :max="maxPickupDate"
-            />
-            <ErrorMessage :error="formErrors.pickupDate" />
-            <p class="form-help">
-              Falls Sie ein bestimmtes Datum bevorzugen. Standard: 7 Tage nach Reservierung.
-            </p>
-          </div>
 
           <div>
             <label for="notes" class="form-label">
@@ -372,7 +376,7 @@
         <!-- GDPR Consent -->
         <fieldset class="space-y-4 p-4 border border-neutral-200 rounded-form bg-neutral-50">
           <legend class="text-lg font-medium text-neutral-900 mb-4 px-2">
-            Datenschutz und Einverständniserklärung
+            Datenschutz
           </legend>
 
           <div class="space-y-3">
@@ -385,62 +389,19 @@
                 required
               />
               <label for="consent-essential" class="ml-3 text-sm text-neutral-700">
-                <span class="font-medium">Erforderliche Datenverarbeitung *</span><br>
-                Ich stimme der Verarbeitung meiner Daten für die Reservierungsabwicklung zu.
-                Dies ist notwendig für die Erfüllung des Vertrags.
-              </label>
-            </div>
-
-            <div class="flex items-start">
-              <input
-                id="consent-functional"
-                v-model="formData.consents.functional"
-                type="checkbox"
-                class="mt-1 h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
-              />
-              <label for="consent-functional" class="ml-3 text-sm text-neutral-700">
-                <span class="font-medium">Funktionale Verbesserungen</span><br>
-                Ich erlaube die Nutzung von Cookies für eine verbesserte Website-Funktionalität.
-              </label>
-            </div>
-
-            <div class="flex items-start">
-              <input
-                id="consent-analytics"
-                v-model="formData.consents.analytics"
-                type="checkbox"
-                class="mt-1 h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
-              />
-              <label for="consent-analytics" class="ml-3 text-sm text-neutral-700">
-                <span class="font-medium">Nutzungsanalyse</span><br>
-                Ich erlaube anonyme Nutzungsstatistiken zur Verbesserung der Website.
-              </label>
-            </div>
-
-            <div class="flex items-start">
-              <input
-                id="consent-marketing"
-                v-model="formData.consents.marketing"
-                type="checkbox"
-                class="mt-1 h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
-              />
-              <label for="consent-marketing" class="ml-3 text-sm text-neutral-700">
-                <span class="font-medium">Marketing-Kommunikation</span><br>
-                Ich möchte Informationen über neue Ausgaben und Veranstaltungen erhalten.
+                <span class="font-medium">Datenverarbeitung für die Reservierung *</span><br>
+                Ich stimme der Verarbeitung meiner Daten (Name, E-Mail, Telefonnummer) für die Reservierung zu.
               </label>
             </div>
           </div>
 
-          <div class="text-xs text-neutral-600 mt-4 space-y-2">
+          <div class="text-xs text-neutral-600 mt-4">
             <p>
               Weitere Informationen finden Sie in unserer 
               <a href="/privacy" class="text-primary-600 hover:text-primary-700 underline">
                 Datenschutzerklärung
               </a>.
-            </p>
-            <p>
-              Sie können Ihre Einwilligung jederzeit widerrufen. Ihre Daten werden nach 
-              einem Jahr automatisch gelöscht, sofern keine gesetzlichen Aufbewahrungsfristen bestehen.
+              Ihre Daten werden nur für die Reservierung verwendet und anschließend gelöscht.
             </p>
           </div>
 
@@ -483,12 +444,11 @@
             </div>
             <div class="ml-3">
               <h3 class="text-sm font-medium text-success-800">
-                Reservierung erfolgreich!
+                {{ forms.reservation.successTitle }}
               </h3>
               <div class="mt-2 text-sm text-success-700">
                 <p>
-                  Ihre Reservierung wurde erfolgreich übermittelt. 
-                  Sie erhalten in Kürze eine Bestätigungs-E-Mail mit allen Details.
+                  {{ forms.reservation.successMessage }}
                 </p>
                 <p class="mt-2 font-medium">
                   Reservierungs-ID: {{ reservationId }}
@@ -508,6 +468,8 @@ import { z } from 'zod';
 import type { Magazine, ReservationFormData, ConsentData, FormErrors } from '@/types';
 import ErrorMessage from './ErrorMessage.vue';
 import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
+import { paymentConfig, formatCurrency, calculateTotalCost } from '@/config/payment';
+import { forms, magazine } from '@/config/content';
 
 // Props
 interface Props {
@@ -527,17 +489,21 @@ const serverError = ref('');
 const reservationId = ref('');
 const availableMagazines = ref<Magazine[]>(props.magazines || []);
 
+// Pricing configuration
+const magazinePrice = ref(paymentConfig.magazinePrice);
+const shippingCost = ref(paymentConfig.shippingCost);
+
 // Form data
 const formData = reactive<ReservationFormData>({
   firstName: '',
   lastName: '',
   email: '',
-  phone: '',
   magazineId: '',
   quantity: 1,
-  deliveryMethod: 'pickup',
-  pickupLocation: '',
-  pickupDate: '',
+  deliveryMethod: 'pickup',  // Default to pickup (cheaper option)
+  pickupLocation: '',  // Used for pickup
+  pickupDate: '',  // Used for pickup  
+  paymentMethod: '',  // Required for shipping only
   address: {
     street: '',
     houseNumber: '',
@@ -578,17 +544,14 @@ const reservationSchema = z.object({
   email: z.string()
     .email('Bitte geben Sie eine gültige E-Mail-Adresse ein')
     .max(254, 'E-Mail-Adresse ist zu lang'),
-  phone: z.string()
-    .regex(/^\+?[1-9]\d{1,14}$/, 'Bitte geben Sie eine gültige Telefonnummer ein')
-    .optional()
-    .or(z.literal('')),
   magazineId: z.string().min(1, 'Bitte wählen Sie eine Magazin-Ausgabe'),
   quantity: z.number()
     .min(1, 'Mindestens 1 Exemplar erforderlich')
-    .max(5, 'Maximal 5 Exemplare pro Reservierung'),
-  deliveryMethod: z.enum(['pickup', 'shipping']),
-  pickupLocation: z.string().optional(),
-  pickupDate: z.string().optional(),
+    .max(1, 'Maximal 1 Exemplar pro Familie'),  // Fixed to 1 magazine per family
+  deliveryMethod: z.enum(['pickup', 'shipping']),  // Both pickup and shipping supported
+  pickupLocation: z.string().optional(),  // Used for pickup
+  pickupDate: z.string().optional(),  // Used for pickup
+  paymentMethod: z.string().optional(),  // Required only for shipping
   address: addressSchema,
   notes: z.string().max(500, 'Anmerkungen dürfen maximal 500 Zeichen lang sein').optional(),
   consents: z.object({
@@ -598,23 +561,15 @@ const reservationSchema = z.object({
     marketing: z.boolean()
   })
 }).refine((data) => {
-  // If pickup method, pickupLocation is required
-  if (data.deliveryMethod === 'pickup') {
-    return data.pickupLocation && data.pickupLocation.length > 0;
-  }
-  return true;
-}, {
-  message: 'Bitte wählen Sie einen Abholort',
-  path: ['pickupLocation']
-}).refine((data) => {
   // If shipping method, address is required
   if (data.deliveryMethod === 'shipping') {
     return data.address && 
            data.address.street && 
            data.address.houseNumber && 
            data.address.postalCode && 
-           data.address.city && 
-           data.address.country;
+           data.address.city &&
+           data.address.country &&
+           data.paymentMethod && data.paymentMethod.length > 0;
   }
   return true;
 }, {
@@ -627,9 +582,7 @@ const selectedMagazine = computed(() =>
   availableMagazines.value?.find?.(m => m.id === formData.magazineId)
 );
 
-const maxQuantity = computed(() => 
-  Math.min(selectedMagazine.value?.availableCopies || 1, 5)
-);
+const maxQuantity = computed(() => 1);  // Fixed to 1 magazine per family
 
 const minPickupDate = computed(() => {
   const tomorrow = new Date();
@@ -646,6 +599,11 @@ const maxPickupDate = computed(() => {
 const isFormValid = computed(() => {
   const result = reservationSchema.safeParse(formData);
   return result.success;
+});
+
+const totalCost = computed(() => {
+  const isShipping = formData.deliveryMethod === 'shipping';
+  return calculateTotalCost(isShipping);
 });
 
 // Methods
@@ -675,15 +633,16 @@ const validateForm = (): boolean => {
 };
 
 const updateQuantityOptions = () => {
-  if (formData.quantity > maxQuantity.value) {
-    formData.quantity = maxQuantity.value;
-  }
+  // Quantity is fixed to 1
+  formData.quantity = 1;
 };
 
+// Handle delivery method changes
 const onDeliveryMethodChange = () => {
   // Clear pickup location when switching to shipping
   if (formData.deliveryMethod === 'shipping') {
     formData.pickupLocation = '';
+    formData.pickupDate = '';
   }
   
   // Clear address when switching to pickup
@@ -696,14 +655,20 @@ const onDeliveryMethodChange = () => {
       country: 'DE',
       addressLine2: ''
     };
+    formData.paymentMethod = '';
   }
   
-  // Clear related validation errors
-  Object.keys(formErrors).forEach(key => {
-    if (key.startsWith('address.') || key === 'pickupLocation') {
-      delete formErrors[key];
-    }
-  });
+  // Clear validation errors for switched fields
+  if (formData.deliveryMethod === 'shipping') {
+    delete formErrors.pickupLocation;
+    delete formErrors.pickupDate;
+  } else {
+    delete formErrors['address.street'];
+    delete formErrors['address.houseNumber'];
+    delete formErrors['address.postalCode'];
+    delete formErrors['address.city'];
+    delete formErrors.paymentMethod;
+  }
 };
 
 const handleSubmit = async () => {

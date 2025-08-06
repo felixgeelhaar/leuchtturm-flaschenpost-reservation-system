@@ -12,7 +12,11 @@
       "Bash(npm test:*)",
       "Bash(npm run test:coverage:*)",
       "Bash(npm install:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(cp:*)",
+      "Bash(lsof:*)",
+      "mcp__playwright__browser_navigate",
+      "Bash(open /Users/felixgeelhaar/Developer/projects/leuchtturm/leuchtturm-flaschenpost-reservation-system/test-ui.html)"
     ],
     "deny": []
   }

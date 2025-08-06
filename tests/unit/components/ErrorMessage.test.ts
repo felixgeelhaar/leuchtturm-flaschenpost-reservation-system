@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { mountComponent } from '../../helpers/vue-test-utils';
+import { mount } from '@vue/test-utils';
 import ErrorMessage from '@/components/ErrorMessage.vue';
 
 describe('ErrorMessage Component', () => {
   describe('Rendering', () => {
     it('should not render when no error is provided', () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: '' }
       });
 
@@ -14,7 +14,7 @@ describe('ErrorMessage Component', () => {
     });
 
     it('should not render when error is null', () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: null }
       });
 
@@ -22,7 +22,7 @@ describe('ErrorMessage Component', () => {
     });
 
     it('should not render when error is undefined', () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: undefined }
       });
 
@@ -31,7 +31,7 @@ describe('ErrorMessage Component', () => {
 
     it('should render error message when error is provided', () => {
       const errorMessage = 'This field is required';
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: errorMessage }
       });
 
@@ -42,7 +42,7 @@ describe('ErrorMessage Component', () => {
     });
 
     it('should have correct CSS classes for styling', () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: 'Test error' }
       });
 
@@ -56,7 +56,7 @@ describe('ErrorMessage Component', () => {
 
   describe('Accessibility', () => {
     it('should have proper ARIA attributes', () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: 'Validation error' }
       });
 
@@ -66,7 +66,7 @@ describe('ErrorMessage Component', () => {
     });
 
     it('should be announced to screen readers', () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: 'Field validation failed' }
       });
 
@@ -78,7 +78,7 @@ describe('ErrorMessage Component', () => {
   describe('Props', () => {
     it('should accept string error prop', () => {
       const errorMessage = 'String error message';
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: errorMessage }
       });
 
@@ -87,7 +87,7 @@ describe('ErrorMessage Component', () => {
     });
 
     it('should handle empty string gracefully', () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: '' }
       });
 
@@ -95,7 +95,7 @@ describe('ErrorMessage Component', () => {
     });
 
     it('should handle whitespace-only strings', () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: '   ' }
       });
 
@@ -106,7 +106,7 @@ describe('ErrorMessage Component', () => {
 
   describe('Reactivity', () => {
     it('should show error when prop changes from empty to error', async () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: '' }
       });
 
@@ -120,7 +120,7 @@ describe('ErrorMessage Component', () => {
     });
 
     it('should hide error when prop changes from error to empty', async () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: 'Initial error' }
       });
 
@@ -132,7 +132,7 @@ describe('ErrorMessage Component', () => {
     });
 
     it('should update error message when prop changes', async () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: 'First error' }
       });
 
@@ -148,7 +148,7 @@ describe('ErrorMessage Component', () => {
   describe('Edge Cases', () => {
     it('should handle very long error messages', () => {
       const longError = 'This is a very long error message that might cause layout issues if not handled properly. '.repeat(10);
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: longError }
       });
 
@@ -159,7 +159,7 @@ describe('ErrorMessage Component', () => {
 
     it('should handle special characters in error messages', () => {
       const specialCharError = 'Error with special chars: <>&"\'';
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: specialCharError }
       });
 
@@ -170,7 +170,7 @@ describe('ErrorMessage Component', () => {
 
     it('should handle HTML in error messages safely', () => {
       const htmlError = '<script>alert("xss")</script>Safe error message';
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: htmlError }
       });
 
@@ -185,7 +185,7 @@ describe('ErrorMessage Component', () => {
 
   describe('Performance', () => {
     it('should not cause unnecessary re-renders', async () => {
-      const wrapper = mountComponent(ErrorMessage, {
+      const wrapper = mount(ErrorMessage, {
         props: { error: 'Test error' }
       });
 

@@ -1,5 +1,6 @@
 ---
 import '@/styles/globals.css';
+import { kindergarten, images } from '@/config/content';
 
 export interface Props {
   title: string;
@@ -11,7 +12,7 @@ export interface Props {
 const { 
   title, 
   description = 'Reservieren Sie Ihr Exemplar des Flaschenpost Magazins - das Magazin für neugierige Eltern und ihre Kinder.',
-  image = '/images/flaschenpost-og-image.jpg',
+  image = images.heroImage,
   noIndex = false 
 } = Astro.props;
 
@@ -111,8 +112,8 @@ const imageURL = new URL(image, Astro.site);
           <div class="flex-shrink-0">
             <a href="/" class="flex items-center focus-visible">
               <img 
-                src="/images/flaschenpost-logo.svg" 
-                alt="Flaschenpost Magazin Logo"
+                src={images.kindergartenLogo} 
+                alt={`${kindergarten.name} Logo`}
                 class="h-8 w-auto sm:h-10"
                 width="120"
                 height="40"

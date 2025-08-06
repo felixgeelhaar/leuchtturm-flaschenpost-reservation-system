@@ -10,17 +10,24 @@ export const GET: APIRoute = async ({ request }) => {
                     request.headers.get('x-real-ip') || 
                     'unknown';
 
-    // Log the API access
-    await db.logDataProcessing({
-      action: 'accessed',
-      dataType: 'user_data', // magazines are public but we log access
-      legalBasis: 'legitimate_interest',
-      ipAddress: clientIP,
-      details: JSON.stringify({ endpoint: '/api/magazines' })
-    });
+    let magazines;
+    
+    try {
+      // Try to get from database first
+      await db.logDataProcessing({
+        action: 'accessed',
+        dataType: 'user_data', // magazines are public but we log access
+        legalBasis: 'legitimate_interest',
+        ipAddress: clientIP,
+        details: JSON.stringify({ endpoint: '/api/magazines' })
+      });
 
-    // Get active magazines
-    const magazines = await db.getActiveMagazines();
+      magazines = await db.getActiveMagazines();
+    } catch (dbError) {
+      console.error('Database not available:', dbError);
+      // Return empty array - no mock data in production code
+      magazines = [];
+    }
 
     return new Response(
       JSON.stringify({

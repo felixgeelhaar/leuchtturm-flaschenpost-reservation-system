@@ -23,14 +23,6 @@ tests/
 ├── e2e/                     # End-to-end tests
 │   ├── fixtures/            # E2E test data
 │   └── utils/               # E2E test helpers
-├── mocks/                   # Mock implementations
-│   ├── supabase.ts          # Supabase client mocks
-│   └── ...                  # Other service mocks
-├── helpers/                 # Test utility functions
-│   ├── vue-test-utils.ts    # Vue testing helpers
-│   └── api-test-utils.ts    # API testing utilities
-├── fixtures/                # Test data and scenarios
-│   └── test-data.ts         # Common test data
 └── setup.ts                 # Global test setup
 ```
 
@@ -169,40 +161,42 @@ Located in `tests/e2e/utils/test-helpers.ts`:
 - `PageHelpers`: General page utilities
 - `PerformanceHelpers`: Performance testing utilities
 
-## 📊 Test Data & Fixtures
+## 📊 Test Data Strategy
 
-### Test Data
+### Inline Test Data
 
-All test data is centralized in `tests/fixtures/test-data.ts`:
+Test data is now defined inline within each test file to avoid mock dependencies:
 
 ```typescript
-export const testMagazines: Magazine[] = [
-  {
-    id: 'test-mag-1',
-    title: 'Test Magazine',
-    availableCopies: 10,
-    // ...
-  }
-];
+// Example from database.test.ts
+const mockUser = {
+  id: 'user-123',
+  email: 'test@example.com',
+  firstName: 'Test',
+  lastName: 'User',
+  phone: '+49123456789',
+  createdAt: '2024-01-01T00:00:00Z'
+};
 
-export const validFormData: ReservationFormData = {
-  firstName: 'Max',
-  lastName: 'Mustermann',
-  email: 'max@example.com',
-  // ...
+const validFormDataPickup = {
+  firstName: 'John',
+  lastName: 'Doe',
+  email: 'john@example.com',
+  magazineId: '123e4567-e89b-12d3-a456-426614174000',
+  quantity: 1,
+  deliveryMethod: 'pickup',
+  pickupLocation: 'Berlin Mitte',
+  consents: { essential: true }
 };
 ```
 
-### Mock Data
+### Production-Ready Approach
 
-Supabase mocks are in `tests/mocks/supabase.ts`:
-
-```typescript
-import { createSupabaseMock } from './supabase';
-
-const supabase = createSupabaseMock();
-// Use in tests
-```
+This approach ensures:
+- **No mock dependencies**: Tests are self-contained with inline data
+- **Production readiness**: No mock files or demo data in the codebase
+- **Test isolation**: Each test defines its own required data
+- **Maintainability**: Test data is co-located with tests that use it
 
 ## 🎯 Coverage Targets
 

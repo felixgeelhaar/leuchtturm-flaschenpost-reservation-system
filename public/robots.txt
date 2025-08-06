@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Protect sensitive areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /.netlify/
+Disallow: /dist/
+
+# Allow specific public assets
+Allow: /images/
+Allow: /favicon.ico
+Allow: /favicon.svg
