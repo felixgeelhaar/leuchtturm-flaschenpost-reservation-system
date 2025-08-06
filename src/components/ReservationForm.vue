@@ -430,10 +430,10 @@
               >
                 <option value="">Bitte wählen...</option>
                 <option value="seesterne">Seesterne</option>
-                <option value="muscheln">Muscheln</option>
-                <option value="krebse">Krebse</option>
-                <option value="fische">Fische</option>
-                <option value="delfine">Delfine</option>
+                <option value="seepferdchen">Seepferdchen</option>
+                <option value="seeigel">Seeigel</option>
+                <option value="schatzsucher">Schatzsucher</option>
+                <option value="lachmoewen">Lachmöwen</option>
               </select>
               <ErrorMessage :error="formErrors.childGroupName" />
             </div>
