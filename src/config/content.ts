@@ -80,7 +80,7 @@ export const websiteContent = {
     // Hero section
     hero: {
       // TODO: Update with your specific message
-      headline: "Flaschenpost Magazin - Ausgabe 2024 / 2025",
+      headline: "Flaschenpost Magazin reservieren",
       subheadline:
         "Für alle Familien, die das Magazin nicht persönlich abholen können",
 
