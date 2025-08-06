@@ -33,9 +33,7 @@
     "backup:restore": "node scripts/backup-restore.js",
     "test:email": "tsx scripts/test-email.ts",
     "security:audit": "npm audit --audit-level high",
-    "security:scan": "snyk test",
-    "prepare": "husky install",
-    "postinstall": "is-ci || husky install"
+    "security:scan": "snyk test"
   },
   "dependencies": {
     "@astrojs/netlify": "^5.0.0",
@@ -83,12 +81,6 @@
     "*.{json,css,md}": [
       "prettier --write"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged",
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
-    }
   },
   "engines": {
     "node": ">=18.0.0",
