@@ -42,7 +42,7 @@ export class EmailService {
     this.fromAddress = emailConfig.from;
 
     // Create transporter
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       host: emailConfig.host,
       port: emailConfig.port,
       secure: emailConfig.secure,
