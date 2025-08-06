@@ -169,9 +169,9 @@ export const POST: APIRoute = async ({ request }) => {
       );
     }
 
-    // Validate Content-Type
-    const contentType = request.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
+    // Validate Content-Type (allow charset specification)
+    const contentType = request.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) {
       return new Response(
         JSON.stringify({
           success: false,
