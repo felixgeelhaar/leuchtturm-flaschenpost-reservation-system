@@ -62,7 +62,6 @@ export class EmailService {
   async verifyConnection(): Promise<boolean> {
     try {
       await this.transporter.verify();
-      console.log('Email service is ready to send messages');
       return true;
     } catch (error) {
       console.error('Email service verification failed:', error);
@@ -93,7 +92,7 @@ export class EmailService {
         },
       });
 
-      console.log('Reservation confirmation email sent:', info.messageId);
+      // Email sent successfully
     } catch (error) {
       console.error('Failed to send reservation confirmation email:', error);
       throw new Error('Email konnte nicht gesendet werden');

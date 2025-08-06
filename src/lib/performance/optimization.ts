@@ -547,17 +547,13 @@ export function analyzeBundleSize(): void {
     return src ? new URL(src, window.location.origin).pathname : null;
   }).filter(Boolean);
 
-  console.group('Bundle Analysis');
-  console.log('Loaded resources:', resources.length);
-  console.log('Resources:', resources);
-  
-  // Check for duplicate resources
-  const duplicates = resources.filter((item, index) => resources.indexOf(item) !== index);
-  if (duplicates.length > 0) {
-    console.warn('Duplicate resources detected:', duplicates);
+  // Check for duplicate resources in development
+  if (process.env.NODE_ENV === 'development') {
+    const duplicates = resources.filter((item, index) => resources.indexOf(item) !== index);
+    if (duplicates.length > 0) {
+      console.warn('Duplicate resources detected:', duplicates);
+    }
   }
-
-  console.groupEnd();
 }
 
 // Global instances

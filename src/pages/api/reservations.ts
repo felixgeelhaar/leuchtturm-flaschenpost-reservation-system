@@ -357,7 +357,7 @@ async function sendConfirmationEmail(
       magazine
     });
     
-    console.log(`Confirmation email sent to ${user.email} for reservation ${reservation.id}`);
+    // Confirmation email sent successfully
   } catch (error) {
     console.error('Email sending failed:', error);
     throw error;

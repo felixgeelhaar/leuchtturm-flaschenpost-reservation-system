@@ -107,7 +107,6 @@ function validateEnvironment() {
   if (typeof process !== "undefined" && process.env) {
     try {
       const serverEnv = ServerEnvSchema.parse(process.env);
-      console.log("✅ Server environment variables validated successfully");
       return { server: serverEnv, client: null };
     } catch (error) {
       console.error("❌ Server environment validation failed:", error);
@@ -122,7 +121,6 @@ function validateEnvironment() {
     try {
       const clientEnv = import.meta.env || {};
       const validatedClientEnv = ClientEnvSchema.parse(clientEnv);
-      console.log("✅ Client environment variables validated successfully");
       return { server: null, client: validatedClientEnv };
     } catch (error) {
       console.error("❌ Client environment validation failed:", error);
