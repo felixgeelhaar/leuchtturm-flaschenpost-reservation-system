@@ -274,22 +274,24 @@ export async function securityMiddleware(
     const resetTime = rateLimiter.getResetTime(context);
     const remaining = rateLimiter.getRemainingRequests(context);
     
-    return new Response('Too Many Requests', {
-      status: 429,
-      headers: {
-        'Content-Type': 'application/json',
-        'Retry-After': Math.ceil((resetTime - Date.now()) / 1000).toString(),
-        'X-RateLimit-Limit': serverConfig?.security.rateLimitMaxRequests.toString() || '100',
-        'X-RateLimit-Remaining': remaining.toString(),
-        'X-RateLimit-Reset': resetTime.toString(),
-        ...headers,
-      },
-      body: JSON.stringify({
+    return new Response(
+      JSON.stringify({
         error: 'Rate limit exceeded',
         retryAfter: resetTime,
         remaining: remaining,
       }),
-    });
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': Math.ceil((resetTime - Date.now()) / 1000).toString(),
+          'X-RateLimit-Limit': serverConfig?.security.rateLimitMaxRequests.toString() || '100',
+          'X-RateLimit-Remaining': remaining.toString(),
+          'X-RateLimit-Reset': resetTime.toString(),
+          ...headers,
+        },
+      }
+    );
   }
 
   // CSRF protection for state-changing operations
@@ -298,14 +300,16 @@ export async function securityMiddleware(
     
     // Validate content type
     if (!validateContentType(contentType)) {
-      return new Response('Invalid Content-Type', {
-        status: 400,
-        headers: {
-          'Content-Type': 'application/json',
-          ...headers,
-        },
-        body: JSON.stringify({ error: 'Invalid content type' }),
-      });
+      return new Response(
+        JSON.stringify({ error: 'Invalid content type' }),
+        {
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            ...headers,
+          },
+        }
+      );
     }
 
     // CSRF token validation
@@ -315,14 +319,16 @@ export async function securityMiddleware(
       const sessionId = request.headers.get('x-session-id') || 'anonymous';
 
       if (!csrfToken || !csrfProtection.validateToken(csrfToken, sessionId)) {
-        return new Response('CSRF token invalid', {
-          status: 403,
-          headers: {
-            'Content-Type': 'application/json',
-            ...headers,
-          },
-          body: JSON.stringify({ error: 'CSRF token validation failed' }),
-        });
+        return new Response(
+          JSON.stringify({ error: 'CSRF token validation failed' }),
+          {
+            status: 403,
+            headers: {
+              'Content-Type': 'application/json',
+              ...headers,
+            },
+          }
+        );
       }
     }
 
@@ -334,14 +340,16 @@ export async function securityMiddleware(
           // Log suspicious activity but don't reveal honeypot
           console.warn(`Potential bot detected from ${context.clientAddress}`);
           
-          return new Response('Bad Request', {
-            status: 400,
-            headers: {
-              'Content-Type': 'application/json',
-              ...headers,
-            },
-            body: JSON.stringify({ error: 'Invalid form submission' }),
-          });
+          return new Response(
+            JSON.stringify({ error: 'Invalid form submission' }),
+            {
+              status: 400,
+              headers: {
+                'Content-Type': 'application/json',
+                ...headers,
+              },
+            }
+          );
         }
       } catch (error) {
         console.error('Error parsing form data:', error);

@@ -50,6 +50,7 @@ export class NetworkError extends Error implements AppError {
   userMessage = 'Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.';
   category = ErrorCategory.NETWORK;
   timestamp = new Date().toISOString();
+  context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
@@ -64,6 +65,7 @@ export class ValidationError extends Error implements AppError {
   userMessage = 'Die eingegebenen Daten sind ungültig. Bitte überprüfen Sie Ihre Eingaben.';
   category = ErrorCategory.VALIDATION;
   timestamp = new Date().toISOString();
+  context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
@@ -78,6 +80,7 @@ export class AuthenticationError extends Error implements AppError {
   userMessage = 'Authentifizierung fehlgeschlagen. Bitte melden Sie sich erneut an.';
   category = ErrorCategory.AUTHENTICATION;
   timestamp = new Date().toISOString();
+  context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
@@ -92,6 +95,7 @@ export class AuthorizationError extends Error implements AppError {
   userMessage = 'Sie haben keine Berechtigung für diese Aktion.';
   category = ErrorCategory.AUTHORIZATION;
   timestamp = new Date().toISOString();
+  context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
@@ -106,6 +110,7 @@ export class NotFoundError extends Error implements AppError {
   userMessage = 'Die angeforderte Ressource wurde nicht gefunden.';
   category = ErrorCategory.NOT_FOUND;
   timestamp = new Date().toISOString();
+  context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
@@ -120,6 +125,7 @@ export class ServerError extends Error implements AppError {
   userMessage = 'Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
   category = ErrorCategory.SERVER_ERROR;
   timestamp = new Date().toISOString();
+  context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);

@@ -18,7 +18,10 @@
       "mcp__playwright__browser_navigate",
       "Bash(open /Users/felixgeelhaar/Developer/projects/leuchtturm/leuchtturm-flaschenpost-reservation-system/test-ui.html)",
       "Bash(ls:*)",
-      "Bash(npx vitest run:*)"
+      "Bash(npx vitest run:*)",
+      "Bash(npm audit:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(npm run test:*)"
     ],
     "deny": []
   }

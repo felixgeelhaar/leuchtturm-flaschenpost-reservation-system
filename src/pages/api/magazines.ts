@@ -10,7 +10,7 @@ export const GET: APIRoute = async ({ request }) => {
                     request.headers.get('x-real-ip') || 
                     'unknown';
 
-    let magazines;
+    let magazines: import('@/types').Magazine[];
     
     try {
       // Try to get from database first

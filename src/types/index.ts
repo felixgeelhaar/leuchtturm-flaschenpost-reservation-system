@@ -45,8 +45,11 @@ export interface Reservation {
   quantity: number;
   status: ReservationStatus;
   reservationDate: string;
+  deliveryMethod: 'pickup' | 'shipping';
   pickupDate?: string;
   pickupLocation?: string;
+  paymentMethod?: string;
+  shippingAddress?: Address;
   notes?: string;
   consentReference: string;
   createdAt: string;

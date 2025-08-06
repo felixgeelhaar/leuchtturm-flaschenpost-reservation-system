@@ -115,7 +115,7 @@ class ErrorSanitizer {
     return sanitized;
   }
 
-  private sanitizeString(str: string): string {
+  sanitizeString(str: string): string {
     return str
       .replace(this.emailRegex, '[EMAIL_REDACTED]')
       .replace(this.phoneRegex, '[PHONE_REDACTED]')
@@ -381,7 +381,7 @@ class PerformanceTracker {
       dnsLookup: navigation.domainLookupEnd - navigation.domainLookupStart,
       tcpConnection: navigation.connectEnd - navigation.connectStart,
       serverResponse: navigation.responseEnd - navigation.responseStart,
-      domProcessing: navigation.domComplete - navigation.domLoading,
+      domProcessing: navigation.domComplete - navigation.domContentLoadedEventStart,
     };
 
     this.logger.info('Page load performance metrics', {
