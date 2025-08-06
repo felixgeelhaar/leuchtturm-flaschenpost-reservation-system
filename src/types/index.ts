@@ -52,12 +52,29 @@ export interface Reservation {
   shippingAddress?: Address;
   notes?: string;
   consentReference: string;
+  // Picture order fields
+  orderGroupPicture?: boolean;
+  childGroupName?: string;
+  orderVorschulPicture?: boolean;
+  childIsVorschueler?: boolean;
+  childName?: string;
   createdAt: string;
   updatedAt: string;
   expiresAt: string;
 }
 
 export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'expired';
+
+// Picture claim tracking
+export interface PictureClaim {
+  id: string;
+  familyEmail: string; // Email used to identify family
+  groupName: string; // Which kindergarten group
+  pictureType: 'group' | 'vorschul';
+  childName: string;
+  claimedAt: string;
+  reservationId: string; // Link to the reservation
+}
 
 export interface ReservationFormData {
   firstName: string;
@@ -72,6 +89,12 @@ export interface ReservationFormData {
   paymentMethod?: 'paypal' | '';
   notes?: string;
   consents: ConsentData;
+  // Picture order fields
+  orderGroupPicture?: boolean;
+  childGroupName?: string; // Which group the child belongs to
+  orderVorschulPicture?: boolean;
+  childIsVorschueler?: boolean;
+  childName?: string; // Child's name for verification
 }
 
 // GDPR Consent Types

@@ -367,6 +367,111 @@
             </div>
           </fieldset>
 
+        <!-- Picture Orders Section -->
+        <fieldset class="space-y-4 p-4 border-2 border-amber-300 rounded-form bg-gradient-to-br from-amber-50 to-white">
+          <legend class="text-lg font-medium text-amber-800 mb-4 px-2 flex items-center gap-2">
+            <svg class="w-6 h-6" viewBox="0 0 100 100">
+              <use href="/images/nautical-icons.svg#treasure-chest"></use>
+            </svg>
+            Kostenlose Bilder bestellen
+          </legend>
+          
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded">
+            <p class="text-sm text-amber-800">
+              <strong>Hinweis:</strong> Pro Familie kann maximal 1 Gruppenbild und (falls zutreffend) 1 Vorschüler-Bild kostenlos bestellt werden.
+            </p>
+          </div>
+
+          <!-- Child Name (required for picture orders) -->
+          <div v-if="formData.orderGroupPicture || formData.orderVorschulPicture">
+            <label for="childName" class="form-label form-label-required">
+              Name des Kindes
+            </label>
+            <input
+              id="childName"
+              v-model="formData.childName"
+              type="text"
+              :class="getFieldClass('childName')"
+              placeholder="Vor- und Nachname des Kindes"
+              :required="formData.orderGroupPicture || formData.orderVorschulPicture"
+              maxlength="200"
+            />
+            <ErrorMessage :error="formErrors.childName" />
+            <p class="form-help">
+              Zur Verifizierung der Bestellung benötigen wir den Namen Ihres Kindes.
+            </p>
+          </div>
+
+          <!-- Group Picture Order -->
+          <div class="space-y-3">
+            <div class="flex items-start">
+              <input
+                id="order-group-picture"
+                v-model="formData.orderGroupPicture"
+                type="checkbox"
+                class="mt-1 h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+              />
+              <label for="order-group-picture" class="ml-3 text-sm text-neutral-700">
+                <span class="font-medium">Gruppenbild bestellen (kostenlos)</span><br>
+                Ich möchte das Gruppenbild meines Kindes erhalten.
+              </label>
+            </div>
+
+            <!-- Group Selection (shown when group picture is selected) -->
+            <div v-if="formData.orderGroupPicture" class="ml-7">
+              <label for="childGroupName" class="form-label form-label-required">
+                Kindergarten-Gruppe
+              </label>
+              <select
+                id="childGroupName"
+                v-model="formData.childGroupName"
+                :class="getFieldClass('childGroupName')"
+                :required="formData.orderGroupPicture"
+              >
+                <option value="">Bitte wählen...</option>
+                <option value="seesterne">Seesterne</option>
+                <option value="muscheln">Muscheln</option>
+                <option value="krebse">Krebse</option>
+                <option value="fische">Fische</option>
+                <option value="delfine">Delfine</option>
+              </select>
+              <ErrorMessage :error="formErrors.childGroupName" />
+            </div>
+          </div>
+
+          <!-- Vorschüler Picture Order -->
+          <div class="space-y-3">
+            <div class="flex items-start">
+              <input
+                id="child-is-vorschueler"
+                v-model="formData.childIsVorschueler"
+                type="checkbox"
+                class="mt-1 h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+              />
+              <label for="child-is-vorschueler" class="ml-3 text-sm text-neutral-700">
+                <span class="font-medium">Mein Kind ist ein Vorschüler</span><br>
+                Mein Kind kommt dieses Jahr in die Schule.
+              </label>
+            </div>
+
+            <!-- Vorschüler Picture Checkbox (shown when child is Vorschüler) -->
+            <div v-if="formData.childIsVorschueler" class="ml-7">
+              <div class="flex items-start">
+                <input
+                  id="order-vorschul-picture"
+                  v-model="formData.orderVorschulPicture"
+                  type="checkbox"
+                  class="mt-1 h-4 w-4 text-primary-600 border-neutral-300 rounded focus:ring-primary-500"
+                />
+                <label for="order-vorschul-picture" class="ml-3 text-sm text-neutral-700">
+                  <span class="font-medium">Vorschüler-Bild bestellen (kostenlos)</span><br>
+                  Ich möchte das Vorschüler-Gruppenbild erhalten.
+                </label>
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
         <!-- Notes field -->
         <div>
           <label for="notes" class="form-label">
@@ -543,7 +648,13 @@ const formData = reactive<ReservationFormData>({
     functional: false,
     analytics: false,
     marketing: false
-  }
+  },
+  // Picture order fields
+  orderGroupPicture: false,
+  childGroupName: '',
+  orderVorschulPicture: false,
+  childIsVorschueler: false,
+  childName: ''
 });
 
 // Form errors
@@ -579,6 +690,12 @@ const reservationSchema = z.object({
   paymentMethod: z.string().optional(),  // Required only for shipping
   address: addressSchema,
   notes: z.string().max(500, 'Anmerkungen dürfen maximal 500 Zeichen lang sein').optional(),
+  // Picture order fields
+  orderGroupPicture: z.boolean().optional(),
+  childGroupName: z.string().optional(),
+  orderVorschulPicture: z.boolean().optional(),
+  childIsVorschueler: z.boolean().optional(),
+  childName: z.string().max(200, 'Name ist zu lang').optional(),
   consents: z.object({
     essential: z.boolean().refine(val => val === true, 'Erforderliche Einwilligung muss erteilt werden'),
     functional: z.boolean(),
@@ -600,6 +717,26 @@ const reservationSchema = z.object({
 }, {
   message: 'Lieferadresse ist bei Versand erforderlich',
   path: ['address']
+}).refine((data) => {
+  // If ordering group picture, group name and child name are required
+  if (data.orderGroupPicture) {
+    return data.childGroupName && data.childGroupName.length > 0 && 
+           data.childName && data.childName.length > 0;
+  }
+  return true;
+}, {
+  message: 'Gruppenname und Kindername sind für die Bildbestellung erforderlich',
+  path: ['childGroupName']
+}).refine((data) => {
+  // If ordering Vorschüler picture, child must be marked as Vorschüler and name is required
+  if (data.orderVorschulPicture) {
+    return data.childIsVorschueler === true && 
+           data.childName && data.childName.length > 0;
+  }
+  return true;
+}, {
+  message: 'Für die Vorschüler-Bildbestellung muss das Kind als Vorschüler markiert sein',
+  path: ['orderVorschulPicture']
 });
 
 // Computed properties
@@ -787,6 +924,8 @@ const resetForm = () => {
         analytics: false,
         marketing: false
       };
+    } else if (key === 'orderGroupPicture' || key === 'orderVorschulPicture' || key === 'childIsVorschueler') {
+      (formData as any)[key] = false;
     } else {
       (formData as any)[key] = '';
     }

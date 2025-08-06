@@ -143,6 +143,12 @@ export class DatabaseService {
         shipping_country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
         notes: formData.notes || null,
         consent_reference: consentReference,
+        // Picture order fields
+        order_group_picture: formData.orderGroupPicture || false,
+        child_group_name: formData.childGroupName || null,
+        order_vorschul_picture: formData.orderVorschulPicture || false,
+        child_is_vorschueler: formData.childIsVorschueler || false,
+        child_name: formData.childName || null,
         expires_at: expiresAt.toISOString(),
       })
       .select(`
@@ -448,6 +454,12 @@ export class DatabaseService {
       } : undefined,
       notes: data.notes,
       consentReference: data.consent_reference,
+      // Picture order fields
+      orderGroupPicture: data.order_group_picture,
+      childGroupName: data.child_group_name,
+      orderVorschulPicture: data.order_vorschul_picture,
+      childIsVorschueler: data.child_is_vorschueler,
+      childName: data.child_name,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
       expiresAt: data.expires_at,

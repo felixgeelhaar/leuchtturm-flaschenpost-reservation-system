@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
 import { emailService } from '@/lib/email/email-service';
+import { pictureClaimsService } from '@/lib/picture-claims';
 import type { ReservationFormData, ConsentData } from '@/types';
 
 const db = new DatabaseService();
@@ -70,6 +71,12 @@ const reservationSchema = z.object({
     analytics: z.boolean(),
     marketing: z.boolean(),
   }),
+  // Picture order fields
+  orderGroupPicture: z.boolean().optional(),
+  childGroupName: z.string().max(100).optional(),
+  orderVorschulPicture: z.boolean().optional(),
+  childIsVorschueler: z.boolean().optional(),
+  childName: z.string().max(200).trim().optional(),
 }).refine((data) => {
   // If pickup method, pickupLocation is required
   if (data.deliveryMethod === 'pickup') {
@@ -93,6 +100,26 @@ const reservationSchema = z.object({
 }, {
   message: 'Lieferadresse ist bei Versand erforderlich',
   path: ['address'],
+}).refine((data) => {
+  // If ordering group picture, group name and child name are required
+  if (data.orderGroupPicture) {
+    return data.childGroupName && data.childGroupName.length > 0 && 
+           data.childName && data.childName.length > 0;
+  }
+  return true;
+}, {
+  message: 'Gruppenname und Kindername sind für die Bildbestellung erforderlich',
+  path: ['childGroupName'],
+}).refine((data) => {
+  // If ordering Vorschüler picture, child must be marked as Vorschüler and name is required
+  if (data.orderVorschulPicture) {
+    return data.childIsVorschueler === true && 
+           data.childName && data.childName.length > 0;
+  }
+  return true;
+}, {
+  message: 'Für die Vorschüler-Bildbestellung muss das Kind als Vorschüler markiert sein',
+  path: ['orderVorschulPicture'],
 });
 
 // Rate limiting (simple in-memory implementation)
@@ -266,8 +293,65 @@ export const POST: APIRoute = async ({ request }) => {
       }
     }
 
+    // Validate picture orders before creating reservation
+    if (formData.orderGroupPicture || formData.orderVorschulPicture) {
+      const pictureValidation = await pictureClaimsService.validatePictureOrder(
+        formData.email,
+        formData.orderGroupPicture || false,
+        formData.childGroupName,
+        formData.orderVorschulPicture || false,
+        formData.childIsVorschueler || false
+      );
+
+      if (!pictureValidation.valid) {
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: 'Picture order validation failed',
+            message: pictureValidation.errors.join(' '),
+            errors: pictureValidation.errors.map(msg => ({ field: 'picture', message: msg })),
+          }),
+          {
+            status: 409,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        );
+      }
+    }
+
     // Create reservation
     const reservation = await db.createReservation(formData);
+
+    // Create picture claims if applicable
+    if (formData.orderGroupPicture && formData.childGroupName && formData.childName) {
+      try {
+        await pictureClaimsService.createClaim(
+          formData.email,
+          formData.childGroupName,
+          'group',
+          formData.childName,
+          reservation.id
+        );
+      } catch (error) {
+        console.error('Failed to create group picture claim:', error);
+        // Don't fail the reservation, but log the error
+      }
+    }
+
+    if (formData.orderVorschulPicture && formData.childGroupName && formData.childName) {
+      try {
+        await pictureClaimsService.createClaim(
+          formData.email,
+          formData.childGroupName,
+          'vorschul',
+          formData.childName,
+          reservation.id
+        );
+      } catch (error) {
+        console.error('Failed to create Vorschüler picture claim:', error);
+        // Don't fail the reservation, but log the error
+      }
+    }
 
     // Send confirmation email (non-blocking)
     sendConfirmationEmail(user, reservation, magazine).catch(error => {
