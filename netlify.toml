@@ -81,10 +81,6 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
-# Edge functions configuration
-[edge_functions]
-  directory = "netlify/edge-functions"
-
 # Plugin configuration
 [[plugins]]
   package = "@netlify/plugin-lighthouse"
