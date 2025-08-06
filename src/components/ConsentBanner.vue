@@ -22,16 +22,9 @@
               Datenschutzhinweis
             </h3>
             <p id="consent-banner-description" class="text-sm text-neutral-600 mb-4 lg:mb-0">
-              Diese Webseite speichert nur die für die Reservierung notwendigen Daten (Name, E-Mail, Telefonnummer). 
-              Es werden keine Tracking-Cookies oder Analysetools verwendet.
-              <a 
-                href="/privacy" 
-                class="text-primary-600 hover:text-primary-700 underline ml-1"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Datenschutzerklärung
-              </a>
+              Diese Webseite speichert nur die für die Reservierung notwendigen Daten (Name, E-Mail). 
+              Es werden keine Tracking-Cookies oder Analysetools verwendet. 
+              Die Daten werden nur für die Magazine-Reservierung genutzt und nach der Ausgabe gelöscht.
             </p>
           </div>
 

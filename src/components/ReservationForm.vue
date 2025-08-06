@@ -397,11 +397,8 @@
 
           <div class="text-xs text-neutral-600 mt-4">
             <p>
-              Weitere Informationen finden Sie in unserer 
-              <a href="/privacy" class="text-primary-600 hover:text-primary-700 underline">
-                Datenschutzerklärung
-              </a>.
-              Ihre Daten werden nur für die Reservierung verwendet und anschließend gelöscht.
+              Ihre Daten werden ausschließlich für die Reservierung verwendet und nach der Magazine-Ausgabe wieder gelöscht. 
+              Es erfolgt keine Weitergabe an Dritte.
             </p>
           </div>
 

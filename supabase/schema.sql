@@ -170,39 +170,10 @@ CREATE POLICY "Service role can access data processing"
   USING (auth.role() = 'service_role');
 
 -- ============================================================================
--- INITIAL DATA - MAGAZINE ISSUES
+-- NO INITIAL DATA - MAGAZINES WILL BE ADDED MANUALLY
 -- ============================================================================
-
--- Insert current magazine issues
-INSERT INTO magazines (title, issue_number, publish_date, description, total_copies, available_copies, is_active)
-VALUES 
-  (
-    'Flaschenpost Magazin', 
-    'Ausgabe 2025/1', 
-    '2025-02-01', 
-    'Winterausgabe mit spannenden Geschichten aus dem Leuchtturm, kreativen Bastelanleitungen für kalte Tage und lehrreichen Experimenten zum Thema Eis und Schnee.', 
-    100, 
-    95, 
-    true
-  ),
-  (
-    'Flaschenpost Magazin', 
-    'Ausgabe 2025/2', 
-    '2025-04-01', 
-    'Frühlingsausgabe voller Naturentdeckungen, Gartenprojekte für kleine Gärtner und Osterbastelein. Mit extra Rätselspaß und Frühlingsgeschichten.', 
-    100, 
-    100, 
-    true
-  ),
-  (
-    'Flaschenpost Magazin', 
-    'Ausgabe 2025/3', 
-    '2025-06-01', 
-    'Sommerausgabe mit Outdoor-Abenteuern, Wasserspielen, Urlaubsgeschichten und tollen Ideen für die Ferienzeit. Plus: Unser großes Sommer-Quiz!', 
-    100, 
-    100, 
-    false -- Not yet active
-  );
+-- Magazine issues should be added manually through the admin interface
+-- or direct database insertion when real magazines are available
 
 -- ============================================================================
 -- HELPER FUNCTIONS
