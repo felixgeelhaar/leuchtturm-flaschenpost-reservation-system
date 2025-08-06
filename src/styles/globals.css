@@ -6,12 +6,20 @@
 html {
   overflow-x: hidden;
   overflow-y: auto !important;
+  height: auto !important;
 }
 
 body {
   overflow-x: hidden;
   overflow-y: auto !important;
   min-height: 100vh;
+  height: auto !important;
+}
+
+/* Ensure main content can scroll */
+main {
+  overflow-y: visible !important;
+  min-height: auto !important;
 }
 
 /* Custom CSS Variables */

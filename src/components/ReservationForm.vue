@@ -981,7 +981,7 @@ const fetchMagazines = async () => {
 <style scoped>
 /* Additional component-specific styles */
 .form-container {
-  min-height: 100vh;
+  /* Remove min-height to prevent layout conflicts - parent layout handles this */
 }
 
 @media (max-width: 640px) {
