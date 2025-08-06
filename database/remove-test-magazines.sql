@@ -6,17 +6,20 @@ SELECT id, title, issue_number, publish_date, description, available_copies
 FROM magazines 
 ORDER BY publish_date;
 
--- Delete test magazines (keeping only the real one you want)
--- IMPORTANT: Update the WHERE clause based on what you see above
--- Example: Keep only the most recent magazine or the one with a specific issue number
+-- The API currently shows 2 magazines:
+-- 1. "Ausgabe 2025/1" - Winterausgabe (95 available)
+-- 2. "Ausgabe 2025/2" - Frühlingsausgabe (100 available)
 
--- Option 1: Delete all magazines with issue numbers that look like test data
+-- Option 1: Delete the specific test magazines that were found
 DELETE FROM magazines 
-WHERE issue_number IN ('2024-01', '2024-02')
-AND description LIKE '%Experimente für zu Hause%' 
-   OR description LIKE '%Gartenprojekten und Naturentdeckungen%';
+WHERE issue_number IN ('Ausgabe 2025/1', 'Ausgabe 2025/2')
+AND (description LIKE '%Winterausgabe mit spannenden Geschichten%' 
+   OR description LIKE '%Frühlingsausgabe voller Naturentdeckungen%');
 
--- Option 2: Keep only the magazine you manually added (replace with your actual magazine details)
+-- Option 2: Delete ALL magazines and let admin add the real one manually
+-- DELETE FROM magazines;
+
+-- Option 3: Keep only one specific magazine (update issue_number with the real one you want to keep)
 -- DELETE FROM magazines 
 -- WHERE issue_number != 'YOUR_REAL_ISSUE_NUMBER';
 
