@@ -10,13 +10,13 @@ export const prerender = false;
 
 const db = new DatabaseService();
 
-// Address validation schema
+// Address validation schema - fields are validated conditionally based on delivery method
 const addressSchema = z.object({
-  street: z.string().min(1, 'Straße ist erforderlich').max(200, 'Straße ist zu lang').trim(),
-  houseNumber: z.string().min(1, 'Hausnummer ist erforderlich').max(20, 'Hausnummer ist zu lang').trim(),
-  postalCode: z.string().min(4, 'Postleitzahl muss mindestens 4 Zeichen lang sein').max(20, 'Postleitzahl ist zu lang').trim(),
-  city: z.string().min(1, 'Stadt ist erforderlich').max(100, 'Stadt ist zu lang').trim(),
-  country: z.string().length(2, 'Ungültiger Ländercode').refine(val => ['DE', 'AT', 'CH'].includes(val), 'Land wird nicht unterstützt'),
+  street: z.string().max(200, 'Straße ist zu lang').trim().optional(),
+  houseNumber: z.string().max(20, 'Hausnummer ist zu lang').trim().optional(),
+  postalCode: z.string().max(20, 'Postleitzahl ist zu lang').trim().optional(),
+  city: z.string().max(100, 'Stadt ist zu lang').trim().optional(),
+  country: z.string().max(2).optional(),
   addressLine2: z.string().max(200, 'Adresszusatz ist zu lang').optional().transform(val => val?.trim() || undefined),
 }).optional();
 
@@ -90,18 +90,21 @@ const reservationSchema = z.object({
   message: 'Bitte wählen Sie einen Abholort',
   path: ['pickupLocation'],
 }).refine((data) => {
-  // If shipping method, address is required
+  // If shipping method, validate all address fields are present
   if (data.deliveryMethod === 'shipping') {
-    return data.address && 
-           data.address.street && 
-           data.address.houseNumber && 
-           data.address.postalCode && 
-           data.address.city && 
-           data.address.country;
+    if (!data.address) return false;
+    
+    const hasStreet = data.address.street && data.address.street.trim().length > 0;
+    const hasHouseNumber = data.address.houseNumber && data.address.houseNumber.trim().length > 0;
+    const hasPostalCode = data.address.postalCode && data.address.postalCode.trim().length >= 4;
+    const hasCity = data.address.city && data.address.city.trim().length > 0;
+    const hasCountry = data.address.country && data.address.country.length === 2;
+    
+    return hasStreet && hasHouseNumber && hasPostalCode && hasCity && hasCountry;
   }
   return true;
 }, {
-  message: 'Lieferadresse ist bei Versand erforderlich',
+  message: 'Alle Adressfelder sind bei Versand erforderlich',
   path: ['address'],
 }).refine((data) => {
   // If ordering group picture, group name and child name are required
