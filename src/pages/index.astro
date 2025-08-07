@@ -203,14 +203,16 @@ const totalPrice = getTotalPrice();
   
 
   <!-- Reservation Form Section with lighthouse theme -->
-  <section id="reservation-form" class="py-16 lg:py-20 bg-white relative bubbles">
-    <!-- Bubble animations -->
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="bubble"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <section id="reservation-form" class="py-16 lg:py-20 bg-white relative">
+    <!-- Bubble animations in contained wrapper -->
+    <div class="bubbles absolute inset-0 pointer-events-none" aria-hidden="true">
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+      <div class="bubble"></div>
+    </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
           Ihr Exemplar reservieren

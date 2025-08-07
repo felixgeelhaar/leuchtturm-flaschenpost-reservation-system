@@ -25,7 +25,9 @@
       "Bash(curl:*)",
       "Bash(npm run dev:*)",
       "Bash(grep:*)",
-      "Bash(open http://localhost:4321/)"
+      "Bash(open http://localhost:4321/)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

@@ -184,9 +184,9 @@
    Bubble Animation
    ================== */
 .bubbles {
-  position: relative;
+  position: absolute;
   overflow: hidden;
-  max-height: 100%;
+  pointer-events: none;
 }
 
 .bubble {
@@ -196,6 +196,8 @@
   border-radius: 50%;
   opacity: 0.6;
   animation: rise 8s infinite ease-in;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .bubble:nth-child(1) {
