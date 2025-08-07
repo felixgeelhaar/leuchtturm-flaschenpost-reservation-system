@@ -62,7 +62,7 @@ const totalPrice = getTotalPrice();
         </div>
         
         <!-- Hero Image with nautical decoration -->
-        <div class="relative ship-rock">
+        <div class="relative">
           <img 
             src={images.heroImage}
             alt={`${magazine.title} Magazin`}
@@ -73,19 +73,6 @@ const totalPrice = getTotalPrice();
             fetchpriority="high"
             decoding="async"
           />
-          <!-- Optional: Add magazine cover as overlay -->
-          {images.magazineCover && (
-            <div class="absolute -bottom-6 -right-6 w-32 lg:w-40">
-              <img 
-                src={images.magazineCover}
-                alt={`${magazine.title} Cover`}
-                class="rounded-lg shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300"
-                width="160"
-                height="226"
-                loading="eager"
-              />
-            </div>
-          )}
         </div>
       </div>
     </div>
@@ -93,8 +80,6 @@ const totalPrice = getTotalPrice();
 
   <!-- About Section with beach theme -->
   <section id="about-magazine" class="py-16 lg:py-20 bg-gradient-to-b from-white to-yellow-50/30 relative">
-    <!-- Beach decorations -->
-    <div class="absolute bottom-0 left-0 right-0 h-32 treasure-map-bg opacity-10"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
@@ -171,8 +156,6 @@ const totalPrice = getTotalPrice();
 
   <!-- Process Section with compass theme -->
   <section class="py-16 lg:py-20 bg-gradient-to-b from-yellow-50/30 to-sky-50 relative">
-    <!-- Compass decoration -->
-    <div class="absolute top-10 right-10 compass-rose opacity-20"></div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
@@ -213,9 +196,9 @@ const totalPrice = getTotalPrice();
         </p>
       </div>
 
-      <ErrorBoundary client:load>
+      <ErrorBoundary client:idle>
         <ReservationForm 
-          client:load
+          client:idle
           magazines={magazines}
         />
       </ErrorBoundary>
@@ -257,10 +240,6 @@ const totalPrice = getTotalPrice();
 
   <!-- Info Section with lighthouse beacon -->
   <section class="py-6 bg-gradient-to-b from-white to-sky-50 border-t border-sky-200 relative">
-    <!-- Lighthouse beacon effect -->
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-8xl opacity-10 lighthouse-beacon" aria-hidden="true">
-      🏛️
-    </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center">
         <div class="space-y-1">

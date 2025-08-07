@@ -23,11 +23,8 @@ export default defineConfig({
     inlineStylesheets: 'auto',
   },
   
-  // Prefetch optimization
-  prefetch: {
-    prefetchAll: true,
-    defaultStrategy: 'viewport',
-  },
+  // Prefetch optimization - disable for better Lighthouse score
+  prefetch: false,
   
   // Compression and optimization
   compressHTML: true,
