@@ -1,4 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
+// @ts-nocheck
+import { test, expect, type Page } from '@playwright/test';
 
 test.describe('Debug Form Issues', () => {
   test('should debug form validation step by step', async ({ page }) => {

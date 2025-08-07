@@ -1,4 +1,4 @@
-import { test, expect, APIRequestContext } from '@playwright/test';
+import { test, expect, type APIRequestContext } from '@playwright/test';
 
 test.describe('Error Handling - Customer-Facing Messages', () => {
   let apiContext: APIRequestContext;
@@ -65,7 +65,7 @@ test.describe('Error Handling - Customer-Facing Messages', () => {
     expect(Array.isArray(data.errors)).toBe(true);
     
     // Errors should be in German and user-friendly
-    const errorMessages = data.errors.map(err => err.message).join(' ');
+    const errorMessages = data.errors.map((err: any) => err.message).join(' ');
     console.log('Individual error messages:', errorMessages);
     
     // Should not contain technical terms like "string", "required", "validation"
@@ -154,8 +154,8 @@ test.describe('Error Handling - Customer-Facing Messages', () => {
   });
 
   test('should not expose technical details in console errors', async ({ page }) => {
-    const consoleMessages = [];
-    const errorMessages = [];
+    const consoleMessages: string[] = [];
+    const errorMessages: string[] = [];
     
     page.on('console', msg => {
       consoleMessages.push(msg.text());
@@ -186,7 +186,7 @@ test.describe('Error Handling - Customer-Facing Messages', () => {
       console.log('Console errors:', errorMessages);
       
       // Check that console errors don't expose sensitive information
-      errorMessages.forEach(msg => {
+      errorMessages.forEach((msg: string) => {
         expect(msg).not.toMatch(/password|key|token|secret/i);
         expect(msg).not.toMatch(/database.*error|sql.*error/i);
       });

@@ -78,7 +78,7 @@ test.describe('Database Error Handling', () => {
     
     // Check that validation errors are user-friendly
     if (data.errors && Array.isArray(data.errors)) {
-      data.errors.forEach(error => {
+      data.errors.forEach((error: any) => {
         console.log(`Field: ${error.field}, Message: ${error.message}`);
         
         // Should be German, user-friendly messages

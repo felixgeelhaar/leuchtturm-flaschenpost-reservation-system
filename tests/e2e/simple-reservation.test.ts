@@ -54,7 +54,7 @@ test.describe('Simple Reservation Test', () => {
       }
       
       // Check browser console for any errors
-      const logs = [];
+      const logs: string[] = [];
       page.on('console', msg => {
         if (msg.type() === 'error') {
           logs.push(msg.text());
@@ -65,7 +65,7 @@ test.describe('Simple Reservation Test', () => {
         console.log('Console errors:', logs);
       }
       
-    } catch (error) {
+    } catch (error: any) {
       console.log('Submit failed:', error.message);
     }
     

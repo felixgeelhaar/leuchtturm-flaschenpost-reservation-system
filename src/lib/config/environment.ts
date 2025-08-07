@@ -133,7 +133,12 @@ function validateEnvironment() {
           SITE_URL: 'http://localhost:4321',
           BASE_URL: '/',
           GA_MEASUREMENT_ID: undefined,
-          ENABLE_ANALYTICS: false
+          ENABLE_REGISTRATION: true,
+          ENABLE_RESERVATIONS: true,
+          MAINTENANCE_MODE: false,
+          DEFAULT_LANGUAGE: 'de',
+          SUPPORTED_LANGUAGES: 'de,en',
+          NODE_ENV: 'development' as const
         }
       };
     }
@@ -246,23 +251,48 @@ export const clientConfig = clientEnv
 
     // Features
     features: {
-      enableRegistration: clientEnv.ENABLE_REGISTRATION,
-      enableReservations: clientEnv.ENABLE_RESERVATIONS,
-      maintenanceMode: clientEnv.MAINTENANCE_MODE,
+      enableRegistration: clientEnv.ENABLE_REGISTRATION || true,
+      enableReservations: clientEnv.ENABLE_RESERVATIONS || true,
+      maintenanceMode: clientEnv.MAINTENANCE_MODE || false,
     },
 
     // Localization
     i18n: {
-      defaultLanguage: clientEnv.DEFAULT_LANGUAGE,
-      supportedLanguages: clientEnv.SUPPORTED_LANGUAGES.split(','),
+      defaultLanguage: clientEnv.DEFAULT_LANGUAGE || 'de',
+      supportedLanguages: (clientEnv.SUPPORTED_LANGUAGES || 'de,en').split(','),
     },
 
     // Environment
-    isProduction: clientEnv.NODE_ENV === 'production',
-    isDevelopment: clientEnv.NODE_ENV === 'development',
-    isTest: clientEnv.NODE_ENV === 'test',
+    isProduction: (clientEnv.NODE_ENV || 'development') === 'production',
+    isDevelopment: (clientEnv.NODE_ENV || 'development') === 'development',
+    isTest: (clientEnv.NODE_ENV || 'development') === 'test',
   }
-  : null;
+  : {
+    // Default client configuration
+    supabase: {
+      url: undefined,
+      anonKey: undefined,
+    },
+    site: {
+      url: undefined,
+      baseUrl: '/',
+    },
+    analytics: {
+      gaMeasurementId: undefined,
+    },
+    features: {
+      enableRegistration: true,
+      enableReservations: true,
+      maintenanceMode: false,
+    },
+    i18n: {
+      defaultLanguage: 'de',
+      supportedLanguages: ['de', 'en'],
+    },
+    isProduction: false,
+    isDevelopment: true,
+    isTest: false,
+  };
 
 // =============================================================================
 // UTILITY FUNCTIONS

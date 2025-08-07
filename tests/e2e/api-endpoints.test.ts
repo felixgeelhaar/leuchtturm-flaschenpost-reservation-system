@@ -1,4 +1,4 @@
-import { test, expect, APIRequestContext } from '@playwright/test';
+import { test, expect, type APIRequestContext } from '@playwright/test';
 
 test.describe('API Endpoints', () => {
   let apiContext: APIRequestContext;
@@ -52,7 +52,7 @@ test.describe('API Endpoints', () => {
     const magazinesData = await magazinesResponse.json();
     
     if (magazinesData.data.length === 0) {
-      test.skip('No magazines available for reservation test');
+      test.skip(true, 'No magazines available for reservation test');
       return;
     }
 
@@ -142,7 +142,7 @@ test.describe('API Endpoints', () => {
     const magazinesData = await magazinesResponse.json();
     
     if (magazinesData.data.length === 0) {
-      test.skip('No magazines available for shipping test');
+      test.skip(true, 'No magazines available for shipping test');
       return;
     }
 
@@ -195,7 +195,7 @@ test.describe('API Endpoints', () => {
     const magazinesData = await magazinesResponse.json();
     
     if (magazinesData.data.length === 0) {
-      test.skip('No magazines available for rate limit test');
+      test.skip(true, 'No magazines available for rate limit test');
       return;
     }
 
