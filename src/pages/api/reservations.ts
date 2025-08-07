@@ -39,8 +39,8 @@ const reservationSchema = z.object({
     .or(z.literal(''))
     .transform(val => val === '' ? undefined : val),
   magazineId: z.string()
-    .uuid('Ungültige Magazin-ID')
-    .min(1, 'Bitte wählen Sie eine Magazin-Ausgabe'),
+    .min(1, 'Bitte wählen Sie eine Magazin-Ausgabe')
+    .refine(id => id.length > 0, 'Ungültige Magazin-ID'),
   quantity: z.number()
     .int('Anzahl muss eine ganze Zahl sein')
     .min(1, 'Mindestens 1 Exemplar erforderlich')

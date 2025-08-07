@@ -197,6 +197,15 @@ bundle-analysis/
 # =============================================================================
 # CUSTOM PROJECT FILES
 # =============================================================================
+# Debug and test files
+test-*.js
+test-*.json
+test-*.html
+*-test.png
+debug-*.png
+api-test.html
+test-ui.html
+
 # Add any project-specific files or directories to ignore below
 # For example:
 # /uploads/

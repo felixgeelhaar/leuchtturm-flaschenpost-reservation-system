@@ -186,8 +186,8 @@
             </label>
             <input
               id="pickupLocation"
+              v-model="formData.pickupLocation"
               type="text"
-              value="BRK Haus für Kinder - Leuchtturm"
               class="form-field bg-neutral-100"
               disabled
               readonly
@@ -631,7 +631,7 @@ const formData = reactive<ReservationFormData>({
   magazineId: '',
   quantity: 1,
   deliveryMethod: 'pickup',  // Default to pickup (cheaper option)
-  pickupLocation: '',  // Used for pickup
+  pickupLocation: 'BRK Haus für Kinder - Leuchtturm',  // Used for pickup
   pickupDate: '',  // Used for pickup  
   paymentMethod: '',  // Required for shipping only
   address: {
@@ -662,11 +662,11 @@ const formErrors = reactive<FormErrors>({});
 
 // Validation schema
 const addressSchema = z.object({
-  street: z.string().min(1, 'Straße ist erforderlich').max(200, 'Straße ist zu lang'),
-  houseNumber: z.string().min(1, 'Hausnummer ist erforderlich').max(20, 'Hausnummer ist zu lang'),
-  postalCode: z.string().min(4, 'Postleitzahl muss mindestens 4 Zeichen lang sein').max(20, 'Postleitzahl ist zu lang'),
-  city: z.string().min(1, 'Stadt ist erforderlich').max(100, 'Stadt ist zu lang'),
-  country: z.string().length(2, 'Ungültiger Ländercode'),
+  street: z.string().max(200, 'Straße ist zu lang'),
+  houseNumber: z.string().max(20, 'Hausnummer ist zu lang'),
+  postalCode: z.string().max(20, 'Postleitzahl ist zu lang'),
+  city: z.string().max(100, 'Stadt ist zu lang'),
+  country: z.string().length(2, 'Ungültiger Ländercode').optional(),
   addressLine2: z.string().max(200, 'Adresszusatz ist zu lang').optional()
 }).optional();
 
@@ -717,6 +717,15 @@ const reservationSchema = z.object({
 }, {
   message: 'Lieferadresse ist bei Versand erforderlich',
   path: ['address']
+}).refine((data) => {
+  // If pickup method, pickupLocation is required
+  if (data.deliveryMethod === 'pickup') {
+    return data.pickupLocation && data.pickupLocation.length > 0;
+  }
+  return true;
+}, {
+  message: 'Bitte wählen Sie einen Abholort',
+  path: ['pickupLocation']
 }).refine((data) => {
   // If ordering group picture, group name and child name are required
   if (data.orderGroupPicture) {
