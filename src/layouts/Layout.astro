@@ -1,6 +1,4 @@
 ---
-import '@/styles/globals.css';
-import '@/styles/nautical-theme.css';
 import { kindergarten, images } from '@/config/content';
 
 export interface Props {
@@ -129,6 +127,59 @@ const imageURL = new URL(image, Astro.site);
         "addressLocality": "Berlin"
       }
     })} />
+    
+    <!-- Critical CSS Inline -->
+    <style>
+      /* Critical styles only */
+      *{box-sizing:border-box;margin:0;padding:0}
+      html{font-family:system-ui,-apple-system,sans-serif;scroll-behavior:smooth}
+      body{background:#fafafa;color:#0a0a0a;line-height:1.5}
+      .bg-white{background:white}
+      .text-center{text-align:center}
+      .max-w-7xl{max-width:80rem;margin:0 auto}
+      .px-4{padding-left:1rem;padding-right:1rem}
+      .py-6{padding-top:1.5rem;padding-bottom:1.5rem}
+      .py-8{padding-top:2rem;padding-bottom:2rem}
+      .py-12{padding-top:3rem;padding-bottom:3rem}
+      .py-16{padding-top:4rem;padding-bottom:4rem}
+      .mb-4{margin-bottom:1rem}
+      .mb-6{margin-bottom:1.5rem}
+      .mb-8{margin-bottom:2rem}
+      .mb-12{margin-bottom:3rem}
+      .text-xl{font-size:1.25rem}
+      .text-2xl{font-size:1.5rem}
+      .text-3xl{font-size:1.875rem}
+      .text-4xl{font-size:2.25rem}
+      .font-bold{font-weight:700}
+      .text-neutral-900{color:#171717}
+      .text-neutral-600{color:#525252}
+      .text-primary-600{color:#2563eb}
+      .grid{display:grid}
+      .grid-cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}
+      .gap-8{gap:2rem}
+      .space-y-2>*+*{margin-top:0.5rem}
+      .space-y-4>*+*{margin-top:1rem}
+      .space-y-6>*+*{margin-top:1.5rem}
+      .relative{position:relative}
+      .absolute{position:absolute}
+      .inset-0{top:0;right:0;bottom:0;left:0}
+      .z-10{z-index:10}
+      .pointer-events-none{pointer-events:none}
+      .opacity-10{opacity:0.1}
+      .bg-gradient-to-br{background:linear-gradient(to bottom right,var(--tw-gradient-stops))}
+      .from-white{--tw-gradient-from:white;--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}
+      .to-sky-50{--tw-gradient-to:#f0f9ff}
+      .nautical-bg{background:linear-gradient(180deg,#fff 0%,#f0f9ff 50%,#e0f2fe 100%);position:relative}
+      /* All animations disabled for performance */
+      *{animation:none!important;transition:none!important}
+      @media(min-width:640px){.sm\\:text-3xl{font-size:1.875rem}.sm\\:text-4xl{font-size:2.25rem}}
+      @media(min-width:768px){.md\\:grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.md\\:grid-cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+      @media(min-width:1024px){.lg\\:text-4xl{font-size:2.25rem}.lg\\:text-6xl{font-size:3.75rem}.lg\\:py-20{padding-top:5rem;padding-bottom:5rem}}
+    </style>
+    
+    <!-- Load remaining CSS asynchronously -->
+    <link rel="preload" href="/src/styles/globals.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/src/styles/globals.css"></noscript>
   </head>
   
   <body class="bg-neutral-50 font-sans text-neutral-900 nautical-bg">
@@ -276,7 +327,7 @@ const imageURL = new URL(image, Astro.site);
             © 2024 Flaschenpost Magazin. Alle Rechte vorbehalten.
           </p>
           <div class="mt-4 sm:mt-0 flex space-x-6">
-            <a href="mailto:info@flaschenpost-magazin.de" class="text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+            <a href="mailto:leuchtturm-elternbeirat@gmail.com" class="text-neutral-400 hover:text-white focus-visible">
               <span class="sr-only">E-Mail</span>
               <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />

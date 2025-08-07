@@ -10,7 +10,7 @@ async function finalTest() {
   const page = await browser.newPage();
   
   try {
-    await page.goto('http://localhost:4322', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:4321', { waitUntil: 'networkidle' });
     
     // Test scrolling to footer
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
