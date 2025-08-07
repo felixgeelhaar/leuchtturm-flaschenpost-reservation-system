@@ -237,7 +237,7 @@
             id="paymentMethod"
             v-model="formData.paymentMethod"
             :class="getFieldClass('paymentMethod')"
-            required
+            :required="deliveryMethod === 'shipping'"
           >
             <option value="">Bitte wählen...</option>
             <option value="paypal">PayPal</option>
@@ -268,7 +268,7 @@
                   type="text"
                   :class="getFieldClass('address.street')"
                   placeholder="Musterstraße"
-                  required
+                  :required="deliveryMethod === 'shipping'"
                   maxlength="200"
                   autocomplete="street-address"
                 />
@@ -285,7 +285,7 @@
                   type="text"
                   :class="getFieldClass('address.houseNumber')"
                   placeholder="123"
-                  required
+                  :required="deliveryMethod === 'shipping'"
                   maxlength="20"
                 />
                 <ErrorMessage :error="formErrors['address.houseNumber']" />
@@ -321,7 +321,7 @@
                   type="text"
                   :class="getFieldClass('address.postalCode')"
                   placeholder="12345"
-                  required
+                  :required="deliveryMethod === 'shipping'"
                   maxlength="20"
                   autocomplete="postal-code"
                 />
@@ -338,7 +338,7 @@
                   type="text"
                   :class="getFieldClass('address.city')"
                   placeholder="Berlin"
-                  required
+                  :required="deliveryMethod === 'shipping'"
                   maxlength="100"
                   autocomplete="address-level2"
                 />
@@ -354,7 +354,7 @@
                 id="country"
                 v-model="formData.address.country"
                 :class="getFieldClass('address.country')"
-                required
+                :required="deliveryMethod === 'shipping'"
               >
                 <option value="DE">Deutschland</option>
                 <option value="AT">Österreich</option>
