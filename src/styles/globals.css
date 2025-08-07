@@ -38,7 +38,7 @@ footer {
   margin-top: 0;
 }
 
-/* Disable heavy animations but keep essential ones */
+/* Disable ALL animations for performance - minimal transitions only */
 .bubbles .bubble,
 .floating,
 .floating-slow,
@@ -48,17 +48,38 @@ footer {
 .fish,
 .wave-1,
 .wave-2,
-.wave-3 {
+.wave-3,
+.lighthouse-beacon,
+.porthole,
+.life-ring,
+.fade-in,
+.slide-in-up,
+.slide-in-down {
   animation: none !important;
+  transform: none !important;
 }
 
-/* Keep essential hover states and form transitions */
-button,
-input,
-select,
-textarea,
-a {
-  transition: opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+/* Ultra-minimal transitions - only for critical UX */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Remove all other transitions */
+* {
+  transition: none !important;
+}
+
+/* Remove transform transitions that cause paint/composite */
+.hover\\:transform,
+.hover\\:scale-105,
+.transition-transform,
+.transition-all {
+  transition: none !important;
+  transform: none !important;
 }
 
 /* Custom CSS Variables */
@@ -112,9 +133,9 @@ a {
     @apply opacity-50 cursor-not-allowed;
   }
   
-  /* Link styles */
+  /* Link styles - no transitions */
   a {
-    @apply transition-colors duration-200;
+    @apply hover:text-primary-600;
   }
   
   /* Better list styles */
@@ -265,48 +286,13 @@ a {
     @apply bg-neutral-50 font-semibold;
   }
   
-  /* Animation utilities */
-  .fade-in {
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  
-  .slide-in-up {
-    animation: slideInUp 0.3s ease-out;
-  }
-  
+  /* All animations disabled for performance */
+  .fade-in,
+  .slide-in-up,
   .slide-in-down {
-    animation: slideInDown 0.3s ease-out;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-  
-  @keyframes slideInUp {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes slideInDown {
-    from {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    /* No animations - just show content immediately */
+    opacity: 1;
+    transform: none;
   }
   
   /* Form validation states */

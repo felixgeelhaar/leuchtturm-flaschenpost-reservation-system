@@ -29,13 +29,11 @@ const imageURL = new URL(image, Astro.site);
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
     
-    <!-- Performance hints -->
-    <link rel="preconnect" href="/fonts/" crossorigin>
-    <link rel="dns-prefetch" href="/fonts/">
+    <!-- Performance hints - reduce DNS lookups -->
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     
-    <!-- Preload critical images -->
-    <link rel="preload" as="image" href="/images/hero-image-800.webp" type="image/webp" media="(max-width: 1024px)">
-    <link rel="preload" as="image" href="/images/hero-image-1200.webp" type="image/webp" media="(min-width: 1025px)">
+    <!-- Preload only critical above-fold image -->
+    <link rel="preload" as="image" href="/images/hero-image-800.webp" type="image/webp">
     
     <!-- Primary Meta Tags -->
     <title>{title}</title>
@@ -67,12 +65,10 @@ const imageURL = new URL(image, Astro.site);
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
     
-    <!-- Preload Critical Resources -->
+    <!-- Preload Critical Resources - prioritize above-fold content -->
     <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/images/leuchtturm-logo-large.svg" as="image" />
     
     <!-- Resource Hints -->
-    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
     {import.meta.env.PUBLIC_SUPABASE_URL && (
       <link rel="preconnect" href={new URL(import.meta.env.PUBLIC_SUPABASE_URL).origin} />
     )}
@@ -314,27 +310,15 @@ const imageURL = new URL(image, Astro.site);
       </div>
     </footer>
     
-    <!-- Scripts -->
+    <!-- Critical Scripts Only - minimal inline JavaScript -->
     <script>
-      // Mobile menu toggle
-      const mobileMenuButton = document.getElementById('mobile-menu-button');
-      const mobileMenu = document.getElementById('mobile-menu');
-      
-      if (mobileMenuButton && mobileMenu) {
-        mobileMenuButton.addEventListener('click', () => {
-          const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-          mobileMenuButton.setAttribute('aria-expanded', (!isExpanded).toString());
-          mobileMenu.classList.toggle('hidden');
-        });
-      }
-    </script>
-    
-    <!-- Error Handling Setup -->
-    <script>
-      import { setupGlobalErrorHandlers } from '@/lib/error-handling';
-      
-      // Initialize global error handlers
-      setupGlobalErrorHandlers();
+      // Ultra-minimal mobile menu - reduce main thread work
+      document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
+        const menu = document.getElementById('mobile-menu');
+        const expanded = this.getAttribute('aria-expanded') === 'true';
+        this.setAttribute('aria-expanded', String(!expanded));
+        menu?.classList.toggle('hidden');
+      });
     </script>
   </body>
 </html>

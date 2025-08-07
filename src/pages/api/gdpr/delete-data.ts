@@ -2,6 +2,9 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
 
+// Mark this route as server-side only (not to be prerendered)
+export const prerender = false;
+
 const db = new DatabaseService();
 
 const deleteRequestSchema = z.object({

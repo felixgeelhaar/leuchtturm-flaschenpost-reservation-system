@@ -5,6 +5,9 @@ import { emailService } from '@/lib/email/email-service';
 import { pictureClaimsService } from '@/lib/picture-claims';
 import type { ReservationFormData, ConsentData } from '@/types';
 
+// Mark this route as server-side only (not to be prerendered)
+export const prerender = false;
+
 const db = new DatabaseService();
 
 // Address validation schema

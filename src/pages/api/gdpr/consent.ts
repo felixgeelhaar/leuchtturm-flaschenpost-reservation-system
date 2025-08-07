@@ -3,6 +3,9 @@ import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
 import type { ConsentData } from '@/types';
 
+// Mark this route as server-side only (not to be prerendered)
+export const prerender = false;
+
 const db = new DatabaseService();
 
 // Validation schema for consent data

@@ -3,7 +3,9 @@
     <div v-if="error" class="error-boundary-container">
       <div class="error-boundary-content">
         <div class="error-icon">
-          <ExclamationTriangleIcon class="h-12 w-12 text-error-500" />
+          <svg class="h-12 w-12 text-error-500" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+          </svg>
         </div>
         
         <div class="error-details">
@@ -59,7 +61,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onErrorCaptured, nextTick } from 'vue';
-import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline';
+// Removed heroicons import - using inline SVG for performance
 
 // Props
 interface Props {

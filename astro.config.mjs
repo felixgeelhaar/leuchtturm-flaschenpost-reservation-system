@@ -13,7 +13,11 @@ export default defineConfig({
   ],
   
   output: 'hybrid',
-  adapter: netlify(),
+  adapter: netlify({
+    dist: new URL('./dist/', import.meta.url),
+    builder: 'functions-internal',
+    cacheOnDemandPages: false,
+  }),
 
   site: process.env.SITE_URL || 'http://localhost:3000',
   
@@ -40,20 +44,38 @@ export default defineConfig({
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('vue')) {
-                return 'vue';
-              }
+              // Create micro-chunks for better caching
+              if (id.includes('vue')) return 'vue';
+              if (id.includes('zod')) return 'validation';
+              if (id.includes('@supabase')) return 'supabase';
+              // Group remaining vendor code
+              return 'vendor';
             }
+            // Split large internal modules into smaller chunks
+            if (id.includes('/src/lib/database')) return 'database';
+            if (id.includes('/src/lib/validation')) return 'form-validation';
+            if (id.includes('/src/components/Reservation')) return 'reservation-form';
+            if (id.includes('/src/components/Consent')) return 'consent';
+            if (id.includes('/src/components/Error')) return 'error-handling';
           },
         },
       },
       // Enable aggressive minification
       minify: 'esbuild',
-      target: 'es2018',
+      target: 'es2020',
       // Source maps only in development
       sourcemap: false,
-      // Reduce chunk size
-      chunkSizeWarningLimit: 200,
+      // Reduce chunk size warnings
+      chunkSizeWarningLimit: 100,
+      // Enable tree shaking
+      modulePreload: {
+        polyfill: false,
+      },
+      // Optimize imports
+      dynamicImportVarsOptions: {
+        warnOnError: true,
+        exclude: ['node_modules/**'],
+      },
     },
     // CSS optimization
     css: {

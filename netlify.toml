@@ -11,7 +11,7 @@
 # Redirects and rewrites
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  to = "/.netlify/functions/ssr"
   status = 200
 
 [[redirects]]
@@ -80,7 +80,6 @@
 
 # Functions configuration for serverless functions
 [functions]
-  directory = "netlify/functions"
   node_bundler = "esbuild"
 
 # Plugin configuration
