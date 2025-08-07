@@ -220,9 +220,9 @@ const totalPrice = getTotalPrice();
         </p>
       </div>
 
-      <ErrorBoundary client:visible>
+      <ErrorBoundary client:load>
         <ReservationForm 
-          client:visible
+          client:load
           magazines={magazines}
         />
       </ErrorBoundary>

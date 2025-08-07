@@ -24,12 +24,20 @@ main {
 
 /* Simplified scrolling fixes with better performance */
 #reservation-form {
-  position: static;
+  position: relative;
+  overflow: hidden;
 }
 
 /* Prevent animated elements from interfering with scroll - simplified */
 .bubbles .bubble {
   pointer-events: none;
+  position: absolute !important;
+}
+
+/* Contain the bubbles section properly */
+section.bubbles {
+  position: relative;
+  overflow: hidden;
 }
 
 /* Add scroll space */

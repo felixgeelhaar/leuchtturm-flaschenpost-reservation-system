@@ -185,6 +185,8 @@
    ================== */
 .bubbles {
   position: relative;
+  overflow: hidden;
+  max-height: 100%;
 }
 
 .bubble {
@@ -244,7 +246,7 @@
     transform: translateX(100px);
   }
   100% {
-    bottom: 120vh;
+    bottom: calc(100% + 100px);
     transform: translateX(-200px);
   }
 }
