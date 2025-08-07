@@ -22,52 +22,40 @@ main {
   min-height: auto !important;
 }
 
-/* Fix for scrolling issues - ensure form doesn't move */
+/* Simplified scrolling fixes with better performance */
 #reservation-form {
-  position: static !important;
+  position: static;
 }
 
-/* Prevent animated elements from interfering with scroll */
+/* Prevent animated elements from interfering with scroll - simplified */
+.bubbles .bubble {
+  pointer-events: none;
+}
+
+/* Add scroll space */
+footer {
+  margin-top: 2rem;
+  padding-bottom: 2rem;
+}
+
+/* Disable performance-heavy animations by default */
 .bubbles .bubble,
 .floating,
 .floating-slow,
 .floating-delayed,
-.seagull {
-  pointer-events: none !important;
-  will-change: transform;
+.ship-rock,
+.seagull,
+.fish {
+  animation: none;
 }
 
-/* Ensure sections have proper positioning */
-section {
-  position: static !important;
-}
-
-/* Fix footer positioning to ensure scroll works */
-footer {
-  position: static !important;
-  margin-top: 2rem;
-  padding-bottom: 2rem; /* Extra space for scrolling */
-}
-
-/* Add bottom padding to main to ensure footer is reachable */
-main {
-  padding-bottom: 2rem;
-}
-
-/* Respect reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  .bubbles .bubble,
-  .floating,
-  .floating-slow,
-  .floating-delayed,
-  .ship-rock,
-  .seagull,
-  .fish,
-  [class*="animation"],
-  [class*="animate"] {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+/* Only enable minimal animations on larger screens with good performance */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .floating {
+    animation: floating 6s ease-in-out infinite;
+  }
+  .lighthouse-beacon::after {
+    animation: lighthouse-rotate 8s linear infinite;
   }
 }
 

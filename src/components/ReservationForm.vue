@@ -981,10 +981,8 @@ const fetchMagazines = async () => {
 <style scoped>
 /* Additional component-specific styles */
 .form-container {
-  /* Remove min-height to prevent layout conflicts - parent layout handles this */
-  position: static !important;
-  transform: none !important;
-  will-change: auto !important;
+  /* Optimized positioning without heavy CSS overrides */
+  position: static;
 }
 
 @media (max-width: 640px) {
