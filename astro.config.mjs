@@ -12,10 +12,8 @@ export default defineConfig({
     })
   ],
   
-  output: 'hybrid',
-  adapter: netlify({
-    cacheOnDemandPages: false,
-  }),
+  output: 'server',
+  adapter: netlify(),
 
   site: process.env.SITE_URL || 'http://localhost:3000',
   
