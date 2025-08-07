@@ -68,10 +68,7 @@ const imageURL = new URL(image, Astro.site);
     <!-- Preload Critical Resources - prioritize above-fold content -->
     <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
     
-    <!-- Resource Hints -->
-    {import.meta.env.PUBLIC_SUPABASE_URL && (
-      <link rel="preconnect" href={new URL(import.meta.env.PUBLIC_SUPABASE_URL).origin} />
-    )}
+    <!-- Minimal resource hints only when needed -->
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#0ea5e9" />
@@ -112,27 +109,10 @@ const imageURL = new URL(image, Astro.site);
       }
     </style>
     
-    <!-- Structured Data -->
-    <script type="application/ld+json" set:html={JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Flaschenpost Magazin",
-      "url": Astro.site,
-      "logo": new URL('/images/logo.png', Astro.site),
-      "description": "Das Magazin für neugierige Eltern und ihre Kinder",
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+49-123-456789",
-        "contactType": "Customer Service",
-        "areaServed": "DE",
-        "availableLanguage": "German"
-      },
-      "address": {
-        "@type": "PostalAddress",
-        "addressCountry": "DE",
-        "addressLocality": "Berlin"
-      }
-    })} />
+    <!-- Structured Data - minimal for performance -->
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"Organization","name":"Flaschenpost Magazin","url":"{Astro.site}","description":"Das Magazin für neugierige Eltern und ihre Kinder"}
+    </script>
     
     <!-- Critical CSS Inline - minimal for fast initial render -->
     <style>
