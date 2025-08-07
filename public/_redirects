@@ -1,0 +1,2 @@
+# API routes handled by Astro SSR
+/api/* /.netlify/functions/ssr 200!

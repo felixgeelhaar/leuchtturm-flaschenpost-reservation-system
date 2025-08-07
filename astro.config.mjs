@@ -14,8 +14,6 @@ export default defineConfig({
   
   output: 'hybrid',
   adapter: netlify({
-    dist: new URL('./dist/', import.meta.url),
-    builder: 'functions-internal',
     cacheOnDemandPages: false,
   }),
 
