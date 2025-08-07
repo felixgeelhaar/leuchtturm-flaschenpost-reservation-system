@@ -3,6 +3,7 @@ import Layout from '@/layouts/Layout.astro';
 import ReservationForm from '@/components/ReservationForm.vue';
 import ConsentBanner from '@/components/ConsentBanner.vue';
 import ErrorBoundary from '@/components/ErrorBoundary.vue';
+import Picture from '@/components/Picture.astro';
 import { DatabaseService } from '@/lib/database';
 import { kindergarten, magazine, homepage, faq, images, getFormattedPrice, getTotalPrice } from '@/config/content';
 
@@ -63,15 +64,15 @@ const totalPrice = getTotalPrice();
         
         <!-- Hero Image with nautical decoration -->
         <div class="relative">
-          <img 
+          <Picture 
             src={images.heroImage}
             alt={`${magazine.title} Magazin`}
             class="rounded-lg shadow-xl w-full h-auto"
-            width="600"
-            height="400"
+            width={600}
+            height={400}
             loading="eager"
             fetchpriority="high"
-            decoding="async"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 80vw, 600px"
           />
         </div>
       </div>

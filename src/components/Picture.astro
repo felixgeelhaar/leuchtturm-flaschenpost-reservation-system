@@ -1,0 +1,58 @@
+---
+export interface Props {
+  src: string;
+  alt: string;
+  width?: number;
+  height?: number;
+  loading?: 'eager' | 'lazy';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  class?: string;
+  sizes?: string;
+}
+
+const { 
+  src, 
+  alt, 
+  width, 
+  height, 
+  loading = 'lazy', 
+  fetchpriority = 'auto',
+  class: className = '',
+  sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+} = Astro.props;
+
+// Extract filename without extension and path
+const imagePath = src.replace('/images/', '').replace(/\.(jpg|jpeg|png)$/i, '');
+
+// Generate WebP srcset for responsive images
+const webpSrcset = [
+  `${import.meta.env.BASE_URL}images/${imagePath}-400.webp 400w`,
+  `${import.meta.env.BASE_URL}images/${imagePath}-800.webp 800w`,
+  `${import.meta.env.BASE_URL}images/${imagePath}-1200.webp 1200w`,
+  `${import.meta.env.BASE_URL}images/${imagePath}.webp 1536w`
+].join(', ');
+
+// Generate fallback srcset for original format
+const fallbackSrcset = src;
+---
+
+<picture>
+  <!-- WebP sources for modern browsers -->
+  <source 
+    type="image/webp"
+    srcset={webpSrcset}
+    sizes={sizes}
+  />
+  
+  <!-- Fallback for older browsers -->
+  <img 
+    src={src}
+    alt={alt}
+    width={width}
+    height={height}
+    loading={loading}
+    fetchpriority={fetchpriority}
+    decoding="async"
+    class={className}
+  />
+</picture>
