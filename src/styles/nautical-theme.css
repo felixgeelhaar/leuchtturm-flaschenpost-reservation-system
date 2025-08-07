@@ -55,21 +55,25 @@
   background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%);
   position: relative;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .nautical-bg::before {
   content: '';
-  position: absolute;
-  width: 200%;
-  height: 200%;
-  top: -50%;
-  left: -50%;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
   background-image: 
     radial-gradient(circle at 20% 80%, #e0f2fe 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, #fff8e1 0%, transparent 50%),
     radial-gradient(circle at 40% 40%, #f0f9ff 0%, transparent 50%);
-  animation: floatingClouds 60s ease-in-out infinite;
-  opacity: 0.15;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: -1;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 /* ==================

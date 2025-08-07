@@ -14,16 +14,12 @@ body {
   overflow-y: auto !important;
   min-height: 100vh;
   height: auto !important;
-  margin: 0;
-  padding: 0;
 }
 
 /* Ensure main content can scroll */
 main {
   overflow-y: visible !important;
   min-height: auto !important;
-  margin: 0;
-  padding: 0;
 }
 
 /* Simplified scrolling fixes with better performance */
@@ -42,25 +38,16 @@ footer {
   margin-top: 0;
 }
 
-/* Disable performance-heavy animations by default */
-.bubbles .bubble,
-.floating,
-.floating-slow,
-.floating-delayed,
-.ship-rock,
-.seagull,
-.fish {
-  animation: none;
+/* Disable ALL animations for performance */
+* {
+  animation: none !important;
+  transition: none !important;
 }
 
-/* Only enable minimal animations on larger screens with good performance */
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .floating {
-    animation: floating 6s ease-in-out infinite;
-  }
-  .lighthouse-beacon::after {
-    animation: lighthouse-rotate 8s linear infinite;
-  }
+/* Only enable critical hover states */
+a:hover,
+button:hover {
+  transition: opacity 0.2s ease !important;
 }
 
 /* Custom CSS Variables */

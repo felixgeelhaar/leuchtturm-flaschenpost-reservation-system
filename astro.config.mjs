@@ -41,16 +41,22 @@ export default defineConfig({
       // Optimize bundle splitting
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vue-vendor': ['vue', '@vue/runtime-core', '@vue/runtime-dom'],
-            'utils': ['zod'],
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('vue')) {
+                return 'vue';
+              }
+            }
           },
         },
       },
-      // Enable minification (using default esbuild minifier)
-      minify: true,
+      // Enable aggressive minification
+      minify: 'esbuild',
+      target: 'es2018',
       // Source maps only in development
-      sourcemap: process.env.NODE_ENV === 'development',
+      sourcemap: false,
+      // Reduce chunk size
+      chunkSizeWarningLimit: 200,
     },
     // CSS optimization
     css: {
