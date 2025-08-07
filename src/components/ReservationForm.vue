@@ -132,6 +132,25 @@
             </p>
           </div>
 
+          <div>
+            <label for="phone" class="form-label">
+              Telefonnummer (optional)
+            </label>
+            <input
+              id="phone"
+              v-model="formData.phone"
+              type="tel"
+              :class="getFieldClass('phone')"
+              placeholder="+49 123 456789"
+              maxlength="20"
+              autocomplete="tel"
+            />
+            <ErrorMessage :error="formErrors.phone" />
+            <p class="form-help">
+              Nur für wichtige Rückfragen zur Reservierung.
+            </p>
+          </div>
+
         </fieldset>
 
         <!-- Reservation Details with compass theme -->
@@ -630,6 +649,7 @@ const formData = reactive<ReservationFormData>({
   firstName: '',
   lastName: '',
   email: '',
+  phone: '',  // Added phone field
   magazineId: '',
   quantity: 1,
   deliveryMethod: 'pickup',  // Default to pickup (cheaper option)
@@ -662,13 +682,13 @@ const formData = reactive<ReservationFormData>({
 // Form errors
 const formErrors = reactive<FormErrors>({});
 
-// Validation schema
+// Validation schema - address fields are validated conditionally
 const addressSchema = z.object({
-  street: z.string().max(200, 'Straße ist zu lang'),
-  houseNumber: z.string().max(20, 'Hausnummer ist zu lang'),
-  postalCode: z.string().max(20, 'Postleitzahl ist zu lang'),
-  city: z.string().max(100, 'Stadt ist zu lang'),
-  country: z.string().length(2, 'Ungültiger Ländercode').optional(),
+  street: z.string().min(1, 'Straße ist erforderlich').max(200, 'Straße ist zu lang'),
+  houseNumber: z.string().min(1, 'Hausnummer ist erforderlich').max(20, 'Hausnummer ist zu lang'),
+  postalCode: z.string().min(4, 'Postleitzahl muss mindestens 4 Zeichen lang sein').max(20, 'Postleitzahl ist zu lang'),
+  city: z.string().min(1, 'Stadt ist erforderlich').max(100, 'Stadt ist zu lang'),
+  country: z.string().length(2, 'Ungültiger Ländercode'),
   addressLine2: z.string().max(200, 'Adresszusatz ist zu lang').optional()
 }).optional();
 
@@ -682,6 +702,7 @@ const reservationSchema = z.object({
   email: z.string()
     .email('Bitte geben Sie eine gültige E-Mail-Adresse ein')
     .max(254, 'E-Mail-Adresse ist zu lang'),
+  phone: z.string().optional(),  // Phone is optional
   magazineId: z.string().min(1, 'Bitte wählen Sie eine Magazin-Ausgabe'),
   quantity: z.number()
     .min(1, 'Mindestens 1 Exemplar erforderlich')
