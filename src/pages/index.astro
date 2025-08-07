@@ -26,6 +26,9 @@ const totalPrice = getTotalPrice();
 >
   <!-- Hero Section with Nautical Theme -->
   <section class="relative bg-gradient-to-br from-white via-sky-50 to-blue-50 py-12 sm:py-16 lg:py-20">
+    <!-- Minimal decorative elements -->
+    <div class="absolute top-10 left-10 text-4xl opacity-20" aria-hidden="true">⚓</div>
+    <div class="absolute bottom-10 right-10 text-4xl opacity-20" aria-hidden="true">🐚</div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <!-- Content -->
@@ -210,23 +213,12 @@ const totalPrice = getTotalPrice();
         </p>
       </div>
 
-      <!-- Simplified static form for maximum performance -->
-      <div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
-        <h3 class="text-2xl font-bold text-neutral-900 mb-6">Reservierung</h3>
-        <p class="text-neutral-600 mb-8">
-          Bitte wenden Sie sich direkt an den Kindergarten für die Magazin-Reservierung.
-        </p>
-        <div class="bg-gradient-to-br from-primary-50 to-secondary-50 p-6 rounded-lg">
-          <h4 class="font-semibold text-neutral-900 mb-2">Kontakt</h4>
-          <p class="text-neutral-700">
-            <strong>Kindergarten Leuchtturm</strong><br>
-            E-Mail: <a href="mailto:leuchtturm-elternbeirat@gmail.com" class="text-primary-600 hover:underline">leuchtturm-elternbeirat@gmail.com</a>
-          </p>
-          <div class="mt-4 p-4 bg-white rounded border-l-4 border-primary-500">
-            <p class="text-sm font-medium text-primary-800">Preis: 12,00 € inkl. Versandkostenpauschale</p>
-          </div>
-        </div>
-      </div>
+      <ErrorBoundary client:load>
+        <ReservationForm 
+          client:load
+          magazines={magazines}
+        />
+      </ErrorBoundary>
     </div>
   </section>
 
@@ -279,16 +271,11 @@ const totalPrice = getTotalPrice();
     </div>
   </section>
 
-  <!-- Static GDPR Notice -->
-  <div class="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg max-w-sm border-l-4 border-primary-500">
-    <p class="text-sm text-neutral-700 mb-2">
-      Diese Website nutzt nur technisch notwendige Cookies.
-    </p>
-    <button onclick="this.parentElement.style.display='none'" 
-            class="text-xs bg-primary-600 text-white px-3 py-1 rounded hover:bg-primary-700">
-      OK
-    </button>
-  </div>
+  <!-- GDPR Consent Banner -->
+  <ConsentBanner 
+    client:idle
+    isVisible={true}
+  />
 </Layout>
 
 <style>

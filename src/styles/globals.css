@@ -38,16 +38,27 @@ footer {
   margin-top: 0;
 }
 
-/* Disable ALL animations for performance */
-* {
+/* Disable heavy animations but keep essential ones */
+.bubbles .bubble,
+.floating,
+.floating-slow,
+.floating-delayed,
+.ship-rock,
+.seagull,
+.fish,
+.wave-1,
+.wave-2,
+.wave-3 {
   animation: none !important;
-  transition: none !important;
 }
 
-/* Only enable critical hover states */
-a:hover,
-button:hover {
-  transition: opacity 0.2s ease !important;
+/* Keep essential hover states and form transitions */
+button,
+input,
+select,
+textarea,
+a {
+  transition: opacity 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 
 /* Custom CSS Variables */
