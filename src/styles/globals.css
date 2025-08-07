@@ -14,12 +14,16 @@ body {
   overflow-y: auto !important;
   min-height: 100vh;
   height: auto !important;
+  margin: 0;
+  padding: 0;
 }
 
 /* Ensure main content can scroll */
 main {
   overflow-y: visible !important;
   min-height: auto !important;
+  margin: 0;
+  padding: 0;
 }
 
 /* Simplified scrolling fixes with better performance */
@@ -35,8 +39,7 @@ main {
 
 /* Add scroll space */
 footer {
-  margin-top: 2rem;
-  padding-bottom: 2rem;
+  margin-top: 0;
 }
 
 /* Disable performance-heavy animations by default */
