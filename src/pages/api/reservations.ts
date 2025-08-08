@@ -400,10 +400,13 @@ export const POST: APIRoute = async ({ request }) => {
     }
     */
 
-    // Send confirmation email (non-blocking)
-    // Don't let email failures block the reservation
+    // Send confirmation email - MUST await to ensure it completes before function ends
     console.log('[EMAIL] Starting email send for reservation:', reservation.id);
-    sendConfirmationEmail(user, reservation, magazine).catch(error => {
+    try {
+      await sendConfirmationEmail(user, reservation, magazine);
+      console.log('[EMAIL] Email send completed successfully');
+    } catch (error) {
+      // Log error but don't fail the reservation
       console.error('Email send failed (non-blocking):', {
         reservationId: reservation.id,
         userEmail: user.email,
@@ -411,7 +414,7 @@ export const POST: APIRoute = async ({ request }) => {
         errorType: error?.constructor?.name,
         stack: error instanceof Error ? error.stack?.split('\n').slice(0, 3).join(' | ') : undefined
       });
-    });
+    }
 
     // Log successful reservation
     await db.logDataProcessing({
