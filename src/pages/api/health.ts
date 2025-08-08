@@ -21,7 +21,7 @@ export const GET: APIRoute = async () => {
     services: {
       database: hasSupabaseUrl && hasSupabaseKey ? 'configured' : 'missing config',
       email: hasSmtpUser && hasSmtpPass ? 'configured' : 'missing config',
-    }
+    },
   };
   
   return new Response(
@@ -32,7 +32,7 @@ export const GET: APIRoute = async () => {
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*',
       },
-    }
+    },
   );
 };
 

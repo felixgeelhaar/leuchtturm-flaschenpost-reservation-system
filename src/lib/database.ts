@@ -484,7 +484,7 @@ export class DatabaseService {
         country: data.country,
       } : undefined,
       notes: data.notes, // notes column now exists
-      consentReference: "legacy", // Column doesn't exist
+      consentReference: 'legacy', // Column doesn't exist
       // Picture order fields - now exist in database
       orderGroupPicture: data.order_group_picture || false,
       childGroupName: data.child_group_name,

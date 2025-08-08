@@ -9,7 +9,7 @@ export const GET: APIRoute = async ({ url }) => {
     if (!email) {
       return new Response(
         JSON.stringify({ error: 'Email parameter required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } },
       );
     }
 
@@ -43,9 +43,9 @@ export const GET: APIRoute = async ({ url }) => {
         JSON.stringify({ 
           success: false, 
           error: error.message,
-          code: error.code 
+          code: error.code, 
         }),
-        { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+        { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } },
       );
     }
 
@@ -60,23 +60,23 @@ export const GET: APIRoute = async ({ url }) => {
             groupName: data?.child_group_name,
             vorschulPicture: data?.order_vorschul_picture,
             isVorschueler: data?.child_is_vorschueler,
-            childName: data?.child_name
-          }
-        }
+            childName: data?.child_name,
+          },
+        },
       }),
       { 
         status: 200, 
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } 
-      }
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, 
+      },
     );
     
   } catch (error) {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+      { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } },
     );
   }
 };

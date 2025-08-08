@@ -33,7 +33,8 @@
       "Bash(mkdir:*)",
       "Bash(find:*)",
       "Bash(npm run type-check:*)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "Bash(node:*)"
     ],
     "deny": []
   }

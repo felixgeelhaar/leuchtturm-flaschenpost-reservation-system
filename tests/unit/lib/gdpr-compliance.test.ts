@@ -33,7 +33,7 @@ describe('GDPRComplianceManager', () => {
     marketing: false,
   };
 
-  const mockUser: Partial<User> = {
+  const  Partial<User> = {
     id: 'user-123',
     email: 'test@example.com',
     firstName: 'John',
@@ -100,7 +100,7 @@ describe('GDPRComplianceManager', () => {
 
         expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
           'gdpr-consent', 
-          expect.stringContaining('"essential":true')
+          expect.stringContaining('"essential":true'),
         );
       });
 
@@ -111,7 +111,7 @@ describe('GDPRComplianceManager', () => {
         });
 
         await expect(
-          GDPRComplianceManager.recordConsent('user-123', mockConsents)
+          GDPRComplianceManager.recordConsent('user-123', mockConsents),
         ).rejects.toThrow('Failed to record consent');
       });
 
@@ -119,7 +119,7 @@ describe('GDPRComplianceManager', () => {
         (global.fetch as any).mockRejectedValue(new Error('Network error'));
 
         await expect(
-          GDPRComplianceManager.recordConsent('user-123', mockConsents)
+          GDPRComplianceManager.recordConsent('user-123', mockConsents),
         ).rejects.toThrow('Network error');
       });
     });
@@ -148,7 +148,7 @@ describe('GDPRComplianceManager', () => {
         await GDPRComplianceManager.withdrawConsent('user-123', 'marketing');
 
         const setItemCall = mockLocalStorage.setItem.mock.calls.find(
-          call => call[0] === 'gdpr-consent'
+          call => call[0] === 'gdpr-consent',
         );
         expect(setItemCall).toBeDefined();
         
@@ -160,7 +160,7 @@ describe('GDPRComplianceManager', () => {
         mockLocalStorage.getItem.mockReturnValue(null);
 
         await expect(
-          GDPRComplianceManager.withdrawConsent('user-123', 'analytics')
+          GDPRComplianceManager.withdrawConsent('user-123', 'analytics'),
         ).resolves.not.toThrow();
       });
 
@@ -171,7 +171,7 @@ describe('GDPRComplianceManager', () => {
         });
 
         await expect(
-          GDPRComplianceManager.withdrawConsent('user-123', 'functional')
+          GDPRComplianceManager.withdrawConsent('user-123', 'functional'),
         ).rejects.toThrow('Failed to withdraw consent');
       });
     });
@@ -235,7 +235,7 @@ describe('GDPRComplianceManager', () => {
 
         expect(mockLocalStorage.setItem).toHaveBeenCalledWith(
           'gdpr-consent',
-          expect.stringContaining('"version":"1.0"')
+          expect.stringContaining('"version":"1.0"'),
         );
 
         const storedData = JSON.parse(mockLocalStorage.setItem.mock.calls[0][1]);
@@ -312,7 +312,7 @@ describe('GDPRComplianceManager', () => {
         });
 
         await expect(
-          GDPRComplianceManager.requestDataExport('user-123')
+          GDPRComplianceManager.requestDataExport('user-123'),
         ).rejects.toThrow('Failed to export data');
       });
     });
@@ -361,7 +361,7 @@ describe('GDPRComplianceManager', () => {
         });
 
         await expect(
-          GDPRComplianceManager.requestDataDeletion('user-123')
+          GDPRComplianceManager.requestDataDeletion('user-123'),
         ).rejects.toThrow('Failed to delete data');
       });
     });
@@ -391,7 +391,7 @@ describe('GDPRComplianceManager', () => {
         });
 
         await expect(
-          GDPRComplianceManager.requestDataRectification('user-123', { firstName: 'Jane' })
+          GDPRComplianceManager.requestDataRectification('user-123', { firstName: 'Jane' }),
         ).rejects.toThrow('Failed to rectify data');
       });
     });
@@ -455,7 +455,7 @@ describe('GDPRComplianceManager', () => {
             action: 'created' as const,
             dataType: 'user_data' as const,
             legalBasis: 'consent' as const,
-          })
+          }),
         ).resolves.not.toThrow();
 
         expect(consoleSpy).toHaveBeenCalled();
@@ -472,7 +472,7 @@ describe('GDPRComplianceManager', () => {
             action: 'created' as const,
             dataType: 'user_data' as const,
             legalBasis: 'consent' as const,
-          })
+          }),
         ).resolves.not.toThrow();
 
         expect(consoleSpy).toHaveBeenCalled();

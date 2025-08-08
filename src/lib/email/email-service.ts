@@ -146,7 +146,7 @@ export class EmailService {
       console.error('Email send failed:', {
         to: user.email,
         error: error instanceof Error ? error.message : 'Unknown error',
-        code: (error as any)?.code
+        code: (error as any)?.code,
       });
       throw new Error(`Failed to send confirmation email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }

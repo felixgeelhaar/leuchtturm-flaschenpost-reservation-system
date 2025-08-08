@@ -16,7 +16,7 @@ export class PictureClaimsService {
   async hasExistingClaim(
     email: string,
     groupName: string,
-    pictureType: 'group' | 'vorschul'
+    pictureType: 'group' | 'vorschul',
   ): Promise<boolean> {
     try {
       const { data, error } = await this.supabase
@@ -43,7 +43,7 @@ export class PictureClaimsService {
    */
   async checkMultipleClaims(
     email: string,
-    claims: Array<{ groupName: string; pictureType: 'group' | 'vorschul' }>
+    claims: Array<{ groupName: string; pictureType: 'group' | 'vorschul' }>,
   ): Promise<Map<string, boolean>> {
     const results = new Map<string, boolean>();
 
@@ -69,7 +69,7 @@ export class PictureClaimsService {
     groupName: string,
     pictureType: 'group' | 'vorschul',
     childName: string,
-    reservationId: string
+    reservationId: string,
   ): Promise<PictureClaim> {
     try {
       // First check if claim already exists
@@ -78,7 +78,7 @@ export class PictureClaimsService {
       if (exists) {
         throw new Error(
           `Sie haben bereits ein ${pictureType === 'group' ? 'Gruppenbild' : 'Vorschüler-Bild'} ` +
-          `für die Gruppe ${groupName} bestellt.`
+          `für die Gruppe ${groupName} bestellt.`,
         );
       }
 
@@ -90,7 +90,7 @@ export class PictureClaimsService {
           picture_type: pictureType,
           child_name: childName,
           reservation_id: reservationId,
-          claimed_at: new Date().toISOString()
+          claimed_at: new Date().toISOString(),
         })
         .select()
         .single();
@@ -99,7 +99,7 @@ export class PictureClaimsService {
         if (error.code === '23505') { // Unique constraint violation
           throw new Error(
             `Sie haben bereits ein ${pictureType === 'group' ? 'Gruppenbild' : 'Vorschüler-Bild'} ` +
-            `für die Gruppe ${groupName} bestellt.`
+            `für die Gruppe ${groupName} bestellt.`,
           );
         }
         throw error;
@@ -164,7 +164,7 @@ export class PictureClaimsService {
     orderGroupPicture: boolean,
     groupName: string | undefined,
     orderVorschulPicture: boolean,
-    childIsVorschueler: boolean
+    childIsVorschueler: boolean,
   ): Promise<{ valid: boolean; errors: string[] }> {
     const errors: string[] = [];
 
@@ -175,7 +175,7 @@ export class PictureClaimsService {
         if (hasGroupClaim) {
           errors.push(
             `Sie haben bereits ein Gruppenbild für die Gruppe "${groupName}" bestellt. ` +
-            `Pro Familie ist nur ein Gruppenbild pro Gruppe erlaubt.`
+            'Pro Familie ist nur ein Gruppenbild pro Gruppe erlaubt.',
           );
         }
       }
@@ -184,14 +184,14 @@ export class PictureClaimsService {
       if (orderVorschulPicture && groupName) {
         if (!childIsVorschueler) {
           errors.push(
-            'Um ein Vorschüler-Bild zu bestellen, muss Ihr Kind als Vorschüler markiert sein.'
+            'Um ein Vorschüler-Bild zu bestellen, muss Ihr Kind als Vorschüler markiert sein.',
           );
         } else {
           const hasVorschulClaim = await this.hasExistingClaim(email, groupName, 'vorschul');
           if (hasVorschulClaim) {
             errors.push(
               `Sie haben bereits ein Vorschüler-Bild für die Gruppe "${groupName}" bestellt. ` +
-              `Pro Familie ist nur ein Vorschüler-Bild pro Gruppe erlaubt.`
+              'Pro Familie ist nur ein Vorschüler-Bild pro Gruppe erlaubt.',
             );
           }
         }
@@ -199,13 +199,13 @@ export class PictureClaimsService {
 
       return {
         valid: errors.length === 0,
-        errors
+        errors,
       };
     } catch (error) {
       console.error('Error validating picture order:', error);
       return {
         valid: false,
-        errors: ['Fehler bei der Validierung der Bildbestellung. Bitte versuchen Sie es später erneut.']
+        errors: ['Fehler bei der Validierung der Bildbestellung. Bitte versuchen Sie es später erneut.'],
       };
     }
   }

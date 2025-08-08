@@ -85,7 +85,7 @@ describe('Simple Import Tests for Coverage', () => {
         AuthenticationError,
         AuthorizationError,
         NotFoundError,
-        ServerError
+        ServerError,
       } = await import('@/lib/error-handling');
       
       expect(new NetworkError('test')).toBeInstanceOf(Error);

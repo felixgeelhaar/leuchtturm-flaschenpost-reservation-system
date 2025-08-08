@@ -409,7 +409,7 @@ export const POST: APIRoute = async ({ request }) => {
       // Log error but don't fail the reservation
       console.error('Email send failed:', {
         reservationId: reservation.id,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
 
@@ -491,8 +491,8 @@ export const POST: APIRoute = async ({ request }) => {
           debug: {
             error: error instanceof Error ? error.message : String(error),
             type: error?.constructor?.name,
-          }
-        })
+          },
+        }),
       }),
       {
         status: 500,

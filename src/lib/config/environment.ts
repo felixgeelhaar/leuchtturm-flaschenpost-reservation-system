@@ -138,8 +138,8 @@ function validateEnvironment() {
           MAINTENANCE_MODE: false,
           DEFAULT_LANGUAGE: 'de',
           SUPPORTED_LANGUAGES: 'de,en',
-          NODE_ENV: 'development' as const
-        }
+          NODE_ENV: 'development' as const,
+        },
       };
     }
   }
