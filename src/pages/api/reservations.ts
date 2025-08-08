@@ -301,6 +301,7 @@ export const POST: APIRoute = async ({ request }) => {
         email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
+        phone: formData.phone,
         address: formData.deliveryMethod === 'shipping' ? formData.address : undefined,
         consentVersion: '1.0',
       });
