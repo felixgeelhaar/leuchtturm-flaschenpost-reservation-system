@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
 import { emailService } from '@/lib/email/email-service';
-import { pictureClaimsService } from '@/lib/picture-claims';
+// import { pictureClaimsService } from '@/lib/picture-claims'; // Disabled until picture_claims table exists
 import type { ReservationFormData, ConsentData } from '@/types';
 
 // Mark this route as server-side only (not to be prerendered)

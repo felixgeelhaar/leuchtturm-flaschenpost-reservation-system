@@ -467,12 +467,12 @@ export class DatabaseService {
       } : undefined,
       notes: data.notes,
       consentReference: null, // Column doesn't exist
-      // Picture order fields
-      orderGroupPicture: data.order_group_picture,
-      childGroupName: data.child_group_name,
-      orderVorschulPicture: data.order_vorschul_picture,
-      childIsVorschueler: data.child_is_vorschueler,
-      childName: data.child_name,
+      // Picture order fields - columns don't exist in database
+      orderGroupPicture: false, // data.order_group_picture,
+      childGroupName: null, // data.child_group_name,
+      orderVorschulPicture: false, // data.order_vorschul_picture,
+      childIsVorschueler: false, // data.child_is_vorschueler,
+      childName: null, // data.child_name,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
       expiresAt: null, // Column doesn't exist
@@ -501,13 +501,17 @@ export class DatabaseService {
   }> {
     const now = new Date().toISOString();
     
-    // Clean expired reservations
+    // Clean expired reservations - expires_at column doesn't exist
+    // Skip this for now since expires_at column doesn't exist
+    const expiredReservations: any[] = [];
+    /*
     const { data: expiredReservations } = await this.supabase
       .from('reservations')
       .update({ status: 'expired' })
       .lt('expires_at', now)
       .eq('status', 'pending')
       .select('id');
+    */
 
     // Clean users past retention date
     const { data: expiredUsers } = await this.supabase
