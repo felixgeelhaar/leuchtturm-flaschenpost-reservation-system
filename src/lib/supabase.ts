@@ -24,17 +24,17 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 // Server-side Supabase client (with service role key) - Only use server-side!
 export function createServerSupabaseClient() {
-  // In Netlify, environment variables are available directly on process.env
-  const serviceRoleKey = process.env?.SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+  // In Netlify Functions, environment variables are in Netlify.env or process.env
+  // Try multiple ways to get the service role key
+  const serviceRoleKey = 
+    // @ts-ignore - Netlify global might exist
+    (typeof Netlify !== 'undefined' && Netlify?.env?.get?.('SUPABASE_SERVICE_ROLE_KEY')) ||
+    process.env?.SUPABASE_SERVICE_ROLE_KEY || 
+    import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
   
   if (!serviceRoleKey) {
-    console.error('Warning: SUPABASE_SERVICE_ROLE_KEY not found, falling back to anon key');
-    console.error('Available env vars:', {
-      hasProcessEnv: typeof process !== 'undefined' && process.env,
-      hasImportMeta: import.meta.env,
-      keys: typeof process !== 'undefined' && process.env ? Object.keys(process.env).filter(k => k.includes('SUPABASE')) : []
-    });
-    // Fallback to anon key for testing - this will have limited permissions
+    console.error('Warning: SUPABASE_SERVICE_ROLE_KEY not found, using anon key with limited permissions');
+    // Use anon key as fallback - this will work for reads but may fail for writes due to RLS
     const fallbackKey = supabaseAnonKey;
     if (!fallbackKey) {
       throw new Error('Neither SUPABASE_SERVICE_ROLE_KEY nor anon key available');

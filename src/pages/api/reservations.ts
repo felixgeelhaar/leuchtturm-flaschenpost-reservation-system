@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
-import { emailService } from '@/lib/email/email-service';
+// import { emailService } from '@/lib/email/email-service'; // Disabled until SMTP is configured
 // import { pictureClaimsService } from '@/lib/picture-claims'; // Disabled until picture_claims table exists
 import type { ReservationFormData, ConsentData } from '@/types';
 
@@ -400,10 +400,13 @@ export const POST: APIRoute = async ({ request }) => {
     }
     */
 
-    // Send confirmation email (non-blocking)
+    // Send confirmation email (non-blocking) - disabled for now
+    // TODO: Enable when SMTP credentials are configured
+    /*
     sendConfirmationEmail(user, reservation, magazine).catch(error => {
       console.error('Failed to send confirmation email:', error);
     });
+    */
 
     // Log successful reservation
     await db.logDataProcessing({
@@ -449,6 +452,11 @@ export const POST: APIRoute = async ({ request }) => {
     console.error('Error details:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       stack: error instanceof Error ? error.stack : undefined,
+      type: error?.constructor?.name,
+      // Log specific database errors
+      code: (error as any)?.code,
+      details: (error as any)?.details,
+      hint: (error as any)?.hint,
     });
 
     // Log the error for monitoring
@@ -492,7 +500,8 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-// Email notification function using the EmailService
+// Email notification function using the EmailService - disabled for now
+/*
 async function sendConfirmationEmail(
   user: any, 
   reservation: any, 
@@ -511,6 +520,7 @@ async function sendConfirmationEmail(
     throw error;
   }
 }
+*/
 
 // GET endpoint for retrieving user reservations (requires authentication)
 export const GET: APIRoute = async ({ request, url }) => {
