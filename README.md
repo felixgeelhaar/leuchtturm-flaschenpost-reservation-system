@@ -323,3 +323,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 # Trigger redeploy for updated password Fri Aug  8 13:55:09 CEST 2025
 # Trigger redeploy - SMTP_SECURE corrected Fri Aug  8 14:16:15 CEST 2025
 # Trigger redeploy - new Gmail app password Fri Aug  8 14:37:51 CEST 2025
+# Trigger redeploy - corrected SMTP_USER with dot Fri Aug  8 15:18:49 CEST 2025
