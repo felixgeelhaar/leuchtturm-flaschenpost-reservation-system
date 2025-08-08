@@ -150,7 +150,8 @@ export class DatabaseService {
         shipping_postal_code: formData.deliveryMethod === 'shipping' ? formData.address?.postalCode : null,
         shipping_city: formData.deliveryMethod === 'shipping' ? formData.address?.city : null,
         shipping_country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
-        notes: formData.notes || null,
+        // notes column doesn't exist
+        // notes: formData.notes || null,
         // consent_reference column doesn't exist
         // consent_reference: consentReference,
         // Picture order fields - these columns might not exist
@@ -465,7 +466,7 @@ export class DatabaseService {
         country: data.shipping_country,
         addressLine2: data.shipping_address_line2,
       } : undefined,
-      notes: data.notes,
+      notes: null, // notes column doesn't exist
       consentReference: null, // Column doesn't exist
       // Picture order fields - columns don't exist in database
       orderGroupPicture: false, // data.order_group_picture,
