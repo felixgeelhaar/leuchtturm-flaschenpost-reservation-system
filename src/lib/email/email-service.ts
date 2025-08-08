@@ -119,10 +119,23 @@ export class EmailService {
     };
 
     try {
+      console.log('Attempting to send email to:', user.email);
       const info = await this.transporter.sendMail(mailOptions);
-      console.log('Email sent successfully:', info.messageId);
+      console.log('Email sent successfully:', {
+        messageId: info.messageId,
+        accepted: info.accepted,
+        rejected: info.rejected,
+        response: info.response
+      });
     } catch (error) {
-      console.error('Failed to send email:', error);
+      console.error('Failed to send email:', {
+        error: error instanceof Error ? error.message : error,
+        code: (error as any)?.code,
+        command: (error as any)?.command,
+        response: (error as any)?.response,
+        responseCode: (error as any)?.responseCode,
+        to: user.email
+      });
       throw new Error(`Failed to send confirmation email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }

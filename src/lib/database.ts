@@ -394,26 +394,33 @@ export class DatabaseService {
     ipAddress?: string;
     details?: string;
   }): Promise<void> {
-    const { error } = await this.supabase
-      .from('data_processing_logs')
-      .insert({
-        user_id: log.userId || null,
-        action: log.action,
-        data_type: log.dataType,
-        legal_basis: log.legalBasis,
-        processor_id: log.processorId || null,
-        ip_address: log.ipAddress || null,
-        details: log.details || null,
-      });
+    // Skip logging if table doesn't exist to avoid blocking operations
+    // This is a temporary fix - the table should be created in production
+    try {
+      const { data, error } = await this.supabase
+        .from('data_processing_logs')
+        .insert({
+          user_id: log.userId || null,
+          action: log.action,
+          data_type: log.dataType,
+          legal_basis: log.legalBasis,
+          processor_id: log.processorId || null,
+          ip_address: log.ipAddress || null,
+          details: log.details || null,
+        })
+        .select();
 
-    if (error) {
-      console.error('Failed to log data processing:', {
-        error: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint,
-        logData: log
-      });
+      if (error) {
+        // Only log critical info, not full error to reduce noise
+        if (error.code === '42P01') {
+          console.warn('GDPR logging skipped: data_processing_logs table does not exist');
+        } else {
+          console.error('Failed to log data processing:', error?.message || 'Unknown error');
+        }
+      }
+    } catch (err) {
+      // Silently fail to not break the main flow
+      console.warn('GDPR logging failed silently:', err instanceof Error ? err.message : 'Unknown error');
     }
   }
 

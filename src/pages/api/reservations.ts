@@ -402,8 +402,13 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Send confirmation email (non-blocking)
     // Don't let email failures block the reservation
+    console.log('Preparing to send confirmation email for reservation:', reservation.id);
     sendConfirmationEmail(user, reservation, magazine).catch(error => {
-      console.error('Failed to send confirmation email (non-fatal):', error);
+      console.error('Failed to send confirmation email (non-fatal):', {
+        error: error instanceof Error ? error.message : error,
+        reservationId: reservation.id,
+        userEmail: user.email
+      });
     });
 
     // Log successful reservation
