@@ -38,7 +38,8 @@ export const POST: APIRoute = async ({ request }) => {
           email: body.email,
           first_name: body.firstName,
           last_name: body.lastName,
-          phone: body.phone,
+          // phone column doesn't exist
+          // phone: body.phone,
           consent_version: '1.0',
           data_retention_until: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
         })

@@ -303,7 +303,7 @@ export const POST: APIRoute = async ({ request }) => {
         email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone,
+        // phone: formData.phone, // phone column doesn't exist in users table
         address: formData.deliveryMethod === 'shipping' ? formData.address : undefined,
         consentVersion: '1.0',
       });

@@ -36,7 +36,8 @@ export class DatabaseService {
         email: userData.email,
         first_name: userData.firstName,
         last_name: userData.lastName,
-        phone: userData.phone,
+        // phone column doesn't exist in users table
+        // phone: userData.phone,
         street: userData.address?.street,
         house_number: userData.address?.houseNumber,
         address_line2: userData.address?.addressLine2,
@@ -419,7 +420,7 @@ export class DatabaseService {
       email: data.email,
       firstName: data.first_name,
       lastName: data.last_name,
-      phone: data.phone,
+      phone: null, // phone column doesn't exist
       createdAt: data.created_at,
       updatedAt: data.updated_at,
       consentVersion: data.consent_version,
