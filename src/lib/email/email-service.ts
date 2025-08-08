@@ -116,12 +116,17 @@ export class EmailService {
    * Send reservation confirmation email
    */
   async sendReservationConfirmation(data: ReservationEmailData): Promise<void> {
+    console.log('sendReservationConfirmation called with data keys:', Object.keys(data));
     const { reservation, user, magazine } = data;
     
+    console.log('Generating email content for user:', user.email);
     // Generate email content
     const subject = `Reservierungsbestätigung - ${magazine.title}`;
     const html = this.generateReservationEmailHTML(reservation, user, magazine);
     const text = this.generateReservationEmailText(reservation, user, magazine);
+
+    console.log('Email content generated, subject:', subject);
+    console.log('HTML length:', html.length, 'Text length:', text.length);
 
     // Prepare email options
     const mailOptions = {
@@ -136,16 +141,24 @@ export class EmailService {
       },
     };
 
+    console.log('Mail options prepared, from:', mailOptions.from, 'to:', mailOptions.to);
+
     try {
+      console.log('Starting email send process...');
       console.log('Attempting to send email to:', user.email);
       
       // Add timeout to email sending (10 seconds)
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Email send timeout after 10 seconds')), 10000);
+        setTimeout(() => {
+          console.log('Email send timeout triggered after 10 seconds');
+          reject(new Error('Email send timeout after 10 seconds'));
+        }, 10000);
       });
       
+      console.log('Creating sendMail promise...');
       const sendPromise = this.transporter.sendMail(mailOptions);
       
+      console.log('Racing send promise against timeout...');
       const info = await Promise.race([sendPromise, timeoutPromise]) as any;
       
       console.log('Email sent successfully:', {
@@ -155,14 +168,15 @@ export class EmailService {
         response: info.response
       });
     } catch (error) {
-      console.error('Failed to send email:', {
+      console.error('Failed to send email - caught error:', {
         error: error instanceof Error ? error.message : error,
+        errorType: error?.constructor?.name,
         code: (error as any)?.code,
         command: (error as any)?.command,
         response: (error as any)?.response,
         responseCode: (error as any)?.responseCode,
         to: user.email,
-        stack: error instanceof Error ? error.stack : undefined
+        stack: error instanceof Error ? error.stack?.split('\n').slice(0, 3).join('\n') : undefined
       });
       throw new Error(`Failed to send confirmation email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
