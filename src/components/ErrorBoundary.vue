@@ -46,8 +46,8 @@
           <div class="error-contact">
             <p class="text-sm text-neutral-600 mt-4">
               Bei anhaltenden Problemen kontaktieren Sie uns unter:
-              <a href="mailto:leuchtturm-elternbeirat@gmail.com" class="text-primary-600 hover:text-primary-800">
-                leuchtturm-elternbeirat@gmail.com
+              <a href="mailto:leuchtturm.elternbeirat@gmail.com" class="text-primary-600 hover:text-primary-800">
+                leuchtturm.elternbeirat@gmail.com
               </a>
             </p>
           </div>
