@@ -59,7 +59,10 @@ export class EmailService {
 
     // Check if SMTP credentials are configured
     if (!emailConfig2.auth.user || !emailConfig2.auth.pass) {
-      console.error('[EMAIL-INIT] SMTP credentials missing!');
+      console.error('[EMAIL-INIT] SMTP credentials missing!', {
+        SMTP_USER: import.meta.env.SMTP_USER ? 'set' : 'not set',
+        SMTP_PASS: import.meta.env.SMTP_PASS ? 'set' : 'not set',
+      });
       throw new Error('SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
     }
     console.log('[EMAIL-INIT] SMTP credentials present');

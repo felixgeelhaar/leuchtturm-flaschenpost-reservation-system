@@ -415,7 +415,12 @@ export class DatabaseService {
         if (error.code === '42P01') {
           console.warn('GDPR logging skipped: data_processing_activity table does not exist');
         } else {
-          console.error('Failed to log data processing:', error?.message || error || 'Unknown error');
+          // Ensure we have a readable error message
+          const errorMessage = error?.message || 
+                              (typeof error === 'string' ? error : 
+                              (error?.code ? `Error code: ${error.code}` : 
+                              JSON.stringify(error)));
+          console.error('Failed to log data processing:', errorMessage);
         }
       }
     } catch (err) {
