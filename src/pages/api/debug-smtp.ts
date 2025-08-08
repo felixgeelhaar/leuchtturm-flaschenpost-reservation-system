@@ -6,6 +6,9 @@ export const GET: APIRoute = async () => {
   const smtpUser = process.env.SMTP_USER || 'not set';
   const smtpPass = process.env.SMTP_PASS || 'not set';
   const smtpFrom = process.env.SMTP_FROM || 'not set';
+  const smtpHost = process.env.SMTP_HOST || 'not set';
+  const smtpPort = process.env.SMTP_PORT || 'not set';
+  const smtpSecure = process.env.SMTP_SECURE || 'not set';
   
   // Check if SMTP_USER is full email
   const hasAtSign = smtpUser.includes('@');
@@ -48,6 +51,16 @@ export const GET: APIRoute = async () => {
         SMTP_FROM: {
           configured: smtpFrom !== 'not set',
           value: smtpFrom
+        },
+        SMTP_HOST: {
+          value: smtpHost
+        },
+        SMTP_PORT: {
+          value: smtpPort
+        },
+        SMTP_SECURE: {
+          value: smtpSecure,
+          shouldBe: smtpPort === '465' ? 'true' : 'false'
         }
       },
       issues: issues.length > 0 ? issues : ['No obvious issues found'],
