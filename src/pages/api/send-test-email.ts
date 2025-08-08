@@ -16,16 +16,30 @@ export const POST: APIRoute = async ({ request }) => {
     }
     
     // Try different SMTP configurations
+    const smtpUser = process.env.SMTP_USER || '';
+    const fullEmail = smtpUser.includes('@') ? smtpUser : `${smtpUser}@gmail.com`;
+    
     const configs = [
+      {
+        name: 'Gmail Service',
+        service: 'gmail',
+        auth: {
+          user: fullEmail,
+          pass: process.env.SMTP_PASS || '',
+        },
+      },
       {
         name: 'Gmail with TLS',
         host: 'smtp.gmail.com',
         port: 587,
         secure: false,
         auth: {
-          user: process.env.SMTP_USER || '',
+          user: fullEmail,
           pass: process.env.SMTP_PASS || '',
         },
+        connectionTimeout: 60000,
+        greetingTimeout: 30000,
+        socketTimeout: 60000,
       },
       {
         name: 'Gmail with SSL',
@@ -33,9 +47,12 @@ export const POST: APIRoute = async ({ request }) => {
         port: 465,
         secure: true,
         auth: {
-          user: process.env.SMTP_USER || '',
+          user: fullEmail,
           pass: process.env.SMTP_PASS || '',
         },
+        connectionTimeout: 60000,
+        greetingTimeout: 30000,
+        socketTimeout: 60000,
       },
     ];
     

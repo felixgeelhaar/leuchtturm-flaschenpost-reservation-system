@@ -47,18 +47,27 @@ export class EmailService {
       throw new Error('SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
     }
 
-    // Create real transporter
+    // Create real transporter with Gmail-specific settings
     this.transporter = nodemailer.createTransport({
       host: emailConfig2.host,
       port: emailConfig2.port,
       secure: emailConfig2.secure,
-      auth: emailConfig2.auth,
+      auth: {
+        user: emailConfig2.auth.user.includes('@') ? emailConfig2.auth.user : `${emailConfig2.auth.user}@gmail.com`,
+        pass: emailConfig2.auth.pass,
+      },
+      // Gmail-specific settings
+      service: emailConfig2.host.includes('gmail') ? 'gmail' : undefined,
       // Additional options for better deliverability
       pool: true,
       maxConnections: 5,
       maxMessages: 100,
       rateDelta: 1000,
       rateLimit: 5,
+      // Timeout settings for Netlify environment
+      connectionTimeout: 60000, // 60 seconds
+      greetingTimeout: 30000,  // 30 seconds
+      socketTimeout: 60000,     // 60 seconds
     });
   }
 
