@@ -145,6 +145,8 @@ export class DatabaseService {
         delivery_method: formData.deliveryMethod,
         pickup_location: formData.deliveryMethod === 'pickup' ? formData.pickupLocation : null,
         pickup_date: formData.pickupDate || null,
+        // Set payment_method only for shipping (PayPal), null for pickup
+        payment_method: formData.deliveryMethod === 'shipping' ? 'paypal' : null,
         // None of the shipping address columns exist in the database
         // shipping_street: formData.deliveryMethod === 'shipping' ? formData.address?.street : null,
         // shipping_house_number: formData.deliveryMethod === 'shipping' ? formData.address?.houseNumber : null,
@@ -156,12 +158,12 @@ export class DatabaseService {
         // notes: formData.notes || null,
         // consent_reference column doesn't exist
         // consent_reference: consentReference,
-        // Picture order fields - these columns might not exist
-        // order_group_picture: formData.orderGroupPicture || false,
-        // child_group_name: formData.childGroupName || null,
-        // order_vorschul_picture: formData.orderVorschulPicture || false,
-        // child_is_vorschueler: formData.childIsVorschueler || false,
-        // child_name: formData.childName || null,
+        // Picture order fields - let's try to save them
+        order_group_picture: formData.orderGroupPicture || false,
+        child_group_name: formData.childGroupName || null,
+        order_vorschul_picture: formData.orderVorschulPicture || false,
+        child_is_vorschueler: formData.childIsVorschueler || false,
+        child_name: formData.childName || null,
         // expires_at column doesn't exist
         // expires_at: expiresAt.toISOString(),
       })

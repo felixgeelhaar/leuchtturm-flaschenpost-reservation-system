@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
-// import { emailService } from '@/lib/email/email-service'; // Disabled until SMTP is configured
+import { emailService } from '@/lib/email/email-service';
 // import { pictureClaimsService } from '@/lib/picture-claims'; // Disabled until picture_claims table exists
 import type { ReservationFormData, ConsentData } from '@/types';
 
@@ -400,13 +400,11 @@ export const POST: APIRoute = async ({ request }) => {
     }
     */
 
-    // Send confirmation email (non-blocking) - disabled for now
-    // TODO: Enable when SMTP credentials are configured
-    /*
+    // Send confirmation email (non-blocking)
+    // Don't let email failures block the reservation
     sendConfirmationEmail(user, reservation, magazine).catch(error => {
-      console.error('Failed to send confirmation email:', error);
+      console.error('Failed to send confirmation email (non-fatal):', error);
     });
-    */
 
     // Log successful reservation
     await db.logDataProcessing({
@@ -500,8 +498,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 };
 
-// Email notification function using the EmailService - disabled for now
-/*
+// Email notification function using the EmailService
 async function sendConfirmationEmail(
   user: any, 
   reservation: any, 
@@ -513,14 +510,12 @@ async function sendConfirmationEmail(
       user,
       magazine,
     });
-    
-    // Confirmation email sent successfully
+    console.log('Confirmation email sent successfully to:', user.email);
   } catch (error) {
     console.error('Email sending failed:', error);
-    throw error;
+    // Don't throw - let reservation succeed even if email fails
   }
 }
-*/
 
 // GET endpoint for retrieving user reservations (requires authentication)
 export const GET: APIRoute = async ({ request, url }) => {

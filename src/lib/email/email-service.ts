@@ -42,19 +42,36 @@ export class EmailService {
 
     this.fromAddress = emailConfig2.from;
 
-    // Create transporter
-    this.transporter = nodemailer.createTransport({
-      host: emailConfig2.host,
-      port: emailConfig2.port,
-      secure: emailConfig2.secure,
-      auth: emailConfig2.auth,
-      // Additional options for better deliverability
-      pool: true,
-      maxConnections: 5,
-      maxMessages: 100,
-      rateDelta: 1000,
-      rateLimit: 5,
-    });
+    // Create transporter - use dummy if no credentials
+    if (!emailConfig2.auth.user || !emailConfig2.auth.pass) {
+      console.warn('Email service: No SMTP credentials configured, using console logging instead');
+      // Create a dummy transporter that logs instead of sending
+      this.transporter = {
+        sendMail: async (options: any) => {
+          console.log('=== EMAIL WOULD BE SENT ===');
+          console.log('To:', options.to);
+          console.log('Subject:', options.subject);
+          console.log('From:', options.from);
+          console.log('Preview:', options.text?.substring(0, 200) || options.html?.substring(0, 200));
+          console.log('===========================');
+          return { messageId: 'dummy-' + Date.now() };
+        },
+      } as any;
+    } else {
+      // Create real transporter
+      this.transporter = nodemailer.createTransport({
+        host: emailConfig2.host,
+        port: emailConfig2.port,
+        secure: emailConfig2.secure,
+        auth: emailConfig2.auth,
+        // Additional options for better deliverability
+        pool: true,
+        maxConnections: 5,
+        maxMessages: 100,
+        rateDelta: 1000,
+        rateLimit: 5,
+      });
+    }
   }
 
   /**
