@@ -238,7 +238,8 @@ export class DatabaseService {
       consent_given: given,
       consent_version: '1.0',
       ip_address: metadata.ipAddress || null,
-      user_agent: metadata.userAgent || null,
+      // user_agent column doesn't exist in the database
+      // user_agent: metadata.userAgent || null,
     }));
 
     const { error } = await this.supabase
@@ -273,11 +274,12 @@ export class DatabaseService {
       .from('user_consents')
       .update({ 
         consent_given: false,
-        withdrawal_timestamp: new Date().toISOString(),
+        // withdrawal_timestamp column might not exist
+        // withdrawal_timestamp: new Date().toISOString(),
       })
       .eq('user_id', userId)
-      .eq('consent_type', consentType)
-      .is('withdrawal_timestamp', null);
+      .eq('consent_type', consentType);
+      // .is('withdrawal_timestamp', null);
 
     if (error) throw new Error(`Failed to withdraw consent: ${error.message}`);
 
@@ -476,8 +478,8 @@ export class DatabaseService {
       consentVersion: data.consent_version,
       timestamp: data.timestamp,
       ipAddress: data.ip_address,
-      userAgent: data.user_agent,
-      withdrawalTimestamp: data.withdrawal_timestamp,
+      userAgent: null, // Column doesn't exist in database
+      withdrawalTimestamp: null, // Column doesn't exist in database
     };
   }
 
