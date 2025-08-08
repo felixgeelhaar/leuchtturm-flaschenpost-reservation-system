@@ -40,7 +40,8 @@ export class DatabaseService {
         // phone: userData.phone,
         street: userData.address?.street,
         house_number: userData.address?.houseNumber,
-        address_line2: userData.address?.addressLine2,
+        // address_line2 column doesn't exist
+        // address_line2: userData.address?.addressLine2,
         postal_code: userData.address?.postalCode,
         city: userData.address?.city,
         country: userData.address?.country,
@@ -146,7 +147,8 @@ export class DatabaseService {
         pickup_date: formData.pickupDate || null,
         shipping_street: formData.deliveryMethod === 'shipping' ? formData.address?.street : null,
         shipping_house_number: formData.deliveryMethod === 'shipping' ? formData.address?.houseNumber : null,
-        shipping_address_line2: formData.deliveryMethod === 'shipping' ? formData.address?.addressLine2 : null,
+        // shipping_address_line2 column doesn't exist
+        // shipping_address_line2: formData.deliveryMethod === 'shipping' ? formData.address?.addressLine2 : null,
         shipping_postal_code: formData.deliveryMethod === 'shipping' ? formData.address?.postalCode : null,
         shipping_city: formData.deliveryMethod === 'shipping' ? formData.address?.city : null,
         shipping_country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
@@ -464,7 +466,7 @@ export class DatabaseService {
         postalCode: data.shipping_postal_code,
         city: data.shipping_city,
         country: data.shipping_country,
-        addressLine2: data.shipping_address_line2,
+        addressLine2: null, // shipping_address_line2 column doesn't exist
       } : undefined,
       notes: null, // notes column doesn't exist
       consentReference: null, // Column doesn't exist
