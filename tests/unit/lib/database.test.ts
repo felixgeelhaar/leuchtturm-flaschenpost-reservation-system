@@ -1,32 +1,32 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { DatabaseService } from '@/lib/database';
 // Using inline test data instead of mock fixtures
-const mockUser = {
-  id: 'user-123',
-  email: 'test@example.com',
-  firstName: 'Test',
-  lastName: 'User',
-  phone: '+49123456789',
-  consentVersion: '1.0',
-  consentTimestamp: '2024-01-01T00:00:00Z',
-  lastActivity: '2024-01-01T00:00:00Z',
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z',
-};
+// const mockUser = {
+//   id: 'user-123',
+//   email: 'test@example.com',
+//   firstName: 'Test',
+//   lastName: 'User',
+//   phone: '+49123456789',
+//   consentVersion: '1.0',
+//   consentTimestamp: '2024-01-01T00:00:00Z',
+//   lastActivity: '2024-01-01T00:00:00Z',
+//   createdAt: '2024-01-01T00:00:00Z',
+//   updatedAt: '2024-01-01T00:00:00Z',
+// };
 
-const mockMagazines = [{
-  id: '123e4567-e89b-12d3-a456-426614174000',
-  title: 'Test Magazine',
-  issueNumber: '2024-01',
-  publishDate: '2024-01-01T00:00:00Z',
-  description: 'Test Magazine',
-  coverImageUrl: 'https://example.com/cover.jpg',
-  availableCopies: 10,
-  totalCopies: 100,
-  isActive: true,
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z',
-}];
+// const mockMagazines = [{
+//   id: '123e4567-e89b-12d3-a456-426614174000',
+//   title: 'Test Magazine',
+//   issueNumber: '2024-01',
+//   publishDate: '2024-01-01T00:00:00Z',
+//   description: 'Test Magazine',
+//   coverImageUrl: 'https://example.com/cover.jpg',
+//   availableCopies: 10,
+//   totalCopies: 100,
+//   isActive: true,
+//   createdAt: '2024-01-01T00:00:00Z',
+//   updatedAt: '2024-01-01T00:00:00Z',
+// }];
 
 const validFormDataPickup = {
   firstName: 'John',
@@ -330,7 +330,8 @@ describe('DatabaseService', () => {
         error: null,
       });
 
-      const reservation = await db.createReservation(validFormDataPickup);
+      // const reservation = await db.createReservation(validFormDataPickup);
+      await db.createReservation(validFormDataPickup);
 
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('users');
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('reservations');

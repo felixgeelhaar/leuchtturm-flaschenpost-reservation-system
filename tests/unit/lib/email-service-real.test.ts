@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import nodemailer from 'nodemailer';
+// import nodemailer from 'nodemailer';
 import type { Reservation, User, Magazine } from '@/types';
 
 // Mock nodemailer

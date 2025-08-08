@@ -34,7 +34,9 @@
       "Bash(find:*)",
       "Bash(npm run type-check:*)",
       "Bash(npx playwright:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "mcp__github__list_workflow_runs",
+      "mcp__github__get_job_logs"
     ],
     "deny": []
   }

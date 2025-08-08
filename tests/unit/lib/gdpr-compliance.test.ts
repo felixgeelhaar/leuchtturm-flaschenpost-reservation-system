@@ -33,12 +33,7 @@ describe('GDPRComplianceManager', () => {
     marketing: false,
   };
 
-  const  Partial<User> = {
-    id: 'user-123',
-    email: 'test@example.com',
-    firstName: 'John',
-    lastName: 'Doe',
-  };
+  // Removed unused mockUser variable
 
   beforeEach(() => {
     vi.clearAllMocks();
