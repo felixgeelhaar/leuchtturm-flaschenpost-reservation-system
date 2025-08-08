@@ -848,8 +848,9 @@ watch(deliveryMethod, async (newValue) => {
     formData.pickupDate = '';
   }
   
-  // Clear address when switching to pickup
+  // Set default pickup location and clear address when switching to pickup
   if (newValue === 'pickup') {
+    formData.pickupLocation = 'BRK Haus für Kinder - Leuchtturm';  // Restore default pickup location
     formData.address = {
       street: '',
       houseNumber: '',
