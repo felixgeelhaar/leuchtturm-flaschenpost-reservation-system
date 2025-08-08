@@ -407,7 +407,13 @@ export class DatabaseService {
       });
 
     if (error) {
-      console.error('Failed to log data processing:', error);
+      console.error('Failed to log data processing:', {
+        error: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint,
+        logData: log
+      });
     }
   }
 

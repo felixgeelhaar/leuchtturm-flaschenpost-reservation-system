@@ -512,7 +512,12 @@ async function sendConfirmationEmail(
     });
     console.log('Confirmation email sent successfully to:', user.email);
   } catch (error) {
-    console.error('Email sending failed:', error);
+    console.error('Email sending failed:', {
+      error: error instanceof Error ? error.message : error,
+      stack: error instanceof Error ? error.stack : undefined,
+      userEmail: user.email,
+      reservationId: reservation.id
+    });
     // Don't throw - let reservation succeed even if email fails
   }
 }

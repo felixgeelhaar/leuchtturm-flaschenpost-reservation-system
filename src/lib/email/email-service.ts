@@ -45,6 +45,16 @@ export class EmailService {
       from: import.meta.env.SMTP_FROM || 'noreply@example.com',
     };
 
+    // Log configuration (without sensitive data) for debugging
+    console.log('Email service initializing with:', {
+      host: emailConfig2.host,
+      port: emailConfig2.port,
+      secure: emailConfig2.secure,
+      hasUser: !!emailConfig2.auth.user,
+      hasPass: !!emailConfig2.auth.pass,
+      from: emailConfig2.from,
+    });
+
     this.fromAddress = emailConfig2.from;
 
     // Check if SMTP credentials are configured
