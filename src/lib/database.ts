@@ -58,7 +58,6 @@ export class DatabaseService {
       .from('users')
       .select('*')
       .eq('email', email)
-      .eq('is_active', true)
       .single();
 
     if (error) {
@@ -85,7 +84,6 @@ export class DatabaseService {
     const { data, error } = await this.supabase
       .from('magazines')
       .select('*')
-      .eq('is_active', true)
       .gt('available_copies', 0)
       .order('publish_date', { ascending: false });
 
@@ -98,7 +96,6 @@ export class DatabaseService {
       .from('magazines')
       .select('*')
       .eq('id', id)
-      .eq('is_active', true)
       .single();
 
     if (error) {
@@ -111,15 +108,19 @@ export class DatabaseService {
 
   // Reservation operations
   async createReservation(formData: ReservationFormData): Promise<Reservation> {
-    // Start a transaction to ensure data consistency
-    const { data: user } = await this.supabase
-      .from('users')
-      .select('id')
-      .eq('email', formData.email)
-      .single();
-
+    // Get or create user
+    let user = await this.getUserByEmail(formData.email);
+    
     if (!user) {
-      throw new Error('User not found');
+      // Create user if they don't exist
+      user = await this.createUser({
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phone: formData.phone,
+        address: formData.deliveryMethod === 'shipping' ? formData.address : undefined,
+        consentVersion: '1.0',
+      });
     }
 
     const consentReference = `consent-${user.id}-${Date.now()}`;
@@ -426,7 +427,7 @@ export class DatabaseService {
       totalCopies: data.total_copies,
       availableCopies: data.available_copies,
       coverImageUrl: data.cover_image_url,
-      isActive: data.is_active,
+      isActive: true, // Default to true since column doesn't exist
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };
@@ -500,8 +501,7 @@ export class DatabaseService {
     const { data: expiredUsers } = await this.supabase
       .from('users')
       .select('id')
-      .lt('data_retention_until', now)
-      .eq('is_active', false);
+      .lt('data_retention_until', now);
 
     let deletedUsersCount = 0;
     if (expiredUsers) {
