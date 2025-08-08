@@ -42,48 +42,34 @@ export class EmailService {
 
     this.fromAddress = emailConfig2.from;
 
-    // Create transporter - use dummy if no credentials
+    // Check if SMTP credentials are configured
     if (!emailConfig2.auth.user || !emailConfig2.auth.pass) {
-      console.warn('Email service: No SMTP credentials configured, using console logging instead');
-      // Create a dummy transporter that logs instead of sending
-      this.transporter = {
-        sendMail: async (options: any) => {
-          console.log('=== EMAIL WOULD BE SENT ===');
-          console.log('To:', options.to);
-          console.log('Subject:', options.subject);
-          console.log('From:', options.from);
-          console.log('Preview:', options.text?.substring(0, 200) || options.html?.substring(0, 200));
-          console.log('===========================');
-          return { messageId: 'dummy-' + Date.now() };
-        },
-      } as any;
-    } else {
-      // Create real transporter
-      this.transporter = nodemailer.createTransport({
-        host: emailConfig2.host,
-        port: emailConfig2.port,
-        secure: emailConfig2.secure,
-        auth: emailConfig2.auth,
-        // Additional options for better deliverability
-        pool: true,
-        maxConnections: 5,
-        maxMessages: 100,
-        rateDelta: 1000,
-        rateLimit: 5,
-      });
+      throw new Error('SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
     }
+
+    // Create real transporter
+    this.transporter = nodemailer.createTransport({
+      host: emailConfig2.host,
+      port: emailConfig2.port,
+      secure: emailConfig2.secure,
+      auth: emailConfig2.auth,
+      // Additional options for better deliverability
+      pool: true,
+      maxConnections: 5,
+      maxMessages: 100,
+      rateDelta: 1000,
+      rateLimit: 5,
+    });
   }
 
   /**
    * Verify email configuration
    */
-  async verifyConnection(): Promise<boolean> {
+  async verifyConnection(): Promise<void> {
     try {
       await this.transporter.verify();
-      return true;
     } catch (error) {
-      console.error('Email service verification failed:', error);
-      return false;
+      throw new Error(`Email service verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
@@ -93,88 +79,113 @@ export class EmailService {
   async sendReservationConfirmation(data: ReservationEmailData): Promise<void> {
     const { reservation, user, magazine } = data;
     
-    const subject = emailConfig.subjects.reservation;
-    const html = this.generateReservationEmailHTML(data);
-    const text = this.generateReservationEmailText(data);
+    // Generate email content
+    const subject = `Reservierungsbestätigung - ${magazine.title}`;
+    const html = this.generateReservationEmailHTML(reservation, user, magazine);
+    const text = this.generateReservationEmailText(reservation, user, magazine);
+
+    // Prepare email options
+    const mailOptions = {
+      from: `${kindergarten.name} <${this.fromAddress}>`,
+      to: user.email,
+      subject,
+      html,
+      text,
+      headers: {
+        'X-Reservation-ID': reservation.id,
+        'X-Priority': '1',
+      },
+    };
 
     try {
-      const info = await this.transporter.sendMail({
-        from: `"${emailConfig.senderName}" <${this.fromAddress}>`,
-        to: user.email,
-        subject,
-        text,
-        html,
-        headers: {
-          'X-Priority': '3',
-          'X-Mailer': `${kindergarten.name} Reservation System`,
-        },
-      });
-
-      // Email sent successfully
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Email sent successfully:', info.messageId);
     } catch (error) {
-      console.error('Failed to send reservation confirmation email:', error);
-      throw new Error('Email konnte nicht gesendet werden');
+      console.error('Failed to send email:', error);
+      throw new Error(`Failed to send confirmation email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
-   * Send reservation cancellation email
+   * Send cancellation confirmation email
    */
-  async sendReservationCancellation(data: ReservationEmailData): Promise<void> {
-    const { magazine, user } = data;
+  async sendCancellationConfirmation(data: ReservationEmailData): Promise<void> {
+    const { reservation, user, magazine } = data;
     
-    const subject = `Reservierung storniert: ${magazine.title} - ${magazine.issueNumber}`;
-    const html = this.generateCancellationEmailHTML(data);
-    const text = this.generateCancellationEmailText(data);
+    const subject = `Reservierung storniert - ${magazine.title}`;
+    const html = this.generateCancellationEmailHTML(reservation, user, magazine);
+    const text = this.generateCancellationEmailText(reservation, user, magazine);
+
+    const mailOptions = {
+      from: `${kindergarten.name} <${this.fromAddress}>`,
+      to: user.email,
+      subject,
+      html,
+      text,
+      headers: {
+        'X-Reservation-ID': reservation.id,
+      },
+    };
 
     try {
-      await this.transporter.sendMail({
-        from: `"${emailConfig.senderName}" <${this.fromAddress}>`,
-        to: user.email,
-        subject,
-        text,
-        html,
-      });
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Cancellation email sent:', info.messageId);
     } catch (error) {
       console.error('Failed to send cancellation email:', error);
-      // Don't throw for cancellation emails - they're not critical
+      throw new Error(`Failed to send cancellation email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
-   * Send reminder email for pickup
+   * Send pickup reminder email
    */
   async sendPickupReminder(data: ReservationEmailData): Promise<void> {
-    const { reservation, magazine, user } = data;
+    const { reservation, user, magazine } = data;
     
-    if (!reservation.pickupDate || !reservation.pickupLocation) {
-      return; // Skip if no pickup details
-    }
+    const subject = `Erinnerung: Abholung ${magazine.title}`;
+    const html = this.generateReminderEmailHTML(reservation, user, magazine);
+    const text = this.generateReminderEmailText(reservation, user, magazine);
 
-    const subject = `Erinnerung: Abholung ${magazine.title} - ${magazine.issueNumber}`;
-    const html = this.generateReminderEmailHTML(data);
-    const text = this.generateReminderEmailText(data);
+    const mailOptions = {
+      from: `${kindergarten.name} <${this.fromAddress}>`,
+      to: user.email,
+      subject,
+      html,
+      text,
+      headers: {
+        'X-Reservation-ID': reservation.id,
+      },
+    };
 
     try {
-      await this.transporter.sendMail({
-        from: `"${emailConfig.senderName}" <${this.fromAddress}>`,
-        to: user.email,
-        subject,
-        text,
-        html,
-      });
+      const info = await this.transporter.sendMail(mailOptions);
+      console.log('Reminder email sent:', info.messageId);
     } catch (error) {
       console.error('Failed to send reminder email:', error);
+      throw new Error(`Failed to send reminder email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
    * Generate HTML email for reservation confirmation
    */
-  private generateReservationEmailHTML(data: ReservationEmailData): string {
-    const { reservation, user, magazine } = data;
-    const isShipping = reservation.deliveryMethod === 'shipping';
-    
+  private generateReservationEmailHTML(
+    reservation: Reservation,
+    user: User,
+    magazine: Magazine,
+  ): string {
+    const pickupDate = reservation.pickupDate 
+      ? new Date(reservation.pickupDate).toLocaleDateString('de-DE', { 
+          weekday: 'long', 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        })
+      : 'Nach Ankündigung';
+
+    const totalCost = calculateTotalCost(reservation.quantity);
+    const paymentReference = generatePaymentReference(reservation.id);
+
     return `
 <!DOCTYPE html>
 <html lang="de">
@@ -190,42 +201,57 @@ export class EmailService {
       max-width: 600px;
       margin: 0 auto;
       padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     .header {
-      background-color: #f8f9fa;
-      padding: 30px;
       text-align: center;
-      border-radius: 8px 8px 0 0;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #0066cc;
+    }
+    .header h1 {
+      color: #0066cc;
+      margin: 0;
+      font-size: 28px;
+    }
+    .kindergarten-name {
+      color: #666;
+      font-size: 18px;
+      margin-top: 5px;
     }
     .content {
-      background-color: #ffffff;
-      padding: 30px;
-      border: 1px solid #e9ecef;
-      border-radius: 0 0 8px 8px;
+      margin: 30px 0;
     }
     .info-box {
-      background-color: #e8f4f8;
+      background-color: #f8f9fa;
       border-left: 4px solid #0066cc;
       padding: 15px;
       margin: 20px 0;
     }
-    .details {
-      margin: 20px 0;
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
     }
-    .details dt {
+    .info-label {
       font-weight: bold;
-      color: #666;
-      margin-top: 10px;
+      color: #555;
     }
-    .details dd {
-      margin: 5px 0 0 0;
+    .info-value {
+      color: #333;
     }
-    .footer {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 1px solid #e9ecef;
-      font-size: 14px;
-      color: #666;
+    .payment-info {
+      background-color: #fff3cd;
+      border: 1px solid #ffc107;
+      border-radius: 4px;
+      padding: 15px;
+      margin: 20px 0;
     }
     .button {
       display: inline-block;
@@ -236,145 +262,130 @@ export class EmailService {
       border-radius: 4px;
       margin: 20px 0;
     }
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+      font-size: 14px;
+      color: #666;
+      text-align: center;
+    }
+    .important {
+      color: #d9534f;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <div class="header">
-    <h1 style="color: #0066cc; margin: 0;">Reservierung bestätigt! 🎉</h1>
-    <p style="margin: 10px 0 0 0; color: #666;">Vielen Dank für Ihre Reservierung</p>
-  </div>
-  
-  <div class="content">
-    <p>Liebe/r ${user.firstName} ${user.lastName},</p>
-    
-    <p>wir freuen uns, Ihnen mitteilen zu können, dass Ihre Reservierung für das <strong>${magazine.title}</strong> erfolgreich eingegangen ist.</p>
-    
-    <div class="info-box">
-      <strong>Reservierungs-ID:</strong> ${reservation.id}<br>
-      <strong>Status:</strong> Bestätigt ✓
+  <div class="container">
+    <div class="header">
+      <h1>Reservierung bestätigt!</h1>
+      <div class="kindergarten-name">${kindergarten.name}</div>
     </div>
     
-    <h2 style="color: #0066cc;">Ihre Reservierungsdetails:</h2>
-    
-    <dl class="details">
-      <dt>Magazin:</dt>
-      <dd>${magazine.title} - Ausgabe ${magazine.issueNumber}</dd>
+    <div class="content">
+      <p>Hallo ${user.firstName} ${user.lastName},</p>
       
-      <dt>Anzahl:</dt>
-      <dd>${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}</dd>
+      <p>vielen Dank für Ihre Reservierung der <strong>${magazine.title}</strong>.</p>
       
-      <dt>Erhalt:</dt>
-      <dd>${isShipping ? 'Versand nach Hause' : 'Abholung vor Ort'}</dd>
-      
-      ${!isShipping && reservation.pickupLocation ? `
-        <dt>Abholort:</dt>
-        <dd>${reservation.pickupLocation}</dd>
+      <div class="info-box">
+        <h3>Reservierungsdetails:</h3>
+        <div class="info-row">
+          <span class="info-label">Reservierungsnummer:</span>
+          <span class="info-value">${reservation.id.slice(0, 8).toUpperCase()}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Magazin:</span>
+          <span class="info-value">${magazine.title} - ${magazine.issueNumber}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Anzahl:</span>
+          <span class="info-value">${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Preis pro Exemplar:</span>
+          <span class="info-value">${formatCurrency(magazineConfig.price)}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Gesamtpreis:</span>
+          <span class="info-value"><strong>${formatCurrency(totalCost)}</strong></span>
+        </div>
+      </div>
+
+      ${reservation.deliveryMethod === 'pickup' ? `
+        <div class="info-box">
+          <h3>Abholung:</h3>
+          <div class="info-row">
+            <span class="info-label">Ort:</span>
+            <span class="info-value">${reservation.pickupLocation}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Datum:</span>
+            <span class="info-value">${pickupDate}</span>
+          </div>
+        </div>
         
-        ${reservation.pickupDate ? `
-          <dt>Gewünschtes Abholdatum:</dt>
-          <dd>${new Date(reservation.pickupDate).toLocaleDateString('de-DE', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}</dd>
-        ` : ''}
-      ` : ''}
-      
-      ${isShipping && reservation.shippingAddress ? `
-        <dt>Lieferadresse:</dt>
-        <dd>
-          ${reservation.shippingAddress.street} ${reservation.shippingAddress.houseNumber}<br>
-          ${reservation.shippingAddress.addressLine2 ? reservation.shippingAddress.addressLine2 + '<br>' : ''}
-          ${reservation.shippingAddress.postalCode} ${reservation.shippingAddress.city}<br>
-          ${reservation.shippingAddress.country === 'DE' ? 'Deutschland' : 
-            reservation.shippingAddress.country === 'AT' ? 'Österreich' : 'Schweiz'}
-        </dd>
-      ` : ''}
-      
-      ${reservation.notes ? `
-        <dt>Ihre Anmerkungen:</dt>
-        <dd>${reservation.notes}</dd>
-      ` : ''}
-    </dl>
-    
-    <h3 style="color: #0066cc;">Was passiert als Nächstes?</h3>
-    
-    ${isShipping ? `
-      <div style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 15px; margin: 20px 0;">
-        <h4 style="margin: 0 0 10px 0; color: #856404;">Zahlungsinformationen</h4>
-        <div style="margin: 10px 0;">
-          <table style="width: 100%; font-size: 14px;">
-            <tr>
-              <td>Magazin (1 Exemplar):</td>
-              <td style="text-align: right;">${formatCurrency(paymentConfig.magazinePrice)}</td>
-            </tr>
-            <tr>
-              <td>Versandkostenpauschale:</td>
-              <td style="text-align: right;">${formatCurrency(paymentConfig.shippingCost)}</td>
-            </tr>
-            <tr style="border-top: 1px solid #dee2e6;">
-              <td style="padding-top: 5px;"><strong>Gesamtbetrag:</strong></td>
-              <td style="text-align: right; padding-top: 5px;"><strong>${formatCurrency(calculateTotalCost(true))}</strong></td>
-            </tr>
-          </table>
+        <div class="payment-info">
+          <h3>💰 Zahlungsinformationen</h3>
+          <p><strong>Bitte bezahlen Sie bei der Abholung in bar.</strong></p>
+          <p>Betrag: <strong>${formatCurrency(totalCost)}</strong></p>
+          <p class="important">Bitte bringen Sie den passenden Betrag mit.</p>
+        </div>
+      ` : `
+        <div class="info-box">
+          <h3>Versand:</h3>
+          <p>Die Lieferadresse wurde gespeichert. Die Versandkosten werden separat berechnet.</p>
         </div>
         
         ${reservation.paymentMethod === 'paypal' ? `
-          <p style="margin: 10px 0;">Sie haben PayPal als Zahlungsart gewählt.</p>
-          <p style="margin: 10px 0;">Bitte zahlen Sie den Gesamtbetrag über folgenden Link:</p>
-          <a href="${paymentConfig.paypal.paypalMeLink}/${calculateTotalCost(true)}EUR" 
-             style="display: inline-block; padding: 10px 20px; background-color: #0070ba; color: white; text-decoration: none; border-radius: 4px; margin: 10px 0;">
-            Mit PayPal bezahlen
-          </a>
-          <p style="margin: 10px 0; font-size: 14px;">Verwendungszweck: ${generatePaymentReference(reservation.id)}</p>
-        ` : `
-          <p style="margin: 10px 0;">Sie haben Überweisung als Zahlungsart gewählt.</p>
-          <p style="margin: 10px 0;">Bitte überweisen Sie den Gesamtbetrag auf folgendes Konto:</p>
-          <div style="background-color: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0;">
-            <strong>Kontoinhaber:</strong> ${paymentConfig.bankTransfer.accountHolder}<br>
-            <strong>IBAN:</strong> ${paymentConfig.bankTransfer.iban}<br>
-            <strong>BIC:</strong> ${paymentConfig.bankTransfer.bic}<br>
-            <strong>Bank:</strong> ${paymentConfig.bankTransfer.bankName}<br>
-            <strong>Betrag:</strong> ${formatCurrency(calculateTotalCost(true))}<br>
-            <strong>Verwendungszweck:</strong> ${generatePaymentReference(reservation.id)}
+          <div class="payment-info">
+            <h3>💳 PayPal-Zahlung</h3>
+            <p>Bitte überweisen Sie den Betrag von <strong>${formatCurrency(totalCost)}</strong> an:</p>
+            <p>
+              <strong>PayPal:</strong> ${paymentConfig.paypalEmail}<br>
+              <strong>Verwendungszweck:</strong> ${paymentReference}
+            </p>
+            <p class="important">Bitte geben Sie unbedingt den Verwendungszweck an!</p>
           </div>
-        `}
-        
-        <p style="margin: 10px 0 0 0; font-size: 14px; color: #856404;">
-          <strong>Wichtig:</strong> Das Magazin wird erst nach Zahlungseingang versandt.
-        </p>
-      </div>
-    ` : `
-      <p>Ihr Magazin liegt ab dem ${reservation.pickupDate ? 
-        new Date(reservation.pickupDate).toLocaleDateString('de-DE') : 
-        'vereinbarten Datum'} zur Abholung bereit. Bitte bringen Sie diese E-Mail oder Ihre Reservierungs-ID mit.</p>
-      
-      <p><strong>Abholzeiten:</strong><br>
-      Montag - Freitag: 9:00 - 18:00 Uhr<br>
-      Samstag: 10:00 - 14:00 Uhr</p>
-    `}
+        ` : ''}
+      `}
+
+      ${reservation.orderGroupPicture || reservation.orderVorschulPicture ? `
+        <div class="info-box">
+          <h3>📸 Bildbestellung:</h3>
+          ${reservation.orderGroupPicture ? `
+            <div class="info-row">
+              <span class="info-label">Gruppenbild:</span>
+              <span class="info-value">✓ Bestellt (${reservation.childGroupName})</span>
+            </div>
+          ` : ''}
+          ${reservation.orderVorschulPicture ? `
+            <div class="info-row">
+              <span class="info-label">Vorschüler-Bild:</span>
+              <span class="info-value">✓ Bestellt</span>
+            </div>
+          ` : ''}
+          ${reservation.childName ? `
+            <div class="info-row">
+              <span class="info-label">Kind:</span>
+              <span class="info-value">${reservation.childName}</span>
+            </div>
+          ` : ''}
+        </div>
+      ` : ''}
+
+      <p>Bei Fragen können Sie uns gerne kontaktieren:</p>
+      <ul>
+        <li>E-Mail: <a href="mailto:${emailConfig.contact}">${emailConfig.contact}</a></li>
+        <li>Telefon: ${kindergarten.phone}</li>
+      </ul>
+    </div>
     
     <div class="footer">
-      <p><strong>Wichtige Hinweise:</strong></p>
-      <ul style="margin: 10px 0; padding-left: 20px;">
-        <li>Diese Reservierung ist ${reservation.expiresAt ? 
-          `bis zum ${new Date(reservation.expiresAt).toLocaleDateString('de-DE')} gültig` : 
-          '7 Tage gültig'}.</li>
-        <li>Bei Fragen wenden Sie sich bitte an unseren Kundenservice.</li>
-        <li>Diese E-Mail wurde automatisch generiert. Bitte antworten Sie nicht auf diese E-Mail.</li>
-      </ul>
-      
-      <p style="margin-top: 30px;">
-        Mit freundlichen Grüßen,<br>
-        <strong>${emailConfig.signature.name}</strong><br>
-        ${emailConfig.signature.role}
-      </p>
-      
-      <p style="font-size: 12px; color: #999; margin-top: 30px;">
-        Datenschutz ist uns wichtig. Ihre Daten werden gemäß unserer Datenschutzerklärung verarbeitet.
-        Sie können Ihre Einwilligungen jederzeit widerrufen.
-      </p>
+      <p>Diese E-Mail wurde automatisch generiert. Bitte antworten Sie nicht direkt auf diese E-Mail.</p>
+      <p>${kindergarten.name}<br>
+      ${kindergarten.address.street} ${kindergarten.address.houseNumber}<br>
+      ${kindergarten.address.postalCode} ${kindergarten.address.city}</p>
     </div>
   </div>
 </body>
@@ -385,103 +396,95 @@ export class EmailService {
   /**
    * Generate plain text email for reservation confirmation
    */
-  private generateReservationEmailText(data: ReservationEmailData): string {
-    const { reservation, user, magazine } = data;
-    const isShipping = reservation.deliveryMethod === 'shipping';
-    
+  private generateReservationEmailText(
+    reservation: Reservation,
+    user: User,
+    magazine: Magazine,
+  ): string {
+    const pickupDate = reservation.pickupDate 
+      ? new Date(reservation.pickupDate).toLocaleDateString('de-DE')
+      : 'Nach Ankündigung';
+
+    const totalCost = calculateTotalCost(reservation.quantity);
+    const paymentReference = generatePaymentReference(reservation.id);
+
     let text = `
 Reservierung bestätigt!
+======================
 
-Liebe/r ${user.firstName} ${user.lastName},
+Hallo ${user.firstName} ${user.lastName},
 
-wir freuen uns, Ihnen mitteilen zu können, dass Ihre Reservierung für das ${magazine.title} erfolgreich eingegangen ist.
+vielen Dank für Ihre Reservierung der ${magazine.title}.
 
-RESERVIERUNGS-ID: ${reservation.id}
-STATUS: Bestätigt
-
-IHRE RESERVIERUNGSDETAILS:
--------------------------
-Magazin: ${magazine.title} - Ausgabe ${magazine.issueNumber}
+RESERVIERUNGSDETAILS:
+--------------------
+Reservierungsnummer: ${reservation.id.slice(0, 8).toUpperCase()}
+Magazin: ${magazine.title} - ${magazine.issueNumber}
 Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
-Erhalt: ${isShipping ? 'Versand nach Hause' : 'Abholung vor Ort'}
+Preis pro Exemplar: ${formatCurrency(magazineConfig.price)}
+Gesamtpreis: ${formatCurrency(totalCost)}
 `;
 
-    if (isShipping) {
+    if (reservation.deliveryMethod === 'pickup') {
       text += `
-\nZAHLUNGSINFORMATIONEN:
----------------------------------
-Magazin (1 Exemplar): ${formatCurrency(paymentConfig.magazinePrice)}
-Versandkostenpauschale: ${formatCurrency(paymentConfig.shippingCost)}
----------------------------------
-GESAMTBETRAG: ${formatCurrency(calculateTotalCost(true))}
+ABHOLUNG:
+---------
+Ort: ${reservation.pickupLocation}
+Datum: ${pickupDate}
 
+ZAHLUNG:
+--------
+Bitte bezahlen Sie bei der Abholung in bar.
+Betrag: ${formatCurrency(totalCost)}
+WICHTIG: Bitte bringen Sie den passenden Betrag mit.
 `;
-      
-      if (reservation.paymentMethod === 'paypal') {
-        text += `Zahlungsart: PayPal
-Bitte zahlen Sie über folgenden Link:
-${paymentConfig.paypal.paypalMeLink}/${calculateTotalCost(true)}EUR
-Verwendungszweck: ${generatePaymentReference(reservation.id)}\n`;
-      } else {
-        text += `Zahlungsart: Überweisung
-
-Kontoinhaber: ${paymentConfig.bankTransfer.accountHolder}
-IBAN: ${paymentConfig.bankTransfer.iban}
-BIC: ${paymentConfig.bankTransfer.bic}
-Bank: ${paymentConfig.bankTransfer.bankName}
-Betrag: ${formatCurrency(calculateTotalCost(true))}
-Verwendungszweck: ${generatePaymentReference(reservation.id)}\n`;
-      }
-      
-      text += '\nWICHTIG: Das Magazin wird erst nach Zahlungseingang versandt.\n';
-    }
-
-    if (!isShipping && reservation.pickupLocation) {
-      text += `\nAbholort: ${reservation.pickupLocation}`;
-      if (reservation.pickupDate) {
-        text += `\nGewünschtes Abholdatum: ${new Date(reservation.pickupDate).toLocaleDateString('de-DE')}`;
-      }
-    }
-
-    if (isShipping && reservation.shippingAddress) {
-      text += `\n\nLieferadresse:
-${reservation.shippingAddress.street} ${reservation.shippingAddress.houseNumber}
-${reservation.shippingAddress.addressLine2 || ''}
-${reservation.shippingAddress.postalCode} ${reservation.shippingAddress.city}
-${reservation.shippingAddress.country}`;
-    }
-
-    if (reservation.notes) {
-      text += `\n\nIhre Anmerkungen: ${reservation.notes}`;
-    }
-
-    text += `\n\nWAS PASSIERT ALS NÄCHSTES?
--------------------------\n`;
-
-    if (isShipping) {
-      text += 'Wir werden Ihr Magazin schnellstmöglich versenden. Sie erhalten eine weitere E-Mail mit den Versandinformationen.';
     } else {
-      text += `Ihr Magazin liegt ab dem ${reservation.pickupDate ? 
-        new Date(reservation.pickupDate).toLocaleDateString('de-DE') : 
-        'vereinbarten Datum'} zur Abholung bereit.
-
-Abholzeiten:
-Montag - Freitag: 9:00 - 18:00 Uhr
-Samstag: 10:00 - 14:00 Uhr`;
+      text += `
+VERSAND:
+--------
+Die Lieferadresse wurde gespeichert.
+Die Versandkosten werden separat berechnet.
+`;
+      if (reservation.paymentMethod === 'paypal') {
+        text += `
+PAYPAL-ZAHLUNG:
+--------------
+Bitte überweisen Sie ${formatCurrency(totalCost)} an:
+PayPal: ${paymentConfig.paypalEmail}
+Verwendungszweck: ${paymentReference}
+WICHTIG: Bitte geben Sie unbedingt den Verwendungszweck an!
+`;
+      }
     }
 
-    text += `\n\nWICHTIGE HINWEISE:
-- Diese Reservierung ist ${reservation.expiresAt ? 
-  `bis zum ${new Date(reservation.expiresAt).toLocaleDateString('de-DE')} gültig` : 
-  '7 Tage gültig'}.
-- Bei Fragen wenden Sie sich bitte an unseren Kundenservice.
+    if (reservation.orderGroupPicture || reservation.orderVorschulPicture) {
+      text += `
+BILDBESTELLUNG:
+--------------`;
+      if (reservation.orderGroupPicture) {
+        text += `
+Gruppenbild: ✓ Bestellt (${reservation.childGroupName})`;
+      }
+      if (reservation.orderVorschulPicture) {
+        text += `
+Vorschüler-Bild: ✓ Bestellt`;
+      }
+      if (reservation.childName) {
+        text += `
+Kind: ${reservation.childName}`;
+      }
+    }
 
-Mit freundlichen Grüßen,
-${emailConfig.signature.name}
-${emailConfig.signature.role}
+    text += `
 
---
-Datenschutz ist uns wichtig. Ihre Daten werden gemäß unserer Datenschutzerklärung verarbeitet.
+Bei Fragen können Sie uns gerne kontaktieren:
+E-Mail: ${emailConfig.contact}
+Telefon: ${kindergarten.phone}
+
+Mit freundlichen Grüßen
+${kindergarten.name}
+${kindergarten.address.street} ${kindergarten.address.houseNumber}
+${kindergarten.address.postalCode} ${kindergarten.address.city}
 `;
 
     return text;
@@ -490,9 +493,11 @@ Datenschutz ist uns wichtig. Ihre Daten werden gemäß unserer Datenschutzerklä
   /**
    * Generate HTML email for cancellation
    */
-  private generateCancellationEmailHTML(data: ReservationEmailData): string {
-    const { reservation, user, magazine } = data;
-    
+  private generateCancellationEmailHTML(
+    reservation: Reservation,
+    user: User,
+    magazine: Magazine,
+  ): string {
     return `
 <!DOCTYPE html>
 <html lang="de">
@@ -501,19 +506,15 @@ Datenschutz ist uns wichtig. Ihre Daten werden gemäß unserer Datenschutzerklä
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reservierung storniert</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h2 style="color: #dc3545;">Reservierung storniert</h2>
-  
-  <p>Liebe/r ${user.firstName} ${user.lastName},</p>
-  
-  <p>Ihre Reservierung für <strong>${magazine.title} - Ausgabe ${magazine.issueNumber}</strong> wurde erfolgreich storniert.</p>
-  
-  <p><strong>Reservierungs-ID:</strong> ${reservation.id}</p>
-  
-  <p>Falls Sie dies nicht veranlasst haben oder Fragen haben, kontaktieren Sie bitte unseren Kundenservice.</p>
-  
-  <p>Mit freundlichen Grüßen,<br>
-  Ihr Flaschenpost Team</p>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #d9534f;">Reservierung storniert</h1>
+    <p>Hallo ${user.firstName} ${user.lastName},</p>
+    <p>Ihre Reservierung für die <strong>${magazine.title}</strong> wurde erfolgreich storniert.</p>
+    <p>Reservierungsnummer: ${reservation.id.slice(0, 8).toUpperCase()}</p>
+    <p>Falls Sie Fragen haben, kontaktieren Sie uns bitte unter ${emailConfig.contact}.</p>
+    <p>Mit freundlichen Grüßen<br>${kindergarten.name}</p>
+  </div>
 </body>
 </html>
     `;
@@ -522,61 +523,58 @@ Datenschutz ist uns wichtig. Ihre Daten werden gemäß unserer Datenschutzerklä
   /**
    * Generate plain text email for cancellation
    */
-  private generateCancellationEmailText(data: ReservationEmailData): string {
-    const { reservation, user, magazine } = data;
-    
+  private generateCancellationEmailText(
+    reservation: Reservation,
+    user: User,
+    magazine: Magazine,
+  ): string {
     return `
 Reservierung storniert
+=====================
 
-Liebe/r ${user.firstName} ${user.lastName},
+Hallo ${user.firstName} ${user.lastName},
 
-Ihre Reservierung für ${magazine.title} - Ausgabe ${magazine.issueNumber} wurde erfolgreich storniert.
+Ihre Reservierung für die ${magazine.title} wurde erfolgreich storniert.
 
-Reservierungs-ID: ${reservation.id}
+Reservierungsnummer: ${reservation.id.slice(0, 8).toUpperCase()}
 
-Falls Sie dies nicht veranlasst haben oder Fragen haben, kontaktieren Sie bitte unseren Kundenservice.
+Falls Sie Fragen haben, kontaktieren Sie uns bitte unter ${emailConfig.contact}.
 
-Mit freundlichen Grüßen,
-${emailConfig.signature.name}
-${emailConfig.signature.role}
-    `;
+Mit freundlichen Grüßen
+${kindergarten.name}
+`;
   }
 
   /**
    * Generate HTML email for pickup reminder
    */
-  private generateReminderEmailHTML(data: ReservationEmailData): string {
-    const { reservation, user, magazine } = data;
-    
+  private generateReminderEmailHTML(
+    reservation: Reservation,
+    user: User,
+    magazine: Magazine,
+  ): string {
+    const pickupDate = reservation.pickupDate 
+      ? new Date(reservation.pickupDate).toLocaleDateString('de-DE')
+      : 'heute';
+
     return `
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Abholungserinnerung</title>
+  <title>Abholung Erinnerung</title>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <h2 style="color: #0066cc;">Erinnerung: Magazin abholen! 📚</h2>
-  
-  <p>Liebe/r ${user.firstName} ${user.lastName},</p>
-  
-  <p>dies ist eine freundliche Erinnerung, dass Ihr reserviertes Magazin <strong>${magazine.title} - Ausgabe ${magazine.issueNumber}</strong> zur Abholung bereit liegt.</p>
-  
-  <div style="background-color: #e8f4f8; padding: 15px; margin: 20px 0; border-left: 4px solid #0066cc;">
-    <strong>Abholort:</strong> ${reservation.pickupLocation}<br>
-    <strong>Datum:</strong> ${reservation.pickupDate ? new Date(reservation.pickupDate).toLocaleDateString('de-DE') : 'Heute'}<br>
-    <strong>Reservierungs-ID:</strong> ${reservation.id}
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h1 style="color: #0066cc;">Erinnerung: Abholung ${magazine.title}</h1>
+    <p>Hallo ${user.firstName} ${user.lastName},</p>
+    <p>Dies ist eine freundliche Erinnerung, dass Sie ${pickupDate} Ihre reservierte <strong>${magazine.title}</strong> abholen können.</p>
+    <p><strong>Abholort:</strong> ${reservation.pickupLocation}</p>
+    <p><strong>Anzahl:</strong> ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}</p>
+    <p>Bitte denken Sie daran, den Betrag in bar mitzubringen.</p>
+    <p>Mit freundlichen Grüßen<br>${kindergarten.name}</p>
   </div>
-  
-  <p><strong>Abholzeiten:</strong><br>
-  Montag - Freitag: 9:00 - 18:00 Uhr<br>
-  Samstag: 10:00 - 14:00 Uhr</p>
-  
-  <p>Bitte bringen Sie diese E-Mail oder Ihre Reservierungs-ID zur Abholung mit.</p>
-  
-  <p>Mit freundlichen Grüßen,<br>
-  Ihr Flaschenpost Team</p>
 </body>
 </html>
     `;
@@ -585,33 +583,69 @@ ${emailConfig.signature.role}
   /**
    * Generate plain text email for pickup reminder
    */
-  private generateReminderEmailText(data: ReservationEmailData): string {
-    const { reservation, user, magazine } = data;
-    
+  private generateReminderEmailText(
+    reservation: Reservation,
+    user: User,
+    magazine: Magazine,
+  ): string {
+    const pickupDate = reservation.pickupDate 
+      ? new Date(reservation.pickupDate).toLocaleDateString('de-DE')
+      : 'heute';
+
     return `
-Erinnerung: Magazin abholen!
+Erinnerung: Abholung ${magazine.title}
+=====================================
 
-Liebe/r ${user.firstName} ${user.lastName},
+Hallo ${user.firstName} ${user.lastName},
 
-dies ist eine freundliche Erinnerung, dass Ihr reserviertes Magazin zur Abholung bereit liegt.
+Dies ist eine freundliche Erinnerung, dass Sie ${pickupDate} Ihre reservierte ${magazine.title} abholen können.
 
-Magazin: ${magazine.title} - Ausgabe ${magazine.issueNumber}
 Abholort: ${reservation.pickupLocation}
-Datum: ${reservation.pickupDate ? new Date(reservation.pickupDate).toLocaleDateString('de-DE') : 'Heute'}
-Reservierungs-ID: ${reservation.id}
+Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
 
-Abholzeiten:
-Montag - Freitag: 9:00 - 18:00 Uhr
-Samstag: 10:00 - 14:00 Uhr
+Bitte denken Sie daran, den Betrag in bar mitzubringen.
 
-Bitte bringen Sie diese E-Mail oder Ihre Reservierungs-ID zur Abholung mit.
-
-Mit freundlichen Grüßen,
-${emailConfig.signature.name}
-${emailConfig.signature.role}
-    `;
+Mit freundlichen Grüßen
+${kindergarten.name}
+`;
   }
 }
 
-// Export singleton instance for API routes
-export const emailService = new EmailService();
+// Export singleton instance - will throw error if SMTP not configured
+let emailServiceInstance: EmailService | null = null;
+
+export const getEmailService = (): EmailService => {
+  if (!emailServiceInstance) {
+    try {
+      emailServiceInstance = new EmailService();
+    } catch (error) {
+      console.error('Failed to initialize email service:', error);
+      throw error;
+    }
+  }
+  return emailServiceInstance;
+};
+
+// Export for backward compatibility - but will throw if not configured
+export const emailService = (() => {
+  try {
+    return getEmailService();
+  } catch (error) {
+    console.error('Email service not available:', error);
+    // Return a stub that throws meaningful errors
+    return {
+      sendReservationConfirmation: async () => {
+        throw new Error('Email service not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
+      },
+      sendCancellationConfirmation: async () => {
+        throw new Error('Email service not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
+      },
+      sendPickupReminder: async () => {
+        throw new Error('Email service not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
+      },
+      verifyConnection: async () => {
+        throw new Error('Email service not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
+      },
+    };
+  }
+})();
