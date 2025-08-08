@@ -124,7 +124,7 @@ export class DatabaseService {
         email: formData.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
-        phone: formData.phone,
+        // phone: formData.phone, // phone column doesn't exist
         address: formData.deliveryMethod === 'shipping' ? formData.address : undefined,
         consentVersion: '1.0',
       });
