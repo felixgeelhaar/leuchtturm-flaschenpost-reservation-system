@@ -360,7 +360,7 @@ export class DatabaseService {
     
     // Anonymize processing logs (keep for legal compliance)
     await this.supabase
-      .from('data_processing_logs')
+      .from('data_processing_activity')
       .update({ 
         user_id: null,
         details: JSON.stringify({ anonymized: true, reason }),
@@ -398,7 +398,7 @@ export class DatabaseService {
     // This is a temporary fix - the table should be created in production
     try {
       const { data, error } = await this.supabase
-        .from('data_processing_logs')
+        .from('data_processing_activity')
         .insert({
           user_id: log.userId || null,
           action: log.action,
@@ -413,7 +413,7 @@ export class DatabaseService {
       if (error) {
         // Only log critical info, not full error to reduce noise
         if (error.code === '42P01') {
-          console.warn('GDPR logging skipped: data_processing_logs table does not exist');
+          console.warn('GDPR logging skipped: data_processing_activity table does not exist');
         } else {
           console.error('Failed to log data processing:', error?.message || 'Unknown error');
         }
@@ -551,7 +551,7 @@ export class DatabaseService {
     cutoffDate.setFullYear(cutoffDate.getFullYear() - 7);
     
     const { data: cleanedLogs } = await this.supabase
-      .from('data_processing_logs')
+      .from('data_processing_activity')
       .delete()
       .lt('timestamp', cutoffDate.toISOString())
       .select('id');
