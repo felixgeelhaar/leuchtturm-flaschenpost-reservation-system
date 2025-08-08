@@ -141,10 +141,10 @@ export const websiteContent = {
   // PAYMENT INFORMATION
   // ============================================
   payment: {
-    // TODO: Add your actual PayPal information
+    // PayPal information for Elternbeirat
     paypal: {
-      username: 'felixgeelhaar', // for PayPal.Me link
-      email: 'felix@felixgeelhaar.de',
+      username: 'felixgeelhaar', // PayPal.Me username
+      email: 'felix@felixgeelhaar.de', // PayPal account email
     },
 
     // Bank account details for payments

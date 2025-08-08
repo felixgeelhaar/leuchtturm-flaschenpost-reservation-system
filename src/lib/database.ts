@@ -462,16 +462,23 @@ export class DatabaseService {
       pickupDate: data.pickup_date,
       pickupLocation: data.pickup_location,
       paymentMethod: data.payment_method,
-      // None of the shipping address columns exist in the database
-      shippingAddress: undefined,
-      notes: undefined, // notes column doesn't exist
+      // Shipping address fields (now exist in database)
+      shippingAddress: data.street ? {
+        street: data.street,
+        houseNumber: data.house_number,
+        addressLine2: data.address_line2,
+        postalCode: data.postal_code,
+        city: data.city,
+        country: data.country,
+      } : undefined,
+      notes: data.notes, // notes column now exists
       consentReference: "legacy", // Column doesn't exist
-      // Picture order fields - columns don't exist in database
-      orderGroupPicture: false, // data.order_group_picture,
-      childGroupName: undefined, // data.child_group_name,
-      orderVorschulPicture: false, // data.order_vorschul_picture,
-      childIsVorschueler: false, // data.child_is_vorschueler,
-      childName: undefined, // data.child_name,
+      // Picture order fields - now exist in database
+      orderGroupPicture: data.order_group_picture || false,
+      childGroupName: data.child_group_name,
+      orderVorschulPicture: data.order_vorschul_picture || false,
+      childIsVorschueler: data.child_is_vorschueler || false,
+      childName: data.child_name,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
       expiresAt: data.created_at, // Column doesn't exist

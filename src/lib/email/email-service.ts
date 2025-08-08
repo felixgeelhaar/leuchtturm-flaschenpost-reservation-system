@@ -201,16 +201,12 @@ export class EmailService {
       deliveryMethod: reservation.deliveryMethod,
     };
     
-    const pickupDate = safeReservation.pickupDate 
-      ? new Date(safeReservation.pickupDate).toLocaleDateString('de-DE', { 
-          weekday: 'long', 
-          day: 'numeric', 
-          month: 'long', 
-          year: 'numeric' 
-        })
-      : 'Nach Ankündigung';
+    const pickupDate = 'Wir melden uns in Kürze bezüglich eines Abholtermins';
 
-    const totalCost = pricing.magazinePrice * safeReservation.quantity;
+    // Calculate total cost - add shipping for shipping orders
+    const magazineCost = pricing.magazinePrice * safeReservation.quantity;
+    const shippingCost = safeReservation.deliveryMethod === 'shipping' ? pricing.shippingCost : 0;
+    const totalCost = magazineCost + shippingCost;
     const paymentReference = generatePaymentReference(safeReservation.id);
     
     // Use safeReservation in the template
@@ -336,6 +332,16 @@ export class EmailService {
           <span class="info-label">Preis pro Exemplar:</span>
           <span class="info-value">${formatCurrency(pricing.magazinePrice)}</span>
         </div>
+        ${reservation.deliveryMethod === 'shipping' ? `
+        <div class="info-row">
+          <span class="info-label">Zwischensumme:</span>
+          <span class="info-value">${formatCurrency(magazineCost)}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Versandkostenpauschale:</span>
+          <span class="info-value">${formatCurrency(shippingCost)}</span>
+        </div>
+        ` : ''}
         <div class="info-row">
           <span class="info-label">Gesamtpreis:</span>
           <span class="info-value"><strong>${formatCurrency(totalCost)}</strong></span>
@@ -350,7 +356,7 @@ export class EmailService {
             <span class="info-value">${reservation.pickupLocation || 'Kindergarten Leuchtturm'}</span>
           </div>
           <div class="info-row">
-            <span class="info-label">Datum:</span>
+            <span class="info-label">Termin:</span>
             <span class="info-value">${pickupDate}</span>
           </div>
         </div>
@@ -370,9 +376,9 @@ export class EmailService {
         ${reservation.paymentMethod === 'paypal' ? `
           <div class="payment-info">
             <h3>💳 PayPal-Zahlung</h3>
-            <p>Bitte überweisen Sie den Betrag von <strong>${formatCurrency(totalCost)}</strong> an:</p>
+            <p>Bitte überweisen Sie den Betrag von <strong>${formatCurrency(totalCost)}</strong> via PayPal:</p>
             <p>
-              <strong>PayPal:</strong> ${paymentConfig.paypal.paypalEmail}<br>
+              <a href="${paymentConfig.paypal.paypalMeLink}/${totalCost.toFixed(2).replace('.', ',')}EUR" style="color: #0066cc; font-weight: bold; text-decoration: none; display: inline-block; padding: 8px 16px; background-color: #0070ba; color: white; border-radius: 4px;">💳 Mit PayPal bezahlen (${formatCurrency(totalCost)})</a><br><br>
               <strong>Verwendungszweck:</strong> ${paymentReference}
             </p>
             <p class="important">Bitte geben Sie unbedingt den Verwendungszweck an!</p>
@@ -407,7 +413,6 @@ export class EmailService {
       <p>Bei Fragen können Sie uns gerne kontaktieren:</p>
       <ul>
         <li>E-Mail: <a href="mailto:${kindergarten.contact.email}">${kindergarten.contact.email}</a></li>
-        <li>Telefon: ${kindergarten.contact.phone}</li>
       </ul>
     </div>
     
@@ -448,11 +453,12 @@ export class EmailService {
     
     reservation = safeReservation as any;
     
-    const pickupDate = reservation.pickupDate 
-      ? new Date(reservation.pickupDate).toLocaleDateString('de-DE')
-      : 'Nach Ankündigung';
+    const pickupDate = 'Wir melden uns in Kürze bezüglich eines Abholtermins';
 
-    const totalCost = pricing.magazinePrice * reservation.quantity;
+    // Calculate total cost - add shipping for shipping orders
+    const magazineCost = pricing.magazinePrice * reservation.quantity;
+    const shippingCost = reservation.deliveryMethod === 'shipping' ? pricing.shippingCost : 0;
+    const totalCost = magazineCost + shippingCost;
     const paymentReference = generatePaymentReference(reservation.id);
 
     let text = `
@@ -468,7 +474,9 @@ RESERVIERUNGSDETAILS:
 Reservierungsnummer: ${reservation.id.slice(0, 8).toUpperCase()}
 Magazin: ${magazine.title} - ${magazine.issueNumber}
 Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
-Preis pro Exemplar: ${formatCurrency(pricing.magazinePrice)}
+Preis pro Exemplar: ${formatCurrency(pricing.magazinePrice)}${reservation.deliveryMethod === 'shipping' ? `
+Zwischensumme: ${formatCurrency(magazineCost)}
+Versandkostenpauschale: ${formatCurrency(shippingCost)}` : ''}
 Gesamtpreis: ${formatCurrency(totalCost)}
 `;
 
@@ -477,7 +485,7 @@ Gesamtpreis: ${formatCurrency(totalCost)}
 ABHOLUNG:
 ---------
 Ort: ${reservation.pickupLocation || 'Kindergarten Leuchtturm'}
-Datum: ${pickupDate}
+Termin: ${pickupDate}
 
 ZAHLUNG:
 --------
@@ -496,8 +504,8 @@ Die Versandkosten werden separat berechnet.
         text += `
 PAYPAL-ZAHLUNG:
 --------------
-Bitte überweisen Sie ${formatCurrency(totalCost)} an:
-PayPal: ${paymentConfig.paypal.paypalEmail}
+Bitte überweisen Sie ${formatCurrency(totalCost)} via PayPal:
+PayPal.Me Link: ${paymentConfig.paypal.paypalMeLink}/${totalCost.toFixed(2).replace('.', ',')}EUR
 Verwendungszweck: ${paymentReference}
 WICHTIG: Bitte geben Sie unbedingt den Verwendungszweck an!
 `;
@@ -526,7 +534,6 @@ Kind: ${reservation.childName}`;
 
 Bei Fragen können Sie uns gerne kontaktieren:
 E-Mail: ${kindergarten.contact.email}
-Telefon: ${kindergarten.contact.phone}
 
 Mit freundlichen Grüßen
 ${kindergarten.name}
