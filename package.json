@@ -21,6 +21,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:coverage": "vitest run --coverage",
+    "test:coverage:check": "npm run test:coverage && node scripts/check-coverage.js",
     "test:smoke": "playwright test --grep='@smoke'",
     "test:performance": "lighthouse-ci autorun",
     "analyze": "astro build --mode=analyze",
