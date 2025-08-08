@@ -45,15 +45,10 @@ export class EmailService {
       from: import.meta.env.SMTP_FROM || 'noreply@example.com',
     };
 
-    // Log configuration (without sensitive data) for debugging
-    console.log('Email service initializing with:', {
-      host: emailConfig2.host,
-      port: emailConfig2.port,
-      secure: emailConfig2.secure,
-      hasUser: !!emailConfig2.auth.user,
-      hasPass: !!emailConfig2.auth.pass,
-      from: emailConfig2.from,
-    });
+    // Only log in development mode
+    if (import.meta.env.MODE === 'development') {
+      console.log('Email service initialized');
+    }
 
     this.fromAddress = emailConfig2.from;
 
@@ -71,12 +66,16 @@ export class EmailService {
           user: emailConfig2.auth.user,
           pass: emailConfig2.auth.pass,
         },
+        // Use connection pooling to reuse connections
+        pool: true,
+        maxConnections: 1,
+        maxMessages: 100,
         // Add timeout settings
-        connectionTimeout: 10000, // 10 seconds
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
-        logger: true, // Enable logging
-        debug: true, // Enable debug output
+        connectionTimeout: 5000, // 5 seconds
+        greetingTimeout: 5000,
+        socketTimeout: 5000,
+        logger: false, // Disable verbose logging for production
+        debug: false, // Disable debug for production
       });
     } else {
       // Generic SMTP configuration
@@ -85,20 +84,16 @@ export class EmailService {
         port: emailConfig2.port,
         secure: emailConfig2.secure,
         auth: emailConfig2.auth,
-        connectionTimeout: 10000,
-        greetingTimeout: 10000,
-        socketTimeout: 10000,
+        pool: true,
+        maxConnections: 1,
+        maxMessages: 100,
+        connectionTimeout: 5000,
+        greetingTimeout: 5000,
+        socketTimeout: 5000,
       });
     }
     
-    // Verify connection on initialization (async)
-    this.transporter.verify((error, success) => {
-      if (error) {
-        console.error('Email transporter verification failed:', error.message);
-      } else {
-        console.log('Email transporter is ready to send emails');
-      }
-    });
+    // Transporter ready with connection pooling
   }
 
   /**
@@ -116,17 +111,12 @@ export class EmailService {
    * Send reservation confirmation email
    */
   async sendReservationConfirmation(data: ReservationEmailData): Promise<void> {
-    console.log('sendReservationConfirmation called with data keys:', Object.keys(data));
     const { reservation, user, magazine } = data;
     
-    console.log('Generating email content for user:', user.email);
     // Generate email content
     const subject = `Reservierungsbestätigung - ${magazine.title}`;
     const html = this.generateReservationEmailHTML(reservation, user, magazine);
     const text = this.generateReservationEmailText(reservation, user, magazine);
-
-    console.log('Email content generated, subject:', subject);
-    console.log('HTML length:', html.length, 'Text length:', text.length);
 
     // Prepare email options
     const mailOptions = {
@@ -141,42 +131,27 @@ export class EmailService {
       },
     };
 
-    console.log('Mail options prepared, from:', mailOptions.from, 'to:', mailOptions.to);
-
     try {
-      console.log('Starting email send process...');
-      console.log('Attempting to send email to:', user.email);
-      
       // Add timeout to email sending (10 seconds)
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-          console.log('Email send timeout triggered after 10 seconds');
           reject(new Error('Email send timeout after 10 seconds'));
         }, 10000);
       });
       
-      console.log('Creating sendMail promise...');
       const sendPromise = this.transporter.sendMail(mailOptions);
-      
-      console.log('Racing send promise against timeout...');
       const info = await Promise.race([sendPromise, timeoutPromise]) as any;
       
-      console.log('Email sent successfully:', {
-        messageId: info.messageId,
-        accepted: info.accepted,
-        rejected: info.rejected,
-        response: info.response
-      });
+      // Log success only in development
+      if (import.meta.env.MODE === 'development') {
+        console.log(`Email sent to ${user.email} (${info.messageId})`);
+      }
     } catch (error) {
-      console.error('Failed to send email - caught error:', {
-        error: error instanceof Error ? error.message : error,
-        errorType: error?.constructor?.name,
-        code: (error as any)?.code,
-        command: (error as any)?.command,
-        response: (error as any)?.response,
-        responseCode: (error as any)?.responseCode,
+      // Log error with essential details only
+      console.error('Email send failed:', {
         to: user.email,
-        stack: error instanceof Error ? error.stack?.split('\n').slice(0, 3).join('\n') : undefined
+        error: error instanceof Error ? error.message : 'Unknown error',
+        code: (error as any)?.code
       });
       throw new Error(`Failed to send confirmation email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -204,8 +179,7 @@ export class EmailService {
     };
 
     try {
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('Cancellation email sent:', info.messageId);
+      await this.transporter.sendMail(mailOptions);
     } catch (error) {
       console.error('Failed to send cancellation email:', error);
       throw new Error(`Failed to send cancellation email: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -234,8 +208,7 @@ export class EmailService {
     };
 
     try {
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('Reminder email sent:', info.messageId);
+      await this.transporter.sendMail(mailOptions);
     } catch (error) {
       console.error('Failed to send reminder email:', error);
       throw new Error(`Failed to send reminder email: ${error instanceof Error ? error.message : 'Unknown error'}`);
