@@ -180,8 +180,24 @@ export class EmailService {
     user: User,
     magazine: Magazine,
   ): string {
-    const pickupDate = reservation.pickupDate 
-      ? new Date(reservation.pickupDate).toLocaleDateString('de-DE', { 
+    // Ensure all fields that might be accessed in the template are defined
+    // This prevents "Cannot read properties of undefined" errors
+    const safeReservation = {
+      ...reservation,
+      pickupLocation: reservation.pickupLocation || 'Kindergarten Leuchtturm',
+      pickupDate: reservation.pickupDate,
+      paymentMethod: reservation.paymentMethod || null,
+      orderGroupPicture: reservation.orderGroupPicture || false,
+      orderVorschulPicture: reservation.orderVorschulPicture || false,
+      childGroupName: reservation.childGroupName || '',
+      childName: reservation.childName || '',
+      quantity: reservation.quantity || 1,
+      id: reservation.id,
+      deliveryMethod: reservation.deliveryMethod,
+    };
+    
+    const pickupDate = safeReservation.pickupDate 
+      ? new Date(safeReservation.pickupDate).toLocaleDateString('de-DE', { 
           weekday: 'long', 
           day: 'numeric', 
           month: 'long', 
@@ -189,8 +205,11 @@ export class EmailService {
         })
       : 'Nach Ankündigung';
 
-    const totalCost = calculateTotalCost(reservation.quantity);
-    const paymentReference = generatePaymentReference(reservation.id);
+    const totalCost = calculateTotalCost(safeReservation.quantity);
+    const paymentReference = generatePaymentReference(safeReservation.id);
+    
+    // Use safeReservation in the template
+    reservation = safeReservation as any;
 
     return `
 <!DOCTYPE html>
@@ -323,7 +342,7 @@ export class EmailService {
           <h3>Abholung:</h3>
           <div class="info-row">
             <span class="info-label">Ort:</span>
-            <span class="info-value">${reservation.pickupLocation}</span>
+            <span class="info-value">${reservation.pickupLocation || 'Kindergarten Leuchtturm'}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Datum:</span>
@@ -407,6 +426,23 @@ export class EmailService {
     user: User,
     magazine: Magazine,
   ): string {
+    // Ensure safe access to all fields
+    const safeReservation = {
+      ...reservation,
+      pickupLocation: reservation.pickupLocation || 'Kindergarten Leuchtturm',
+      pickupDate: reservation.pickupDate,
+      paymentMethod: reservation.paymentMethod || null,
+      orderGroupPicture: reservation.orderGroupPicture || false,
+      orderVorschulPicture: reservation.orderVorschulPicture || false,
+      childGroupName: reservation.childGroupName || '',
+      childName: reservation.childName || '',
+      quantity: reservation.quantity || 1,
+      id: reservation.id,
+      deliveryMethod: reservation.deliveryMethod,
+    };
+    
+    reservation = safeReservation as any;
+    
     const pickupDate = reservation.pickupDate 
       ? new Date(reservation.pickupDate).toLocaleDateString('de-DE')
       : 'Nach Ankündigung';
@@ -435,7 +471,7 @@ Gesamtpreis: ${formatCurrency(totalCost)}
       text += `
 ABHOLUNG:
 ---------
-Ort: ${reservation.pickupLocation}
+Ort: ${reservation.pickupLocation || 'Kindergarten Leuchtturm'}
 Datum: ${pickupDate}
 
 ZAHLUNG:
@@ -576,7 +612,7 @@ ${kindergarten.name}
     <h1 style="color: #0066cc;">Erinnerung: Abholung ${magazine.title}</h1>
     <p>Hallo ${user.firstName} ${user.lastName},</p>
     <p>Dies ist eine freundliche Erinnerung, dass Sie ${pickupDate} Ihre reservierte <strong>${magazine.title}</strong> abholen können.</p>
-    <p><strong>Abholort:</strong> ${reservation.pickupLocation}</p>
+    <p><strong>Abholort:</strong> ${reservation.pickupLocation || 'Kindergarten Leuchtturm'}</p>
     <p><strong>Anzahl:</strong> ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}</p>
     <p>Bitte denken Sie daran, den Betrag in bar mitzubringen.</p>
     <p>Mit freundlichen Grüßen<br>${kindergarten.name}</p>
@@ -606,7 +642,7 @@ Hallo ${user.firstName} ${user.lastName},
 
 Dies ist eine freundliche Erinnerung, dass Sie ${pickupDate} Ihre reservierte ${magazine.title} abholen können.
 
-Abholort: ${reservation.pickupLocation}
+Abholort: ${reservation.pickupLocation || 'Kindergarten Leuchtturm'}
 Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
 
 Bitte denken Sie daran, den Betrag in bar mitzubringen.
