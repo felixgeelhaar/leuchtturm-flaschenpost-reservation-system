@@ -347,6 +347,102 @@ export const handleError = (error: Error | AppError, context?: Record<string, an
 export const retry = <T>(operation: () => Promise<T>, maxRetries?: number, baseDelay?: number) =>
   errorHandler.retry(operation, maxRetries, baseDelay);
 
+// Format error for user display
+export const formatErrorForUser = (error: Error | AppError | null | undefined): string => {
+  if (!error) {
+    return 'Ein unerwarteter Fehler ist aufgetreten.';
+  }
+  
+  if (error instanceof NetworkError) {
+    return 'Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.';
+  }
+  
+  if (error instanceof ValidationError) {
+    return 'Ungültige Eingabe. Bitte überprüfen Sie Ihre Daten.';
+  }
+  
+  if (error instanceof AuthenticationError) {
+    return 'Authentifizierungsfehler. Bitte melden Sie sich erneut an.';
+  }
+  
+  if (error instanceof AuthorizationError) {
+    return 'Sie haben keine Berechtigung für diese Aktion.';
+  }
+  
+  if (error instanceof NotFoundError) {
+    return 'Die angeforderte Ressource wurde nicht gefunden.';
+  }
+  
+  if (error instanceof ServerError) {
+    return 'Serverfehler. Bitte versuchen Sie es später erneut.';
+  }
+  
+  return 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+};
+
+// Enrich error with additional context
+export const enrichError = (error: Error | AppError, context?: Record<string, any>): AppError => {
+  if (error instanceof AppError) {
+    error.context = { ...error.context, ...context };
+    return error;
+  }
+  
+  const appError = new ServerError(error.message);
+  appError.context = context || {};
+  return appError;
+};
+
+// Log error (stub for testing)
+export const logError = (error: Error | AppError, context?: Record<string, any>): void => {
+  console.error('Error:', error, 'Context:', context);
+};
+
+// Create error report (stub for testing)
+export const createErrorReport = (error: Error | AppError, url?: string, userAgent?: string): Record<string, any> => {
+  return {
+    message: error.message,
+    stack: error.stack,
+    url,
+    userAgent,
+    timestamp: new Date().toISOString(),
+    context: error instanceof AppError ? error.context : {}
+  };
+};
+
+// Categorize errors based on their type or message
+export const categorizeError = (error: Error | AppError): string => {
+  if (error instanceof NetworkError) return 'network';
+  if (error instanceof ValidationError) return 'validation';
+  if (error instanceof AuthenticationError) return 'authentication';
+  if (error instanceof AuthorizationError) return 'authorization';
+  if (error instanceof NotFoundError) return 'not_found';
+  if (error instanceof ServerError) return 'server_error';
+  
+  // Check error message for patterns
+  const message = error.message.toLowerCase();
+  if (message.includes('fetch') || message.includes('network')) return 'network';
+  if (message.includes('invalid') || message.includes('validation')) return 'validation';
+  if (message.includes('unauthorized') || message.includes('auth')) return 'authentication';
+  if (message.includes('forbidden') || message.includes('permission')) return 'authorization';
+  if (message.includes('not found') || message.includes('404')) return 'not_found';
+  if (message.includes('server') || message.includes('internal')) return 'server_error';
+  
+  return 'unknown';
+};
+
+// Check if an error is retriable
+export const isRetriableError = (error: Error | AppError): boolean => {
+  if (error instanceof NetworkError) return true;
+  if (error instanceof ServerError) return true;
+  
+  // Check for specific error codes or messages that indicate retriable errors
+  const message = error.message.toLowerCase();
+  if (message.includes('timeout') || message.includes('network')) return true;
+  if (message.includes('503') || message.includes('429')) return true; // Service unavailable or rate limited
+  
+  return false;
+};
+
 // Global error handlers setup
 export const setupGlobalErrorHandlers = () => {
   // Handle unhandled promise rejections

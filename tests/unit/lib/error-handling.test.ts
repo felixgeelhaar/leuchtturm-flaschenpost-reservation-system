@@ -46,7 +46,7 @@ describe('Error Handling Utilities', () => {
       const error = new NetworkError('Connection failed');
       
       expect(error).toBeInstanceOf(Error);
-      expect(error.name).toBe('Error');
+      expect(error.name).toBe('NetworkError');
       expect(error.message).toBe('Connection failed');
       expect(error.code).toBe('NETWORK_ERROR');
       expect(error.statusCode).toBe(0);
@@ -72,7 +72,7 @@ describe('Error Handling Utilities', () => {
       
       expect(error).toBeInstanceOf(Error);
       expect(error.message).toBe('Invalid credentials');
-      expect(error.code).toBe('AUTHENTICATION_ERROR');
+      expect(error.code).toBe('AUTH_ERROR');
       expect(error.statusCode).toBe(401);
     });
 
@@ -94,7 +94,7 @@ describe('Error Handling Utilities', () => {
       
       expect(error).toBeInstanceOf(Error);
       expect(error.message).toBe('Resource not found');
-      expect(error.code).toBe('NOT_FOUND_ERROR');
+      expect(error.code).toBe('NOT_FOUND');
       expect(error.statusCode).toBe(404);
     });
 

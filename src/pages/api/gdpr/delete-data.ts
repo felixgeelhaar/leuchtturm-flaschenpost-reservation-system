@@ -5,8 +5,6 @@ import { DatabaseService } from '@/lib/database';
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
 
-const db = new DatabaseService();
-
 const deleteRequestSchema = z.object({
   userId: z.string().uuid('Ungültige Benutzer-ID'),
   reason: z.string().min(1, 'Grund ist erforderlich'),
@@ -15,6 +13,8 @@ const deleteRequestSchema = z.object({
 });
 
 export const DELETE: APIRoute = async ({ request }) => {
+  const db = new DatabaseService();
+  
   try {
     const body = await request.json();
     const validationResult = deleteRequestSchema.safeParse(body);
@@ -161,6 +161,8 @@ export const DELETE: APIRoute = async ({ request }) => {
 
 // Endpoint to check deletion eligibility
 export const POST: APIRoute = async ({ request }) => {
+  const db = new DatabaseService();
+  
   try {
     const body = await request.json();
     const { userId } = body;

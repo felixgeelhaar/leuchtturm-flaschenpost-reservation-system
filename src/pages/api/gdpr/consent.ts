@@ -6,8 +6,6 @@ import type { ConsentData } from '@/types';
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
 
-const db = new DatabaseService();
-
 // Validation schema for consent data
 const consentSchema = z.object({
   userId: z.string().uuid('Ungültige Benutzer-ID').optional(),
@@ -23,6 +21,8 @@ const consentSchema = z.object({
 });
 
 export const POST: APIRoute = async ({ request }) => {
+  const db = new DatabaseService();
+  
   try {
     // Get client information
     const clientIP = request.headers.get('x-forwarded-for') || 
@@ -212,6 +212,8 @@ export const DELETE: APIRoute = async ({ request }) => {
 
 // Get user consents
 export const GET: APIRoute = async ({ request, url }) => {
+  const db = new DatabaseService();
+  
   try {
     const userId = url.searchParams.get('userId');
 

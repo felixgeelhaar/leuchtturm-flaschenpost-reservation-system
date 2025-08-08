@@ -9,6 +9,9 @@ const mockEnv = {
   PUBLIC_SUPABASE_ANON_KEY: '',
 };
 
+// Create mockImportMeta for backward compatibility
+const mockImportMeta = { env: mockEnv };
+
 vi.mock('import.meta', () => ({
   env: mockEnv,
 }));

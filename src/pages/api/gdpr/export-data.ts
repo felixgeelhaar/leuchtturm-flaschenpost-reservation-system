@@ -5,14 +5,13 @@ import { DatabaseService } from '@/lib/database';
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
 
-const db = new DatabaseService();
-
 const exportRequestSchema = z.object({
   userId: z.string().uuid('Ungültige Benutzer-ID'),
   requestTimestamp: z.string().datetime('Ungültiger Zeitstempel'),
 });
 
 export const POST: APIRoute = async ({ request }) => {
+  const db = new DatabaseService();
   try {
     const body = await request.json();
     const validationResult = exportRequestSchema.safeParse(body);

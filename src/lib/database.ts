@@ -12,7 +12,11 @@ import type {
 
 // Server-side database operations
 export class DatabaseService {
-  private supabase = createServerSupabaseClient();
+  private supabase: ReturnType<typeof createServerSupabaseClient>;
+
+  constructor() {
+    this.supabase = createServerSupabaseClient();
+  }
 
   // User operations
   async createUser(userData: {

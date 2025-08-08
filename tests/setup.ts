@@ -1,6 +1,25 @@
 import { vi } from 'vitest';
 import { config } from '@vue/test-utils';
 
+// Set up mock environment variables before anything else
+vi.stubGlobal('import', {
+  meta: {
+    env: {
+      PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
+      PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
+      SUPABASE_SERVICE_ROLE_KEY: 'test-service-key',
+      SMTP_HOST: 'smtp.test.com',
+      SMTP_PORT: '587',
+      SMTP_SECURE: 'false',
+      SMTP_USER: 'test@example.com',
+      SMTP_PASS: 'password123',
+      SMTP_FROM: 'noreply@example.com',
+      MODE: 'test',
+      NODE_ENV: 'test',
+    },
+  },
+});
+
 // Mock global objects
 Object.defineProperty(window, 'fetch', {
   value: vi.fn(),
@@ -15,33 +34,48 @@ Object.defineProperty(window, 'localStorage', {
   },
 });
 
+// Create a chainable mock for Supabase queries
+const createMockChain = () => {
+  const mockPromise = Promise.resolve({ data: [], error: null });
+  
+  const chain: any = {
+    select: vi.fn(() => chain),
+    insert: vi.fn(() => chain),
+    update: vi.fn(() => chain),
+    delete: vi.fn(() => chain),
+    eq: vi.fn(() => chain),
+    neq: vi.fn(() => chain),
+    gt: vi.fn(() => chain),
+    gte: vi.fn(() => chain),
+    lt: vi.fn(() => chain),
+    lte: vi.fn(() => chain),
+    like: vi.fn(() => chain),
+    ilike: vi.fn(() => chain),
+    is: vi.fn(() => chain),
+    in: vi.fn(() => chain),
+    order: vi.fn(() => chain),
+    limit: vi.fn(() => chain),
+    range: vi.fn(() => chain),
+    single: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+    then: mockPromise.then.bind(mockPromise),
+    catch: mockPromise.catch.bind(mockPromise),
+    finally: mockPromise.finally.bind(mockPromise),
+  };
+  
+  return chain;
+};
+
 // Mock Supabase
 vi.mock('@/lib/supabase', () => ({
+  supabase: {
+    from: vi.fn(() => createMockChain()),
+  },
   createServerSupabaseClient: vi.fn(() => ({
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: null, error: null })),
-        })),
-      })),
-      insert: vi.fn(() => ({
-        select: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: {}, error: null })),
-        })),
-      })),
-      update: vi.fn(() => ({
-        eq: vi.fn(() => Promise.resolve({ data: {}, error: null })),
-      })),
-    })),
+    from: vi.fn(() => createMockChain()),
   })),
   createClientSupabaseClient: vi.fn(() => ({
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          single: vi.fn(() => Promise.resolve({ data: null, error: null })),
-        })),
-      })),
-    })),
+    from: vi.fn(() => createMockChain()),
   })),
 }));
 

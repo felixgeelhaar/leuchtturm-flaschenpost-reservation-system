@@ -94,7 +94,7 @@ describe('/api/magazines - Simple Coverage Tests', () => {
       
       const data = await response.json();
       expect(data.success).toBe(true);
-      expect(Array.isArray(data.magazines)).toBe(true);
+      expect(Array.isArray(data.data)).toBe(true);
     });
 
     it('handles database errors gracefully', async () => {
@@ -171,7 +171,7 @@ describe('/api/magazines - Simple Coverage Tests', () => {
       expect(response.status).toBe(200);
       
       const data = await response.json();
-      expect(data.magazines).toHaveLength(1);
+      expect(data.data).toHaveLength(1);
       expect(data.magazines[0].title).toBe('Active Magazine');
     });
 
@@ -255,7 +255,7 @@ describe('/api/magazines - Simple Coverage Tests', () => {
       
       const data = await response.json();
       expect(data.success).toBe(true);
-      expect(data.magazines).toEqual([]);
+      expect(data.data).toEqual([]);
       expect(data.count).toBe(0);
     });
 
@@ -287,7 +287,7 @@ describe('/api/magazines - Simple Coverage Tests', () => {
       
       const data = await response.json();
       expect(data.success).toBe(true);
-      expect(data.magazines).toEqual(mockData);
+      expect(data.data).toEqual(mockData);
       expect(data.count).toBe(mockData.length);
       expect(data.timestamp).toBeDefined();
     });

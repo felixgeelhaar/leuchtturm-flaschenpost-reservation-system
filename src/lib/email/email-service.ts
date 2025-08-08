@@ -135,11 +135,11 @@ export class EmailService {
       });
       
       const sendPromise = this.transporter.sendMail(mailOptions);
-      await Promise.race([sendPromise, timeoutPromise]);
+      const info = await Promise.race([sendPromise, timeoutPromise]);
       
       // Log success only in development
-      if (import.meta.env.MODE === 'development') {
-        console.log(`Email sent to ${user.email} (${info.messageId})`);
+      if (import.meta.env.MODE === 'development' && info) {
+        console.log(`Email sent to ${user.email} (${(info as any).messageId})`);
       }
     } catch (error) {
       // Log error with essential details only

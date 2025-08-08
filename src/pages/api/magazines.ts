@@ -4,9 +4,9 @@ import { DatabaseService } from '@/lib/database';
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
 
-const db = new DatabaseService();
-
 export const GET: APIRoute = async ({ request }) => {
+  const db = new DatabaseService();
+  
   try {
     // Get client IP for logging
     const clientIP = request.headers.get('x-forwarded-for') || 

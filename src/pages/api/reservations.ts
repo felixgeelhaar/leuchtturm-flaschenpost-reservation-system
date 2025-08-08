@@ -8,8 +8,6 @@ import type { ReservationFormData, ConsentData } from '@/types';
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
 
-const db = new DatabaseService();
-
 // Address validation schema - fields are validated conditionally based on delivery method
 const addressSchema = z.object({
   street: z.string().max(200, 'Straße ist zu lang').trim().optional(),
@@ -165,6 +163,8 @@ export const OPTIONS: APIRoute = async () => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
+  const db = new DatabaseService();
+  
   try {
     // Get client information
     // x-forwarded-for can contain multiple IPs, get the first one
