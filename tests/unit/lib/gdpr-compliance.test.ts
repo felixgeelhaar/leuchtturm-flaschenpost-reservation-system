@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { GDPRComplianceManager } from '@/lib/gdpr-compliance';
-import type { ConsentData, User } from '@/types';
+import type { ConsentData } from '@/types';
 
 // Mock globals
 const mockLocalStorage = {

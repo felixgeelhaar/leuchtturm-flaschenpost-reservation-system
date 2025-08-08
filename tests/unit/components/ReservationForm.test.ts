@@ -428,7 +428,6 @@ describe('ReservationForm.vue', () => {
       });
 
       // Check that form fields have labels
-      const firstNameInput = wrapper.find('input[id="firstName"]');
       const firstNameLabel = wrapper.find('label[for="firstName"]');
       
       expect(firstNameLabel.exists()).toBe(true);

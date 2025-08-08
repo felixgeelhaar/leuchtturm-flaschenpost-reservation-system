@@ -36,7 +36,8 @@
       "Bash(npx playwright:*)",
       "Bash(node:*)",
       "mcp__github__list_workflow_runs",
-      "mcp__github__get_job_logs"
+      "mcp__github__get_job_logs",
+      "mcp__github__get_workflow_run"
     ],
     "deny": []
   }
