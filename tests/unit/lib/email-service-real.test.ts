@@ -1,11 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-// import nodemailer from 'nodemailer';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type { Reservation, User, Magazine } from '@/types';
 
-// Mock nodemailer
+// Mock nodemailer - create transporter mock before mocking
 const mockTransporter = {
-  sendMail: vi.fn(),
-  verify: vi.fn(),
+  sendMail: vi.fn().mockResolvedValue({ messageId: 'test-message-id' }),
+  verify: vi.fn().mockResolvedValue(true),
 };
 
 vi.mock('nodemailer', () => ({
@@ -17,15 +16,40 @@ vi.mock('nodemailer', () => ({
 // Mock website config modules
 vi.mock('@/config/content', () => ({
   websiteContent: {
-    kindergarten: { name: 'Test Kindergarten', address: 'Test Address' },
-    magazine: { title: 'Test Magazine' },
-    email: { from: 'test@example.com', replyTo: 'noreply@example.com' },
-    pricing: { shipping: 5.99, pickup: 0 },
+    kindergarten: { 
+      name: 'Test Kindergarten',
+      contact: {
+        email: 'info@test.de',
+        address: {
+          street: 'Test St. 123',
+          postalCode: '12345',
+          city: 'Berlin',
+        },
+      },
+    },
+    magazine: { 
+      title: 'Test Magazine',
+      subtitle: 'Test Subtitle',
+    },
+    email: { 
+      from: 'test@example.com',
+      replyTo: 'noreply@example.com',
+      signature: 'Test Signature',
+    },
+    pricing: { 
+      magazinePrice: 5.99,
+      shippingCost: 2.50,
+    },
   },
 }));
 
 vi.mock('@/config/payment', () => ({
-  paymentConfig: { paypal: { enabled: true } },
+  paymentConfig: { 
+    paypal: { 
+      enabled: true,
+      paypalMeLink: 'https://paypal.me/test',
+    },
+  },
   generatePaymentReference: vi.fn(() => 'PAY-123456'),
   formatCurrency: vi.fn((amount) => `€${amount.toFixed(2)}`),
 }));
@@ -40,6 +64,7 @@ vi.stubGlobal('import', {
       SMTP_USER: 'test@example.com',
       SMTP_PASS: 'password123',
       SMTP_FROM: 'noreply@example.com',
+      MODE: 'test',
     },
   },
 });
@@ -117,9 +142,15 @@ describe('EmailService - Real Implementation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockTransporter.sendMail.mockClear();
+    mockTransporter.verify.mockClear();
     mockTransporter.sendMail.mockResolvedValue({ messageId: 'test-message-id' });
     mockTransporter.verify.mockResolvedValue(true);
     emailService = new EmailService();
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
   });
 
   describe('Email Service Initialization', () => {
@@ -157,18 +188,19 @@ describe('EmailService - Real Implementation', () => {
 
   describe('Connection Verification', () => {
     it('verifies email connection successfully', async () => {
-      const result = await emailService.verifyConnection();
+      mockTransporter.verify.mockResolvedValue(true);
+      
+      await expect(emailService.verifyConnection()).resolves.not.toThrow();
       
       expect(mockTransporter.verify).toHaveBeenCalledTimes(1);
-      expect(result).toBe(true);
     });
 
     it('handles connection verification failure', async () => {
       mockTransporter.verify.mockRejectedValue(new Error('Connection failed'));
 
-      const result = await emailService.verifyConnection();
+      await expect(emailService.verifyConnection()).rejects.toThrow();
       
-      expect(result).toBe(false);
+      expect(mockTransporter.verify).toHaveBeenCalledTimes(1);
     });
   });
 

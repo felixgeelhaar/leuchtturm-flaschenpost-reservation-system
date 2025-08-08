@@ -1,46 +1,28 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock import.meta.env before importing the module
-const mockEnv = {
-  MODE: 'development',
-  SMTP_USER: '',
-  SMTP_PASS: '',
-  PUBLIC_SUPABASE_URL: '',
-  PUBLIC_SUPABASE_ANON_KEY: '',
-};
-
-// Create mockImportMeta for backward compatibility
-const mockImportMeta = { env: mockEnv };
-
-vi.mock('import.meta', () => ({
-  env: mockEnv,
-}));
-
-const { GET, OPTIONS } = await import('@/pages/api/health');
+// This test file uses dynamic imports to properly test environment variable changes
 
 describe('/api/health', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset environment variables
-    Object.assign(mockEnv, {
-      MODE: 'development',
-      SMTP_USER: '',
-      SMTP_PASS: '',
-      PUBLIC_SUPABASE_URL: '',
-      PUBLIC_SUPABASE_ANON_KEY: '',
-    });
+    vi.resetModules();
   });
 
   describe('GET /api/health', () => {
     it('returns healthy status with all configurations present', async () => {
-      Object.assign(mockEnv, {
-        MODE: 'development',
-        SMTP_USER: 'test@example.com',
-        SMTP_PASS: 'password123',
-        PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
-        PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
+            MODE: 'development',
+            SMTP_USER: 'test@example.com',
+            SMTP_PASS: 'password123',
+            PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
+            PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
+          },
+        },
       });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -60,12 +42,17 @@ describe('/api/health', () => {
     });
 
     it('shows missing configuration when SMTP is not configured', async () => {
-      mockImportMeta.env = {
-        MODE: 'production',
-        PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
-        PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
-      };
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
+            MODE: 'production',
+            PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
+            PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -79,12 +66,17 @@ describe('/api/health', () => {
     });
 
     it('shows missing configuration when Supabase is not configured', async () => {
-      mockImportMeta.env = {
-        MODE: 'test',
-        SMTP_USER: 'test@example.com',
-        SMTP_PASS: 'password123',
-      };
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
+            MODE: 'test',
+            SMTP_USER: 'test@example.com',
+            SMTP_PASS: 'password123',
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -97,13 +89,18 @@ describe('/api/health', () => {
     });
 
     it('handles partial SMTP configuration (missing password)', async () => {
-      mockImportMeta.env = {
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
         SMTP_USER: 'test@example.com',
         // SMTP_PASS is missing
         PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
         PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
-      };
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -112,13 +109,18 @@ describe('/api/health', () => {
     });
 
     it('handles partial SMTP configuration (missing user)', async () => {
-      mockImportMeta.env = {
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
         SMTP_PASS: 'password123',
         // SMTP_USER is missing
         PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
         PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
-      };
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -128,13 +130,18 @@ describe('/api/health', () => {
     });
 
     it('handles partial Supabase configuration (missing URL)', async () => {
-      mockImportMeta.env = {
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
         SMTP_USER: 'test@example.com',
         SMTP_PASS: 'password123',
         PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
         // PUBLIC_SUPABASE_URL is missing
-      };
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -143,13 +150,18 @@ describe('/api/health', () => {
     });
 
     it('handles partial Supabase configuration (missing anon key)', async () => {
-      mockImportMeta.env = {
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
         SMTP_USER: 'test@example.com',
         SMTP_PASS: 'password123',
         PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
         // PUBLIC_SUPABASE_ANON_KEY is missing
-      };
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -158,14 +170,19 @@ describe('/api/health', () => {
     });
 
     it('returns unknown environment when MODE is not set', async () => {
-      mockImportMeta.env = {
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
         SMTP_USER: 'test@example.com',
         SMTP_PASS: 'password123',
         PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
         PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
         // MODE is missing
-      };
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -173,13 +190,18 @@ describe('/api/health', () => {
     });
 
     it('properly masks SMTP user email address', async () => {
-      mockImportMeta.env = {
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
         SMTP_USER: 'verylongemailtestuser@example.com',
         SMTP_PASS: 'password123',
         PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
         PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
-      };
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -187,8 +209,13 @@ describe('/api/health', () => {
     });
 
     it('includes proper headers for health endpoint', async () => {
-      mockImportMeta.env = {};
+      vi.stubGlobal('import', {
+        meta: {
+          env: {},
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
 
       expect(response.headers.get('Content-Type')).toBe('application/json');
@@ -196,6 +223,7 @@ describe('/api/health', () => {
     });
 
     it('includes timestamp in response', async () => {
+      const { GET } = await import('@/pages/api/health');
       const beforeTime = new Date().toISOString();
       
       const response = await GET({} as any);
@@ -209,13 +237,18 @@ describe('/api/health', () => {
     });
 
     it('handles empty environment variables gracefully', async () => {
-      mockImportMeta.env = {
+      vi.stubGlobal('import', {
+        meta: {
+          env: {
         SMTP_USER: '',
         SMTP_PASS: '',
         PUBLIC_SUPABASE_URL: '',
         PUBLIC_SUPABASE_ANON_KEY: '',
-      };
+          },
+        },
+      });
 
+      const { GET } = await import('@/pages/api/health');
       const response = await GET({} as any);
       const data = await response.json();
 
@@ -229,6 +262,7 @@ describe('/api/health', () => {
 
   describe('OPTIONS /api/health', () => {
     it('returns proper CORS headers for preflight request', async () => {
+      const { OPTIONS } = await import('@/pages/api/health');
       const response = await OPTIONS({} as any);
 
       expect(response.status).toBe(204);
@@ -238,6 +272,7 @@ describe('/api/health', () => {
     });
 
     it('returns no body for OPTIONS request', async () => {
+      const { OPTIONS } = await import('@/pages/api/health');
       const response = await OPTIONS({} as any);
       const text = await response.text();
 
