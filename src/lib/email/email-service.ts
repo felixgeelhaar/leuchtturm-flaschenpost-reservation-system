@@ -32,7 +32,6 @@ export class EmailService {
   private fromAddress: string;
 
   constructor(config?: EmailConfig) {
-    console.log('[EMAIL-INIT] EmailService constructor called');
     // Use environment variables for configuration
     // In Astro, use import.meta.env instead of process.env
     const emailConfig2 = config || {
@@ -46,26 +45,12 @@ export class EmailService {
       from: import.meta.env.SMTP_FROM || 'noreply@example.com',
     };
 
-    console.log('[EMAIL-INIT] Config:', {
-      host: emailConfig2.host,
-      port: emailConfig2.port,
-      hasUser: !!emailConfig2.auth.user,
-      hasPass: !!emailConfig2.auth.pass,
-      userLength: emailConfig2.auth.user?.length,
-      passLength: emailConfig2.auth.pass?.length
-    });
-
     this.fromAddress = emailConfig2.from;
 
     // Check if SMTP credentials are configured
     if (!emailConfig2.auth.user || !emailConfig2.auth.pass) {
-      console.error('[EMAIL-INIT] SMTP credentials missing!', {
-        SMTP_USER: import.meta.env.SMTP_USER ? 'set' : 'not set',
-        SMTP_PASS: import.meta.env.SMTP_PASS ? 'set' : 'not set',
-      });
       throw new Error('SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
     }
-    console.log('[EMAIL-INIT] SMTP credentials present');
 
     // Create transporter - simple configuration that works with Gmail
     if (emailConfig2.host.includes('gmail')) {
@@ -121,7 +106,6 @@ export class EmailService {
    * Send reservation confirmation email
    */
   async sendReservationConfirmation(data: ReservationEmailData): Promise<void> {
-    console.log('[EMAIL-SEND] sendReservationConfirmation called');
     const { reservation, user, magazine } = data;
     
     // Generate email content
@@ -143,19 +127,15 @@ export class EmailService {
     };
 
     try {
-      console.log('[EMAIL-SEND] Attempting to send email to:', user.email);
       // Add timeout to email sending (10 seconds)
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-          console.log('[EMAIL-SEND] Timeout triggered after 10 seconds');
           reject(new Error('Email send timeout after 10 seconds'));
         }, 10000);
       });
       
-      console.log('[EMAIL-SEND] Calling transporter.sendMail...');
       const sendPromise = this.transporter.sendMail(mailOptions);
-      const info = await Promise.race([sendPromise, timeoutPromise]) as any;
-      console.log('[EMAIL-SEND] Email sent successfully:', info.messageId);
+      await Promise.race([sendPromise, timeoutPromise]);
       
       // Log success only in development
       if (import.meta.env.MODE === 'development') {
@@ -723,16 +703,12 @@ let emailServiceInstance: EmailService | null = null;
 
 export const getEmailService = (): EmailService => {
   if (!emailServiceInstance) {
-    console.log('[EMAIL-INIT] Creating new EmailService instance...');
     try {
       emailServiceInstance = new EmailService();
-      console.log('[EMAIL-INIT] EmailService instance created successfully');
     } catch (error) {
-      console.error('[EMAIL-INIT] Failed to initialize email service:', error);
+      console.error('Failed to initialize email service:', error);
       throw error;
     }
-  } else {
-    console.log('[EMAIL-INIT] Returning existing EmailService instance');
   }
   return emailServiceInstance;
 };

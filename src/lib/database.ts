@@ -411,16 +411,10 @@ export class DatabaseService {
         .select();
 
       if (error) {
-        // Only log critical info, not full error to reduce noise
-        if (error.code === '42P01') {
-          console.warn('GDPR logging skipped: data_processing_activity table does not exist');
-        } else {
-          // Ensure we have a readable error message
-          const errorMessage = error?.message || 
-                              (typeof error === 'string' ? error : 
-                              (error?.code ? `Error code: ${error.code}` : 
-                              JSON.stringify(error)));
-          console.error('Failed to log data processing:', errorMessage);
+        // Silently skip if table doesn't exist (not critical for main flow)
+        if (error.code !== '42P01') {
+          // Only log non-table-missing errors
+          console.error('Data processing log error:', error?.message || error?.code || 'Unknown');
         }
       }
     } catch (err) {
