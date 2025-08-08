@@ -149,6 +149,19 @@ function checkRateLimit(clientIP: string): boolean {
   return clientData.count <= RATE_LIMIT_MAX;
 }
 
+// Add OPTIONS handler for CORS
+export const OPTIONS: APIRoute = async () => {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+};
+
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Get client information
@@ -169,6 +182,7 @@ export const POST: APIRoute = async ({ request }) => {
           status: 429,
           headers: {
             'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
             'Retry-After': '900', // 15 minutes
           },
         },
@@ -186,7 +200,10 @@ export const POST: APIRoute = async ({ request }) => {
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         },
       );
     }
@@ -204,7 +221,10 @@ export const POST: APIRoute = async ({ request }) => {
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         },
       );
     }
@@ -226,7 +246,10 @@ export const POST: APIRoute = async ({ request }) => {
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         },
       );
     }
@@ -244,7 +267,10 @@ export const POST: APIRoute = async ({ request }) => {
         }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         },
       );
     }
@@ -258,7 +284,10 @@ export const POST: APIRoute = async ({ request }) => {
         }),
         {
           status: 409,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
         },
       );
     }
@@ -319,7 +348,10 @@ export const POST: APIRoute = async ({ request }) => {
           }),
           {
             status: 409,
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
           },
         );
       }
@@ -396,6 +428,7 @@ export const POST: APIRoute = async ({ request }) => {
         status: 201,
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
           'X-Content-Type-Options': 'nosniff',
           'X-Frame-Options': 'DENY',
         },
@@ -482,6 +515,7 @@ export const GET: APIRoute = async ({ request, url }) => {
         status: 200,
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
       },
     );
@@ -499,6 +533,7 @@ export const GET: APIRoute = async ({ request, url }) => {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
       },
     );
