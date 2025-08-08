@@ -402,11 +402,14 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Send confirmation email (non-blocking)
     // Don't let email failures block the reservation
+    console.log('[EMAIL] Starting email send for reservation:', reservation.id);
     sendConfirmationEmail(user, reservation, magazine).catch(error => {
       console.error('Email send failed (non-blocking):', {
         reservationId: reservation.id,
         userEmail: user.email,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
+        errorType: error?.constructor?.name,
+        stack: error instanceof Error ? error.stack?.split('\n').slice(0, 3).join(' | ') : undefined
       });
     });
 
@@ -508,21 +511,27 @@ async function sendConfirmationEmail(
   reservation: any, 
   magazine: any,
 ): Promise<void> {
+  console.log('[EMAIL] sendConfirmationEmail called');
   try {
     // Get email service instance
+    console.log('[EMAIL] Getting email service instance...');
     const emailService = getEmailService();
+    console.log('[EMAIL] Email service obtained, calling sendReservationConfirmation...');
     
     await emailService.sendReservationConfirmation({
       reservation,
       user,
       magazine,
     });
+    console.log('[EMAIL] Email sent successfully!');
   } catch (error) {
     // Log error but don't throw - let reservation succeed even if email fails
-    console.error('Email service error:', {
+    console.error('[EMAIL] Email service error:', {
       userEmail: user.email,
       reservationId: reservation.id,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
+      errorType: error?.constructor?.name,
+      errorString: String(error)
     });
   }
 }
