@@ -5,10 +5,11 @@
  * Ensures each family can only claim one group picture and one Vorschüler picture
  */
 
-import { supabase } from './supabase';
+import { createServerSupabaseClient } from './supabase';
 import type { PictureClaim } from '@/types';
 
 export class PictureClaimsService {
+  private supabase = createServerSupabaseClient();
   /**
    * Check if a family has already claimed a picture
    */
@@ -18,7 +19,7 @@ export class PictureClaimsService {
     pictureType: 'group' | 'vorschul'
   ): Promise<boolean> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await this.supabase
         .from('picture_claims')
         .select('id')
         .eq('family_email', email.toLowerCase())
@@ -81,7 +82,7 @@ export class PictureClaimsService {
         );
       }
 
-      const { data, error } = await supabase
+      const { data, error } = await this.supabase
         .from('picture_claims')
         .insert({
           family_email: email.toLowerCase(),
@@ -119,7 +120,7 @@ export class PictureClaimsService {
    */
   async getFamilyClaims(email: string): Promise<PictureClaim[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await this.supabase
         .from('picture_claims')
         .select('*')
         .eq('family_email', email.toLowerCase())
@@ -141,7 +142,7 @@ export class PictureClaimsService {
    */
   async deleteClaim(reservationId: string): Promise<void> {
     try {
-      const { error } = await supabase
+      const { error } = await this.supabase
         .from('picture_claims')
         .delete()
         .eq('reservation_id', reservationId);

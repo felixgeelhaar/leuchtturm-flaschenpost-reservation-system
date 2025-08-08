@@ -330,6 +330,8 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Validate picture orders before creating reservation
+    // TODO: Re-enable when picture_claims table is created
+    /*
     if (formData.orderGroupPicture || formData.orderVorschulPicture) {
       const pictureValidation = await pictureClaimsService.validatePictureOrder(
         formData.email,
@@ -357,11 +359,14 @@ export const POST: APIRoute = async ({ request }) => {
         );
       }
     }
+    */
 
     // Create reservation
     const reservation = await db.createReservation(formData);
 
     // Create picture claims if applicable
+    // TODO: Re-enable when picture_claims table is created
+    /*
     if (formData.orderGroupPicture && formData.childGroupName && formData.childName) {
       try {
         await pictureClaimsService.createClaim(
@@ -391,6 +396,7 @@ export const POST: APIRoute = async ({ request }) => {
         // Don't fail the reservation, but log the error
       }
     }
+    */
 
     // Send confirmation email (non-blocking)
     sendConfirmationEmail(user, reservation, magazine).catch(error => {
