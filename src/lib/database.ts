@@ -168,8 +168,7 @@ export class DatabaseService {
           id,
           email,
           first_name,
-          last_name,
-          phone
+          last_name
         ),
         magazines (
           id,
