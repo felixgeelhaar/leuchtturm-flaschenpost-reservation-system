@@ -147,15 +147,15 @@ export class DatabaseService {
         pickup_date: formData.pickupDate || null,
         // Set payment_method only for shipping (PayPal), null for pickup
         payment_method: formData.deliveryMethod === 'shipping' ? 'paypal' : null,
-        // None of the shipping address columns exist in the database
-        // shipping_street: formData.deliveryMethod === 'shipping' ? formData.address?.street : null,
-        // shipping_house_number: formData.deliveryMethod === 'shipping' ? formData.address?.houseNumber : null,
-        // shipping_address_line2: formData.deliveryMethod === 'shipping' ? formData.address?.addressLine2 : null,
-        // shipping_postal_code: formData.deliveryMethod === 'shipping' ? formData.address?.postalCode : null,
-        // shipping_city: formData.deliveryMethod === 'shipping' ? formData.address?.city : null,
-        // shipping_country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
-        // notes column doesn't exist
-        // notes: formData.notes || null,
+        // Shipping address fields (only for shipping)
+        street: formData.deliveryMethod === 'shipping' ? formData.address?.street : null,
+        house_number: formData.deliveryMethod === 'shipping' ? formData.address?.houseNumber : null,
+        address_line2: formData.deliveryMethod === 'shipping' ? formData.address?.addressLine2 : null,
+        postal_code: formData.deliveryMethod === 'shipping' ? formData.address?.postalCode : null,
+        city: formData.deliveryMethod === 'shipping' ? formData.address?.city : null,
+        country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
+        // Notes field
+        notes: formData.notes || null,
         // consent_reference column doesn't exist
         // consent_reference: consentReference,
         // Picture order fields - let's try to save them
