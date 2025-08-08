@@ -2,6 +2,10 @@ import nodemailer from 'nodemailer';
 import type { Reservation, Magazine, User } from '@/types';
 import { paymentConfig, generatePaymentReference, formatCurrency, calculateTotalCost } from '@/config/payment';
 import { kindergarten, magazine as magazineConfig, email as emailConfig } from '@/config/content';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Email configuration interface
 interface EmailConfig {
@@ -87,8 +91,19 @@ export class EmailService {
     
     // Generate email content
     const subject = `Reservierungsbestätigung - ${magazine.title}`;
-    const html = this.generateReservationEmailHTML(reservation, user, magazine);
-    const text = this.generateReservationEmailText(reservation, user, magazine);
+    
+    let html: string;
+    let text: string;
+    try {
+      html = this.generateReservationEmailHTML(reservation, user, magazine);
+      text = this.generateReservationEmailText(reservation, user, magazine);
+    } catch (error: any) {
+      console.error('Error generating email content:', error);
+      console.error('Error stack:', error.stack);
+      console.error('Reservation data:', JSON.stringify(reservation));
+      console.error('User data:', JSON.stringify(user));
+      throw error;
+    }
 
     // Prepare email options
     const mailOptions = {
@@ -180,6 +195,39 @@ export class EmailService {
     user: User,
     magazine: Magazine,
   ): string {
+    // Debug logging and safety checks
+    console.log('Email template - reservation:', {
+      id: reservation.id,
+      deliveryMethod: reservation.deliveryMethod,
+      hasAddress: !!reservation.address,
+      addressValue: reservation.address,
+      keys: Object.keys(reservation),
+    });
+    
+    // Fix the address field name mismatch and ensure it's never undefined
+    // The database returns shippingAddress, but the template might expect address
+    if (reservation.deliveryMethod === 'shipping') {
+      if (reservation.shippingAddress) {
+        (reservation as any).address = reservation.shippingAddress;
+      } else {
+        console.warn('Shipping order without address, using placeholder');
+        (reservation as any).address = {
+          street: 'Adresse wird geladen',
+          houseNumber: '',
+          postalCode: '',
+          city: '',
+        };
+      }
+    } else {
+      // For pickup orders, ensure address has a safe default to prevent .street access errors
+      (reservation as any).address = {
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
+      };
+    }
+    
     const pickupDate = reservation.pickupDate 
       ? new Date(reservation.pickupDate).toLocaleDateString('de-DE', { 
           weekday: 'long', 
@@ -191,6 +239,39 @@ export class EmailService {
 
     const totalCost = calculateTotalCost(reservation.quantity);
     const paymentReference = generatePaymentReference(reservation.id);
+
+    // Debug: Check what might be undefined
+    console.log('User object:', {
+      id: user.id,
+      email: user.email,
+      hasAddress: !!(user as any).address,
+      keys: Object.keys(user),
+    });
+    
+    // Make sure user.address exists if it's being accessed
+    if (!(user as any).address) {
+      (user as any).address = {
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
+      };
+    }
+    
+    // Check if shippingAddress is being accessed directly
+    if (reservation.deliveryMethod === 'shipping' && reservation.shippingAddress === null) {
+      console.warn('Shipping order with null shippingAddress');
+    }
+    
+    // Safety check - ensure shippingAddress has a value if it exists in the object
+    if ('shippingAddress' in reservation && reservation.shippingAddress === null) {
+      (reservation as any).shippingAddress = {
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
+      };
+    }
 
     return `
 <!DOCTYPE html>

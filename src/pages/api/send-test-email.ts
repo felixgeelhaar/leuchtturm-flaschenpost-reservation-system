@@ -1,5 +1,9 @@
 import type { APIRoute } from 'astro';
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 export const prerender = false;
 

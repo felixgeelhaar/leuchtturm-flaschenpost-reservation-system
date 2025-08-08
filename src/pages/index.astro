@@ -1,26 +1,6 @@
 ---
-export const prerender = true;
-
-import Layout from '@/layouts/Layout.astro';
-import ReservationForm from '@/components/ReservationForm.vue';
-import ConsentBanner from '@/components/ConsentBanner.vue';
-import ErrorBoundary from '@/components/ErrorBoundary.vue';
-import Picture from '@/components/Picture.astro';
-import { DatabaseService } from '@/lib/database';
-import { kindergarten, magazine, homepage, faq, images, getFormattedPrice, getTotalPrice } from '@/config/content';
-
-// Fetch magazines on the server
-const db = new DatabaseService();
-let magazines = [];
-
-try {
-  magazines = await db.getActiveMagazines();
-} catch (error) {
-  console.error('Failed to load magazines:', error);
-  // Continue with empty array - component will handle the error state
-}
-
-const totalPrice = getTotalPrice();
+// MAINTENANCE MODE - Redirect to maintenance page
+return Astro.redirect('/maintenance');
 ---
 
 <Layout 

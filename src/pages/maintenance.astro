@@ -1,0 +1,68 @@
+---
+import Layout from '@/layouts/Layout.astro';
+---
+
+<Layout title="Wartungsarbeiten - Flaschenpost Magazin">
+  <main class="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center px-4">
+    <div class="max-w-md w-full">
+      <div class="bg-white rounded-lg shadow-xl p-8 text-center">
+        <div class="mb-6">
+          <svg class="w-24 h-24 mx-auto text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">
+          Wartungsarbeiten
+        </h1>
+        
+        <p class="text-gray-600 mb-6">
+          Wir führen gerade wichtige Systemverbesserungen durch, um Ihnen einen noch besseren Service bieten zu können.
+        </p>
+        
+        <div class="bg-blue-50 rounded-lg p-4 mb-6">
+          <p class="text-blue-800 font-medium mb-2">
+            Voraussichtliche Dauer:
+          </p>
+          <p class="text-blue-600">
+            Wir sind in wenigen Minuten wieder für Sie da!
+          </p>
+        </div>
+        
+        <div class="border-t pt-6">
+          <p class="text-sm text-gray-500 mb-2">
+            Bei dringenden Fragen erreichen Sie uns unter:
+          </p>
+          <a href="mailto:leuchtturm.elternbeirat@gmail.com" class="text-blue-600 hover:text-blue-700 text-sm font-medium">
+            leuchtturm.elternbeirat@gmail.com
+          </a>
+        </div>
+        
+        <div class="mt-8 pt-6 border-t">
+          <p class="text-xs text-gray-400">
+            Vielen Dank für Ihr Verständnis!
+          </p>
+          <p class="text-xs text-gray-400 mt-1">
+            Ihr Leuchtturm-Elternbeirat Team
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .5;
+    }
+  }
+  
+  svg {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+</style>

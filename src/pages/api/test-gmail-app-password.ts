@@ -1,5 +1,9 @@
 import type { APIRoute } from 'astro';
 import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 export const prerender = false;
 
@@ -10,7 +14,8 @@ export const POST: APIRoute = async ({ request }) => {
     
     // Use provided test password or environment variable
     const user = 'leuchtturm.elternbeirat@gmail.com';
-    const pass = testPassword || process.env.SMTP_PASS || '';
+    // If testPassword is explicitly provided (even empty string), use it; otherwise use env
+    const pass = testPassword !== undefined && testPassword !== '' ? testPassword : process.env.SMTP_PASS || '';
     
     if (!pass) {
       return new Response(
