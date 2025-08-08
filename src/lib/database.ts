@@ -38,13 +38,13 @@ export class DatabaseService {
         last_name: userData.lastName,
         // phone column doesn't exist in users table
         // phone: userData.phone,
-        street: userData.address?.street,
-        house_number: userData.address?.houseNumber,
-        // address_line2 column doesn't exist
+        // Address columns don't exist in users table either
+        // street: userData.address?.street,
+        // house_number: userData.address?.houseNumber,
         // address_line2: userData.address?.addressLine2,
-        postal_code: userData.address?.postalCode,
-        city: userData.address?.city,
-        country: userData.address?.country,
+        // postal_code: userData.address?.postalCode,
+        // city: userData.address?.city,
+        // country: userData.address?.country,
         consent_version: userData.consentVersion,
         data_retention_until: this.calculateRetentionDate(),
       })
@@ -145,13 +145,13 @@ export class DatabaseService {
         delivery_method: formData.deliveryMethod,
         pickup_location: formData.deliveryMethod === 'pickup' ? formData.pickupLocation : null,
         pickup_date: formData.pickupDate || null,
-        shipping_street: formData.deliveryMethod === 'shipping' ? formData.address?.street : null,
-        shipping_house_number: formData.deliveryMethod === 'shipping' ? formData.address?.houseNumber : null,
-        // shipping_address_line2 column doesn't exist
+        // None of the shipping address columns exist in the database
+        // shipping_street: formData.deliveryMethod === 'shipping' ? formData.address?.street : null,
+        // shipping_house_number: formData.deliveryMethod === 'shipping' ? formData.address?.houseNumber : null,
         // shipping_address_line2: formData.deliveryMethod === 'shipping' ? formData.address?.addressLine2 : null,
-        shipping_postal_code: formData.deliveryMethod === 'shipping' ? formData.address?.postalCode : null,
-        shipping_city: formData.deliveryMethod === 'shipping' ? formData.address?.city : null,
-        shipping_country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
+        // shipping_postal_code: formData.deliveryMethod === 'shipping' ? formData.address?.postalCode : null,
+        // shipping_city: formData.deliveryMethod === 'shipping' ? formData.address?.city : null,
+        // shipping_country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
         // notes column doesn't exist
         // notes: formData.notes || null,
         // consent_reference column doesn't exist
@@ -460,14 +460,8 @@ export class DatabaseService {
       pickupDate: data.pickup_date,
       pickupLocation: data.pickup_location,
       paymentMethod: data.payment_method,
-      shippingAddress: data.shipping_street ? {
-        street: data.shipping_street,
-        houseNumber: data.shipping_house_number,
-        postalCode: data.shipping_postal_code,
-        city: data.shipping_city,
-        country: data.shipping_country,
-        addressLine2: null, // shipping_address_line2 column doesn't exist
-      } : undefined,
+      // None of the shipping address columns exist in the database
+      shippingAddress: undefined,
       notes: null, // notes column doesn't exist
       consentReference: null, // Column doesn't exist
       // Picture order fields - columns don't exist in database
