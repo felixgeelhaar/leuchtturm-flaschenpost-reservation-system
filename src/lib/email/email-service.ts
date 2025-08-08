@@ -28,16 +28,16 @@ export class EmailService {
 
   constructor(config?: EmailConfig) {
     // Use environment variables for configuration
-    // In Netlify functions, use import.meta.env or process.env
+    // In Netlify functions, process.env is the correct way
     const emailConfig2 = config || {
-      host: import.meta.env.SMTP_HOST || process.env?.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(import.meta.env.SMTP_PORT || process.env?.SMTP_PORT || '587'),
-      secure: (import.meta.env.SMTP_SECURE || process.env?.SMTP_SECURE) === 'true',
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
       auth: {
-        user: import.meta.env.SMTP_USER || process.env?.SMTP_USER || '',
-        pass: import.meta.env.SMTP_PASS || process.env?.SMTP_PASS || '',
+        user: process.env.SMTP_USER || '',
+        pass: process.env.SMTP_PASS || '',
       },
-      from: import.meta.env.SMTP_FROM || process.env?.SMTP_FROM || 'noreply@example.com',
+      from: process.env.SMTP_FROM || 'noreply@example.com',
     };
 
     this.fromAddress = emailConfig2.from;
@@ -47,28 +47,25 @@ export class EmailService {
       throw new Error('SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.');
     }
 
-    // Create real transporter with Gmail-specific settings
-    this.transporter = nodemailer.createTransport({
-      host: emailConfig2.host,
-      port: emailConfig2.port,
-      secure: emailConfig2.secure,
-      auth: {
-        user: emailConfig2.auth.user.includes('@') ? emailConfig2.auth.user : `${emailConfig2.auth.user}@gmail.com`,
-        pass: emailConfig2.auth.pass,
-      },
-      // Gmail-specific settings
-      service: emailConfig2.host.includes('gmail') ? 'gmail' : undefined,
-      // Additional options for better deliverability
-      pool: true,
-      maxConnections: 5,
-      maxMessages: 100,
-      rateDelta: 1000,
-      rateLimit: 5,
-      // Timeout settings for Netlify environment
-      connectionTimeout: 60000, // 60 seconds
-      greetingTimeout: 30000,  // 30 seconds
-      socketTimeout: 60000,     // 60 seconds
-    });
+    // Create transporter - simple configuration that works with Gmail
+    if (emailConfig2.host.includes('gmail')) {
+      // Use Gmail service mode which handles all the configuration
+      this.transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: emailConfig2.auth.user,
+          pass: emailConfig2.auth.pass,
+        },
+      });
+    } else {
+      // Generic SMTP configuration
+      this.transporter = nodemailer.createTransport({
+        host: emailConfig2.host,
+        port: emailConfig2.port,
+        secure: emailConfig2.secure,
+        auth: emailConfig2.auth,
+      });
+    }
   }
 
   /**

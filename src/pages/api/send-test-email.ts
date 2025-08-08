@@ -17,42 +17,16 @@ export const POST: APIRoute = async ({ request }) => {
     
     // Try different SMTP configurations
     const smtpUser = process.env.SMTP_USER || '';
-    const fullEmail = smtpUser.includes('@') ? smtpUser : `${smtpUser}@gmail.com`;
+    const smtpPass = process.env.SMTP_PASS || '';
     
     const configs = [
       {
-        name: 'Gmail Service',
+        name: 'Gmail Service (Simple)',
         service: 'gmail',
         auth: {
-          user: fullEmail,
-          pass: process.env.SMTP_PASS || '',
+          user: smtpUser,
+          pass: smtpPass,
         },
-      },
-      {
-        name: 'Gmail with TLS',
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false,
-        auth: {
-          user: fullEmail,
-          pass: process.env.SMTP_PASS || '',
-        },
-        connectionTimeout: 60000,
-        greetingTimeout: 30000,
-        socketTimeout: 60000,
-      },
-      {
-        name: 'Gmail with SSL',
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true,
-        auth: {
-          user: fullEmail,
-          pass: process.env.SMTP_PASS || '',
-        },
-        connectionTimeout: 60000,
-        greetingTimeout: 30000,
-        socketTimeout: 60000,
       },
     ];
     
@@ -60,14 +34,17 @@ export const POST: APIRoute = async ({ request }) => {
     
     for (const config of configs) {
       try {
+        console.log(`Trying ${config.name} with user: ${config.auth.user}`);
         const transporter = nodemailer.createTransport(config);
         
         // Verify connection
+        console.log('Verifying connection...');
         await transporter.verify();
+        console.log('Connection verified!');
         
         // Send test email
         const info = await transporter.sendMail({
-          from: `"Leuchtturm Test" <${process.env.SMTP_FROM || 'noreply@example.com'}>`,
+          from: `"Leuchtturm Test" <${process.env.SMTP_FROM || config.auth.user}>`,
           to: to,
           subject: 'Test Email from Leuchtturm System',
           text: 'This is a test email to verify SMTP configuration.',
