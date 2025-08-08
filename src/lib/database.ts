@@ -129,9 +129,10 @@ export class DatabaseService {
       });
     }
 
-    const consentReference = `consent-${user.id}-${Date.now()}`;
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
+    // consent_reference and expires_at columns don't exist
+    // const consentReference = `consent-${user.id}-${Date.now()}`;
+    // const expiresAt = new Date();
+    // expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
 
     const { data, error } = await this.supabase
       .from('reservations')
@@ -149,14 +150,16 @@ export class DatabaseService {
         shipping_city: formData.deliveryMethod === 'shipping' ? formData.address?.city : null,
         shipping_country: formData.deliveryMethod === 'shipping' ? formData.address?.country : null,
         notes: formData.notes || null,
-        consent_reference: consentReference,
-        // Picture order fields
-        order_group_picture: formData.orderGroupPicture || false,
-        child_group_name: formData.childGroupName || null,
-        order_vorschul_picture: formData.orderVorschulPicture || false,
-        child_is_vorschueler: formData.childIsVorschueler || false,
-        child_name: formData.childName || null,
-        expires_at: expiresAt.toISOString(),
+        // consent_reference column doesn't exist
+        // consent_reference: consentReference,
+        // Picture order fields - these columns might not exist
+        // order_group_picture: formData.orderGroupPicture || false,
+        // child_group_name: formData.childGroupName || null,
+        // order_vorschul_picture: formData.orderVorschulPicture || false,
+        // child_is_vorschueler: formData.childIsVorschueler || false,
+        // child_name: formData.childName || null,
+        // expires_at column doesn't exist
+        // expires_at: expiresAt.toISOString(),
       })
       .select(`
         *,
@@ -463,7 +466,7 @@ export class DatabaseService {
         addressLine2: data.shipping_address_line2,
       } : undefined,
       notes: data.notes,
-      consentReference: data.consent_reference,
+      consentReference: null, // Column doesn't exist
       // Picture order fields
       orderGroupPicture: data.order_group_picture,
       childGroupName: data.child_group_name,
@@ -472,7 +475,7 @@ export class DatabaseService {
       childName: data.child_name,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
-      expiresAt: data.expires_at,
+      expiresAt: null, // Column doesn't exist
     };
   }
 
