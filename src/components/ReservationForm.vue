@@ -820,7 +820,9 @@ const validateForm = (): boolean => {
     return true;
   } catch (error) {
     if (error instanceof z.ZodError) {
-      error.errors.forEach(err => {
+      // In Zod v4, 'errors' was renamed to 'issues'
+      const issues = error.issues || error.errors || [];
+      issues.forEach(err => {
         const path = err.path.join('.');
         formErrors[path] = err.message;
       });

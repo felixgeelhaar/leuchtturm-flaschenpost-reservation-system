@@ -20,7 +20,7 @@ export const DELETE: APIRoute = async ({ request }) => {
     const validationResult = deleteRequestSchema.safeParse(body);
 
     if (!validationResult.success) {
-      const errors = validationResult.error.errors.map(err => ({
+      const errors = (validationResult.error.issues || validationResult.error.errors || []).map(err => ({
         field: err.path.join('.'),
         message: err.message,
       }));

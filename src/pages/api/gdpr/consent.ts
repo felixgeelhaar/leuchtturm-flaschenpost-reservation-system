@@ -55,7 +55,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Validate data
     const validationResult = consentSchema.safeParse(body);
     if (!validationResult.success) {
-      const errors = validationResult.error.errors.map(err => ({
+      const errors = (validationResult.error.issues || validationResult.error.errors || []).map(err => ({
         field: err.path.join('.'),
         message: err.message,
       }));

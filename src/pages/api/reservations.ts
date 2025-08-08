@@ -236,7 +236,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Validate data with Zod
     const validationResult = reservationSchema.safeParse(body);
     if (!validationResult.success) {
-      const errors = validationResult.error.errors.map(err => ({
+      const errors = (validationResult.error.issues || validationResult.error.errors || []).map(err => ({
         field: err.path.join('.'),
         message: err.message,
       }));
