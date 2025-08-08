@@ -165,9 +165,11 @@ export const OPTIONS: APIRoute = async () => {
 export const POST: APIRoute = async ({ request }) => {
   try {
     // Get client information
-    const clientIP = request.headers.get('x-forwarded-for') || 
-                    request.headers.get('x-real-ip') || 
-                    'unknown';
+    // x-forwarded-for can contain multiple IPs, get the first one
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const clientIP = forwardedFor 
+                    ? forwardedFor.split(',')[0].trim() 
+                    : request.headers.get('x-real-ip') || 'unknown';
     const userAgent = request.headers.get('user-agent') || 'unknown';
 
     // Check rate limiting

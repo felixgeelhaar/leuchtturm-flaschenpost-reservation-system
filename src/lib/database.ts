@@ -69,6 +69,11 @@ export class DatabaseService {
   }
 
   async updateUserActivity(userId: string): Promise<void> {
+    // Skip updating last_activity as column doesn't exist
+    // This method is kept for compatibility but does nothing
+    return;
+    
+    /* Original code - commented out as last_activity column doesn't exist
     const { error } = await this.supabase
       .from('users')
       .update({ last_activity: new Date().toISOString() })
@@ -77,6 +82,7 @@ export class DatabaseService {
     if (error) {
       console.error('Failed to update user activity:', error);
     }
+    */
   }
 
   // Magazine operations
@@ -237,7 +243,8 @@ export class DatabaseService {
       consent_type: type as keyof ConsentData,
       consent_given: given,
       consent_version: '1.0',
-      ip_address: metadata.ipAddress || null,
+      // Temporarily disable IP address to avoid inet format issues
+      // ip_address: metadata.ipAddress || null,
       // user_agent column doesn't exist in the database
       // user_agent: metadata.userAgent || null,
     }));
@@ -415,7 +422,7 @@ export class DatabaseService {
       consentVersion: data.consent_version,
       consentTimestamp: data.consent_timestamp,
       dataRetentionUntil: data.data_retention_until,
-      lastActivity: data.last_activity,
+      lastActivity: null, // Column doesn't exist in database
     };
   }
 
