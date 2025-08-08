@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
-import { emailService } from '@/lib/email/email-service';
+import { getEmailService } from '@/lib/email/email-service';
 // import { pictureClaimsService } from '@/lib/picture-claims'; // Disabled until picture_claims table exists
 import type { ReservationFormData, ConsentData } from '@/types';
 
@@ -510,6 +510,11 @@ async function sendConfirmationEmail(
   magazine: any,
 ): Promise<void> {
   try {
+    // Get email service instance
+    const emailService = getEmailService();
+    
+    console.log('Email service obtained, sending to:', user.email);
+    
     await emailService.sendReservationConfirmation({
       reservation,
       user,
@@ -521,7 +526,8 @@ async function sendConfirmationEmail(
       error: error instanceof Error ? error.message : error,
       stack: error instanceof Error ? error.stack : undefined,
       userEmail: user.email,
-      reservationId: reservation.id
+      reservationId: reservation.id,
+      type: error?.constructor?.name
     });
     // Don't throw - let reservation succeed even if email fails
   }

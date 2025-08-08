@@ -71,6 +71,12 @@ export class EmailService {
           user: emailConfig2.auth.user,
           pass: emailConfig2.auth.pass,
         },
+        // Add timeout settings
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
+        logger: true, // Enable logging
+        debug: true, // Enable debug output
       });
     } else {
       // Generic SMTP configuration
@@ -79,8 +85,20 @@ export class EmailService {
         port: emailConfig2.port,
         secure: emailConfig2.secure,
         auth: emailConfig2.auth,
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 10000,
       });
     }
+    
+    // Verify connection on initialization (async)
+    this.transporter.verify((error, success) => {
+      if (error) {
+        console.error('Email transporter verification failed:', error.message);
+      } else {
+        console.log('Email transporter is ready to send emails');
+      }
+    });
   }
 
   /**
@@ -120,7 +138,16 @@ export class EmailService {
 
     try {
       console.log('Attempting to send email to:', user.email);
-      const info = await this.transporter.sendMail(mailOptions);
+      
+      // Add timeout to email sending (10 seconds)
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Email send timeout after 10 seconds')), 10000);
+      });
+      
+      const sendPromise = this.transporter.sendMail(mailOptions);
+      
+      const info = await Promise.race([sendPromise, timeoutPromise]) as any;
+      
       console.log('Email sent successfully:', {
         messageId: info.messageId,
         accepted: info.accepted,
@@ -134,7 +161,8 @@ export class EmailService {
         command: (error as any)?.command,
         response: (error as any)?.response,
         responseCode: (error as any)?.responseCode,
-        to: user.email
+        to: user.email,
+        stack: error instanceof Error ? error.stack : undefined
       });
       throw new Error(`Failed to send confirmation email: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
