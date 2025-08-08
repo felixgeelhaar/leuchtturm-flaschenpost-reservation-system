@@ -16,7 +16,9 @@ const addressSchema = z.object({
   houseNumber: z.string().max(20, 'Hausnummer ist zu lang').trim().optional(),
   postalCode: z.string().max(20, 'Postleitzahl ist zu lang').trim().optional(),
   city: z.string().max(100, 'Stadt ist zu lang').trim().optional(),
-  country: z.string().max(2).optional(),
+  country: z.enum(['DE', 'AT', 'CH'], {
+    errorMap: () => ({ message: 'Wir liefern nur nach Deutschland, Österreich und in die Schweiz' }),
+  }).optional(),
   addressLine2: z.string().max(200, 'Adresszusatz ist zu lang').optional().transform(val => val?.trim() || undefined),
 }).optional();
 
@@ -43,7 +45,7 @@ const reservationSchema = z.object({
     .transform(val => val === '' ? undefined : val),
   magazineId: z.string()
     .min(1, 'Bitte wählen Sie eine Magazin-Ausgabe')
-    .refine(id => id.length > 0, 'Ungültige Magazin-ID'),
+    .uuid('Ungültige Magazin-ID'),
   quantity: z.number()
     .int('Anzahl muss eine ganze Zahl sein')
     .min(1, 'Mindestens 1 Exemplar erforderlich')
