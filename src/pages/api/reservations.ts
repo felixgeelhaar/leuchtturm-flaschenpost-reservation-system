@@ -444,6 +444,10 @@ export const POST: APIRoute = async ({ request }) => {
 
   } catch (error) {
     console.error('Reservation creation error:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
     // Log the error for monitoring
     await db.logDataProcessing({
@@ -459,11 +463,21 @@ export const POST: APIRoute = async ({ request }) => {
       console.error('Failed to log error:', logError);
     });
 
+    // In development, provide more details about the error
+    const isDevelopment = process.env.NODE_ENV === 'development' || 
+                         import.meta.env.MODE === 'development';
+    
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Internal server error',
         message: 'Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.',
+        ...(isDevelopment && {
+          debug: {
+            error: error instanceof Error ? error.message : String(error),
+            type: error?.constructor?.name,
+          }
+        })
       }),
       {
         status: 500,
