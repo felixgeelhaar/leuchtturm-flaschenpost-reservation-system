@@ -321,3 +321,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ using modern web technologies and production-ready infrastructure.**# Trigger redeploy Fri Aug  8 13:30:44 CEST 2025
 # Trigger redeploy for updated password Fri Aug  8 13:55:09 CEST 2025
+# Trigger redeploy - SMTP_SECURE corrected Fri Aug  8 14:16:15 CEST 2025
