@@ -424,13 +424,13 @@ export class DatabaseService {
       email: data.email,
       firstName: data.first_name,
       lastName: data.last_name,
-      phone: null, // phone column doesn't exist
+      phone: undefined, // phone column doesn't exist
       createdAt: data.created_at,
       updatedAt: data.updated_at,
       consentVersion: data.consent_version,
       consentTimestamp: data.consent_timestamp,
       dataRetentionUntil: data.data_retention_until,
-      lastActivity: null, // Column doesn't exist in database
+      lastActivity: data.updated_at, // Column doesn't exist in database
     };
   }
 
@@ -464,17 +464,17 @@ export class DatabaseService {
       paymentMethod: data.payment_method,
       // None of the shipping address columns exist in the database
       shippingAddress: undefined,
-      notes: null, // notes column doesn't exist
-      consentReference: null, // Column doesn't exist
+      notes: undefined, // notes column doesn't exist
+      consentReference: "legacy", // Column doesn't exist
       // Picture order fields - columns don't exist in database
       orderGroupPicture: false, // data.order_group_picture,
-      childGroupName: null, // data.child_group_name,
+      childGroupName: undefined, // data.child_group_name,
       orderVorschulPicture: false, // data.order_vorschul_picture,
       childIsVorschueler: false, // data.child_is_vorschueler,
-      childName: null, // data.child_name,
+      childName: undefined, // data.child_name,
       createdAt: data.created_at,
       updatedAt: data.updated_at,
-      expiresAt: null, // Column doesn't exist
+      expiresAt: data.created_at, // Column doesn't exist
     };
   }
 
@@ -487,8 +487,8 @@ export class DatabaseService {
       consentVersion: data.consent_version,
       timestamp: data.timestamp,
       ipAddress: data.ip_address,
-      userAgent: null, // Column doesn't exist in database
-      withdrawalTimestamp: null, // Column doesn't exist in database
+      userAgent: '', // Default empty string
+      withdrawalTimestamp: undefined, // Column doesn't exist in database
     };
   }
 

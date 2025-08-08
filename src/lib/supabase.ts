@@ -24,13 +24,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
 
 // Server-side Supabase client (with service role key) - Only use server-side!
 export function createServerSupabaseClient() {
-  // In Netlify Functions, environment variables are in Netlify.env or process.env
-  // Try multiple ways to get the service role key
-  const serviceRoleKey = 
-    // @ts-ignore - Netlify global might exist
-    (typeof Netlify !== 'undefined' && Netlify?.env?.get?.('SUPABASE_SERVICE_ROLE_KEY')) ||
-    process.env?.SUPABASE_SERVICE_ROLE_KEY || 
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+  // In Astro, environment variables are accessed via import.meta.env
+  // For server-only variables (without PUBLIC_ prefix), they're available in server-side code
+  const serviceRoleKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
   
   if (!serviceRoleKey) {
     console.error('Warning: SUPABASE_SERVICE_ROLE_KEY not found, using anon key with limited permissions');

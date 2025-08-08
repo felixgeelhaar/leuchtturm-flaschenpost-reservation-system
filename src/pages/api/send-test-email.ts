@@ -16,8 +16,8 @@ export const POST: APIRoute = async ({ request }) => {
     }
     
     // Try different SMTP configurations
-    const smtpUser = process.env.SMTP_USER || '';
-    const smtpPass = process.env.SMTP_PASS || '';
+    const smtpUser = import.meta.env.SMTP_USER || '';
+    const smtpPass = import.meta.env.SMTP_PASS || '';
     
     const configs = [
       {
@@ -44,7 +44,7 @@ export const POST: APIRoute = async ({ request }) => {
         
         // Send test email
         const info = await transporter.sendMail({
-          from: `"Leuchtturm Test" <${process.env.SMTP_FROM || config.auth.user}>`,
+          from: `"Leuchtturm Test" <${import.meta.env.SMTP_FROM || config.auth.user}>`,
           to: to,
           subject: 'Test Email from Leuchtturm System',
           text: 'This is a test email to verify SMTP configuration.',
@@ -84,8 +84,8 @@ export const POST: APIRoute = async ({ request }) => {
         message: 'All SMTP configurations failed',
         attempts: results,
         debug: {
-          SMTP_USER: process.env.SMTP_USER ? `${process.env.SMTP_USER.substring(0, 3)}...` : 'not set',
-          SMTP_PASS: process.env.SMTP_PASS ? 'set' : 'not set',
+          SMTP_USER: import.meta.env.SMTP_USER ? `${import.meta.env.SMTP_USER.substring(0, 3)}...` : 'not set',
+          SMTP_PASS: import.meta.env.SMTP_PASS ? 'set' : 'not set',
         }
       }),
       { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }

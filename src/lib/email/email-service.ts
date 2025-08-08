@@ -1,7 +1,12 @@
 import nodemailer from 'nodemailer';
 import type { Reservation, Magazine, User } from '@/types';
-import { paymentConfig, generatePaymentReference, formatCurrency, calculateTotalCost } from '@/config/payment';
-import { kindergarten, magazine as magazineConfig, email as emailConfig } from '@/config/content';
+import { paymentConfig, generatePaymentReference, formatCurrency } from '@/config/payment';
+import { websiteContent } from '@/config/content';
+
+const kindergarten = websiteContent.kindergarten;
+const magazineConfig = websiteContent.magazine;
+const emailConfig = websiteContent.email;
+const pricing = websiteContent.pricing;
 
 // Email configuration interface
 interface EmailConfig {
@@ -28,16 +33,16 @@ export class EmailService {
 
   constructor(config?: EmailConfig) {
     // Use environment variables for configuration
-    // In Netlify functions, process.env is the correct way
+    // In Astro, use import.meta.env instead of process.env
     const emailConfig2 = config || {
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true',
+      host: import.meta.env.SMTP_HOST || 'smtp.gmail.com',
+      port: parseInt(import.meta.env.SMTP_PORT || '587'),
+      secure: import.meta.env.SMTP_SECURE === 'true',
       auth: {
-        user: process.env.SMTP_USER || '',
-        pass: process.env.SMTP_PASS || '',
+        user: import.meta.env.SMTP_USER || '',
+        pass: import.meta.env.SMTP_PASS || '',
       },
-      from: process.env.SMTP_FROM || 'noreply@example.com',
+      from: import.meta.env.SMTP_FROM || 'noreply@example.com',
     };
 
     this.fromAddress = emailConfig2.from;
@@ -205,7 +210,7 @@ export class EmailService {
         })
       : 'Nach Ankündigung';
 
-    const totalCost = calculateTotalCost(safeReservation.quantity);
+    const totalCost = pricing.magazinePrice * safeReservation.quantity;
     const paymentReference = generatePaymentReference(safeReservation.id);
     
     // Use safeReservation in the template
@@ -329,7 +334,7 @@ export class EmailService {
         </div>
         <div class="info-row">
           <span class="info-label">Preis pro Exemplar:</span>
-          <span class="info-value">${formatCurrency(magazineConfig.price)}</span>
+          <span class="info-value">${formatCurrency(pricing.magazinePrice)}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Gesamtpreis:</span>
@@ -367,7 +372,7 @@ export class EmailService {
             <h3>💳 PayPal-Zahlung</h3>
             <p>Bitte überweisen Sie den Betrag von <strong>${formatCurrency(totalCost)}</strong> an:</p>
             <p>
-              <strong>PayPal:</strong> ${paymentConfig.paypalEmail}<br>
+              <strong>PayPal:</strong> ${paymentConfig.paypal.paypalEmail}<br>
               <strong>Verwendungszweck:</strong> ${paymentReference}
             </p>
             <p class="important">Bitte geben Sie unbedingt den Verwendungszweck an!</p>
@@ -401,16 +406,16 @@ export class EmailService {
 
       <p>Bei Fragen können Sie uns gerne kontaktieren:</p>
       <ul>
-        <li>E-Mail: <a href="mailto:${emailConfig.contact}">${emailConfig.contact}</a></li>
-        <li>Telefon: ${kindergarten.phone}</li>
+        <li>E-Mail: <a href="mailto:${kindergarten.contact.email}">${kindergarten.contact.email}</a></li>
+        <li>Telefon: ${kindergarten.contact.phone}</li>
       </ul>
     </div>
     
     <div class="footer">
       <p>Diese E-Mail wurde automatisch generiert. Bitte antworten Sie nicht direkt auf diese E-Mail.</p>
       <p>${kindergarten.name}<br>
-      ${kindergarten.address.street} ${kindergarten.address.houseNumber}<br>
-      ${kindergarten.address.postalCode} ${kindergarten.address.city}</p>
+      ${kindergarten.contact.address.street}<br>
+      ${kindergarten.contact.address.postalCode} ${kindergarten.contact.address.city}</p>
     </div>
   </div>
 </body>
@@ -447,7 +452,7 @@ export class EmailService {
       ? new Date(reservation.pickupDate).toLocaleDateString('de-DE')
       : 'Nach Ankündigung';
 
-    const totalCost = calculateTotalCost(reservation.quantity);
+    const totalCost = pricing.magazinePrice * reservation.quantity;
     const paymentReference = generatePaymentReference(reservation.id);
 
     let text = `
@@ -463,7 +468,7 @@ RESERVIERUNGSDETAILS:
 Reservierungsnummer: ${reservation.id.slice(0, 8).toUpperCase()}
 Magazin: ${magazine.title} - ${magazine.issueNumber}
 Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
-Preis pro Exemplar: ${formatCurrency(magazineConfig.price)}
+Preis pro Exemplar: ${formatCurrency(pricing.magazinePrice)}
 Gesamtpreis: ${formatCurrency(totalCost)}
 `;
 
@@ -492,7 +497,7 @@ Die Versandkosten werden separat berechnet.
 PAYPAL-ZAHLUNG:
 --------------
 Bitte überweisen Sie ${formatCurrency(totalCost)} an:
-PayPal: ${paymentConfig.paypalEmail}
+PayPal: ${paymentConfig.paypal.paypalEmail}
 Verwendungszweck: ${paymentReference}
 WICHTIG: Bitte geben Sie unbedingt den Verwendungszweck an!
 `;
@@ -520,13 +525,13 @@ Kind: ${reservation.childName}`;
     text += `
 
 Bei Fragen können Sie uns gerne kontaktieren:
-E-Mail: ${emailConfig.contact}
-Telefon: ${kindergarten.phone}
+E-Mail: ${kindergarten.contact.email}
+Telefon: ${kindergarten.contact.phone}
 
 Mit freundlichen Grüßen
 ${kindergarten.name}
-${kindergarten.address.street} ${kindergarten.address.houseNumber}
-${kindergarten.address.postalCode} ${kindergarten.address.city}
+${kindergarten.contact.address.street}
+${kindergarten.contact.address.postalCode} ${kindergarten.contact.address.city}
 `;
 
     return text;
@@ -554,7 +559,7 @@ ${kindergarten.address.postalCode} ${kindergarten.address.city}
     <p>Hallo ${user.firstName} ${user.lastName},</p>
     <p>Ihre Reservierung für die <strong>${magazine.title}</strong> wurde erfolgreich storniert.</p>
     <p>Reservierungsnummer: ${reservation.id.slice(0, 8).toUpperCase()}</p>
-    <p>Falls Sie Fragen haben, kontaktieren Sie uns bitte unter ${emailConfig.contact}.</p>
+    <p>Falls Sie Fragen haben, kontaktieren Sie uns bitte unter ${kindergarten.contact.email}.</p>
     <p>Mit freundlichen Grüßen<br>${kindergarten.name}</p>
   </div>
 </body>
@@ -580,7 +585,7 @@ Ihre Reservierung für die ${magazine.title} wurde erfolgreich storniert.
 
 Reservierungsnummer: ${reservation.id.slice(0, 8).toUpperCase()}
 
-Falls Sie Fragen haben, kontaktieren Sie uns bitte unter ${emailConfig.contact}.
+Falls Sie Fragen haben, kontaktieren Sie uns bitte unter ${kindergarten.contact.email}.
 
 Mit freundlichen Grüßen
 ${kindergarten.name}

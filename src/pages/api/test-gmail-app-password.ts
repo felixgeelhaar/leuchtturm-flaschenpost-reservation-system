@@ -10,7 +10,7 @@ export const POST: APIRoute = async ({ request }) => {
     
     // Use provided test password or environment variable
     const user = 'leuchtturm.elternbeirat@gmail.com';
-    const pass = testPassword || process.env.SMTP_PASS || '';
+    const pass = testPassword || import.meta.env.SMTP_PASS || '';
     
     if (!pass) {
       return new Response(
