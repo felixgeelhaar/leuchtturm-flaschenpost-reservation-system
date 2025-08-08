@@ -1,220 +1,73 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Reservation, User, Magazine } from '@/types';
 
-// Create a mock EmailService class that doesn't depend on nodemailer
-class MockEmailService {
-  private mockTransporter = {
-    sendMail: vi.fn(),
-    verify: vi.fn(),
-  };
+// Mock nodemailer
+const mockTransporter = {
+  sendMail: vi.fn(),
+  verify: vi.fn(),
+};
 
-  constructor(config?: any) {
-    // Mock constructor
-  }
-
-  async verifyConnection(): Promise<boolean> {
-    try {
-      await this.mockTransporter.verify();
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  async sendReservationConfirmation(data: any): Promise<void> {
-    const { reservation, user, magazine } = data;
-    const isShipping = reservation.deliveryMethod === 'shipping';
-    
-    const subject = `Ihre Reservierung für ${magazine.title} - Ausgabe ${magazine.issueNumber}`;
-    
-    // Generate realistic HTML content
-    let html = `
-<!DOCTYPE html>
-<html lang="de">
-<body>
-  <h1>Reservierung bestätigt! 🎉</h1>
-  <p>Liebe/r ${user.firstName} ${user.lastName},</p>
-  <p>wir freuen uns, Ihnen mitteilen zu können, dass Ihre Reservierung für das <strong>${magazine.title}</strong> erfolgreich eingegangen ist.</p>
-  
-  <div>
-    <strong>Reservierungs-ID:</strong> ${reservation.id}<br>
-    <strong>Status:</strong> Bestätigt ✓
-  </div>
-  
-  <h2>Ihre Reservierungsdetails:</h2>
-  <dl>
-    <dt>Magazin:</dt>
-    <dd>${magazine.title} - Ausgabe ${magazine.issueNumber}</dd>
-    <dt>Anzahl:</dt>
-    <dd>${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}</dd>
-    <dt>Erhalt:</dt>
-    <dd>${isShipping ? 'Versand nach Hause' : 'Abholung vor Ort'}</dd>`;
-
-    if (!isShipping && reservation.pickupLocation) {
-      html += `
-    <dt>Abholort:</dt>
-    <dd>${reservation.pickupLocation}</dd>`;
-    }
-
-    if (isShipping && reservation.shippingAddress) {
-      html += `
-    <dt>Lieferadresse:</dt>
-    <dd>${reservation.shippingAddress.street} ${reservation.shippingAddress.houseNumber}<br>
-    ${reservation.shippingAddress.postalCode} ${reservation.shippingAddress.city}</dd>`;
-    }
-
-    html += `
-  </dl>
-  <p>Mit freundlichen Grüßen,<br>Ihr Flaschenpost Team</p>
-</body>
-</html>`;
-
-    // Generate realistic text content
-    let text = `
-Reservierung bestätigt!
-
-Liebe/r ${user.firstName} ${user.lastName},
-
-wir freuen uns, Ihnen mitteilen zu können, dass Ihre Reservierung für das ${magazine.title} erfolgreich eingegangen ist.
-
-RESERVIERUNGS-ID: ${reservation.id}
-STATUS: Bestätigt
-
-IHRE RESERVIERUNGSDETAILS:
-Magazin: ${magazine.title} - Ausgabe ${magazine.issueNumber}
-Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
-Erhalt: ${isShipping ? 'Versand nach Hause' : 'Abholung vor Ort'}`;
-
-    if (!isShipping && reservation.pickupLocation) {
-      text += `\nAbholort: ${reservation.pickupLocation}`;
-    }
-
-    if (isShipping && reservation.shippingAddress) {
-      text += `\n\nLieferadresse:\n${reservation.shippingAddress.street} ${reservation.shippingAddress.houseNumber}\n${reservation.shippingAddress.postalCode} ${reservation.shippingAddress.city}`;
-    }
-
-    text += '\n\nMit freundlichen Grüßen,\nIhr Flaschenpost Team';
-
-    try {
-      await this.mockTransporter.sendMail({
-        from: '"Flaschenpost Magazin" <noreply@test.com>',
-        to: user.email,
-        subject,
-        html,
-        text,
-      });
-    } catch (error) {
-      // Match the real implementation's error handling
-      throw new Error('Email konnte nicht gesendet werden');
-    }
-  }
-
-  async sendReservationCancellation(data: any): Promise<void> {
-    const { reservation, user, magazine } = data;
-    
-    const subject = `Reservierung storniert: ${magazine.title} - ${magazine.issueNumber}`;
-    
-    const html = `
-<!DOCTYPE html>
-<html lang="de">
-<body>
-  <h2 style="color: #dc3545;">Reservierung storniert</h2>
-  <p>Liebe/r ${user.firstName} ${user.lastName},</p>
-  <p>Ihre Reservierung für <strong>${magazine.title} - Ausgabe ${magazine.issueNumber}</strong> wurde erfolgreich storniert.</p>
-  <p><strong>Reservierungs-ID:</strong> ${reservation.id}</p>
-  <p>Mit freundlichen Grüßen,<br>Ihr Flaschenpost Team</p>
-</body>
-</html>`;
-
-    const text = `
-Reservierung storniert
-
-Liebe/r ${user.firstName} ${user.lastName},
-
-Ihre Reservierung für ${magazine.title} - Ausgabe ${magazine.issueNumber} wurde erfolgreich storniert.
-
-Reservierungs-ID: ${reservation.id}
-
-Mit freundlichen Grüßen,
-Ihr Flaschenpost Team`;
-
-    try {
-      await this.mockTransporter.sendMail({
-        to: user.email,
-        subject,
-        html,
-        text,
-      });
-    } catch (error) {
-      // Match the real implementation - don't throw for cancellation emails
-      // as they're not critical
-    }
-  }
-
-  async sendPickupReminder(data: any): Promise<void> {
-    const { reservation, user, magazine } = data;
-    
-    // Skip if no pickup details (matching real implementation)
-    if (reservation.deliveryMethod === 'shipping' || !reservation.pickupLocation) {
-      return;
-    }
-    
-    const subject = `Erinnerung: Abholung ${magazine.title} - ${magazine.issueNumber}`;
-    
-    const html = `
-<!DOCTYPE html>
-<html lang="de">
-<body>
-  <h2 style="color: #0066cc;">Erinnerung: Magazin abholen! 📚</h2>
-  <p>Liebe/r ${user.firstName} ${user.lastName},</p>
-  <p>dies ist eine freundliche Erinnerung, dass Ihr reserviertes Magazin <strong>${magazine.title} - Ausgabe ${magazine.issueNumber}</strong> zur Abholung bereit liegt.</p>
-  
-  <div style="background-color: #e8f4f8; padding: 15px;">
-    <strong>Abholort:</strong> ${reservation.pickupLocation}<br>
-    <strong>Reservierungs-ID:</strong> ${reservation.id}
-  </div>
-  
-  <p>Mit freundlichen Grüßen,<br>Ihr Flaschenpost Team</p>
-</body>
-</html>`;
-
-    const text = `
-Erinnerung: Magazin abholen!
-
-Liebe/r ${user.firstName} ${user.lastName},
-
-dies ist eine freundliche Erinnerung, dass Ihr reserviertes Magazin zur Abholung bereit liegt.
-
-Magazin: ${magazine.title} - Ausgabe ${magazine.issueNumber}
-Abholort: ${reservation.pickupLocation}
-Reservierungs-ID: ${reservation.id}
-
-Mit freundlichen Grüßen,
-Ihr Flaschenpost Team`;
-
-    await this.mockTransporter.sendMail({
-      to: user.email,
-      subject,
-      html,
-      text,
-    });
-  }
-
-  // Expose the mock transporter for testing
-  get _mockTransporter() {
-    return this.mockTransporter;
-  }
-}
-
-// Mock the EmailService module
-vi.mock('@/lib/email/email-service', () => ({
-  EmailService: MockEmailService,
+vi.mock('nodemailer', () => ({
+  default: {
+    createTransporter: vi.fn(() => mockTransporter),
+  },
 }));
 
-const EmailService = MockEmailService;
+// Mock config modules
+vi.mock('@/config/content', () => ({
+  websiteContent: {
+    kindergarten: { 
+      name: 'Test Kindergarten', 
+      contact: {
+        email: 'info@test.de',
+        address: {
+          street: 'Test St. 123',
+          postalCode: '12345',
+          city: 'Berlin',
+        },
+      },
+    },
+    magazine: { title: 'Flaschenpost', subtitle: 'Das Kita-Magazin' },
+    email: { 
+      from: 'noreply@test-kindergarten.de',
+      replyTo: 'info@test-kindergarten.de',
+      signature: 'Ihr Team von Test Kindergarten',
+    },
+    pricing: { 
+      magazinePrice: 5.99,
+      shippingCost: 2.50,
+    },
+  },
+}));
+
+vi.mock('@/config/payment', () => ({
+  paymentConfig: { 
+    paypal: { 
+      enabled: true,
+      paypalMeLink: 'https://paypal.me/test',
+    },
+  },
+  generatePaymentReference: vi.fn(() => 'PAY-123456'),
+  formatCurrency: vi.fn((amount) => `€${amount.toFixed(2)}`),
+}));
+
+// Mock import.meta.env
+vi.stubGlobal('import', {
+  meta: {
+    env: {
+      SMTP_HOST: 'smtp.test.com',
+      SMTP_PORT: '587',
+      SMTP_SECURE: 'false',
+      SMTP_USER: 'test@example.com',
+      SMTP_PASS: 'password123',
+      SMTP_FROM: 'noreply@example.com',
+      MODE: 'test',
+    },
+  },
+});
 
 describe('EmailService', () => {
-  let emailService: InstanceType<typeof EmailService>;
+  let EmailService: any;
 
   const mockUser: User = {
     id: 'user-123',
@@ -224,6 +77,7 @@ describe('EmailService', () => {
     consentVersion: '1.0',
     consentTimestamp: new Date().toISOString(),
     lastActivity: new Date().toISOString(),
+    dataRetentionUntil: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
@@ -242,273 +96,191 @@ describe('EmailService', () => {
     updatedAt: new Date().toISOString(),
   };
 
-  const mockReservationPickup: Reservation = {
+  const mockReservation: Reservation = {
     id: 'res-123',
     userId: mockUser.id,
     magazineId: mockMagazine.id,
     quantity: 2,
-    status: 'pending',
+    status: 'confirmed',
     reservationDate: new Date().toISOString(),
     deliveryMethod: 'pickup',
     pickupLocation: 'Berlin Mitte',
-    pickupDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    pickupDate: new Date().toISOString(),
+    paymentMethod: null,
+    orderGroupPicture: false,
+    orderVorschulPicture: false,
+    childGroupName: '',
+    childName: '',
     consentReference: 'consent-ref-123',
     expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 
-  const mockReservationShipping: Reservation = {
-    id: 'res-456',
-    userId: mockUser.id,
-    magazineId: mockMagazine.id,
-    quantity: 1,
-    status: 'pending',
-    reservationDate: new Date().toISOString(),
-    deliveryMethod: 'shipping',
-    shippingAddress: {
-      street: 'Test Street',
-      houseNumber: '123',
-      postalCode: '10115',
-      city: 'Berlin',
-      country: 'DE',
-    },
-    consentReference: 'consent-ref-456',
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
-
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
-    
-    emailService = new EmailService({
-      host: 'smtp.test.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: 'test@test.com',
-        pass: 'test-pass',
-      },
-      from: 'noreply@test.com',
+    mockTransporter.verify.mockResolvedValue(true);
+    mockTransporter.sendMail.mockResolvedValue({ messageId: 'test-message-id' });
+
+    // Import after mocks are set up
+    const module = await import('@/lib/email/email-service');
+    EmailService = module.EmailService;
+  });
+
+  describe('constructor', () => {
+    it('should create EmailService instance with valid config', () => {
+      expect(() => new EmailService({
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: 'test@test.com',
+          pass: 'test-pass',
+        },
+        from: 'noreply@test.com',
+      })).not.toThrow();
     });
 
-    // Set up mock transporter responses
-    emailService._mockTransporter.verify.mockResolvedValue(true);
-    emailService._mockTransporter.sendMail.mockResolvedValue({ messageId: 'test-message-id' });
+    it('should throw error without credentials', () => {
+      expect(() => new EmailService({
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: '',
+          pass: '',
+        },
+        from: 'noreply@test.com',
+      })).toThrow('SMTP credentials not configured');
+    });
   });
 
   describe('verifyConnection', () => {
     it('should verify email connection successfully', async () => {
-      const result = await emailService.verifyConnection();
-      
-      expect(result).toBe(true);
-      expect(emailService._mockTransporter.verify).toHaveBeenCalled();
+      const emailService = new EmailService({
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: { user: 'test@test.com', pass: 'test-pass' },
+        from: 'noreply@test.com',
+      });
+
+      await expect(emailService.verifyConnection()).resolves.not.toThrow();
+      expect(mockTransporter.verify).toHaveBeenCalled();
     });
 
     it('should handle verification failure', async () => {
-      emailService._mockTransporter.verify.mockRejectedValue(new Error('Connection failed'));
+      mockTransporter.verify.mockRejectedValue(new Error('Connection failed'));
       
-      const result = await emailService.verifyConnection();
-      
-      expect(result).toBe(false);
+      const emailService = new EmailService({
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: { user: 'test@test.com', pass: 'test-pass' },
+        from: 'noreply@test.com',
+      });
+
+      await expect(emailService.verifyConnection()).rejects.toThrow('Email service verification failed');
     });
   });
 
   describe('sendReservationConfirmation', () => {
-    it('should send pickup confirmation email', async () => {
+    it('should send reservation confirmation email', async () => {
+      const emailService = new EmailService({
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: { user: 'test@test.com', pass: 'test-pass' },
+        from: 'noreply@test.com',
+      });
+
       await emailService.sendReservationConfirmation({
-        reservation: mockReservationPickup,
+        reservation: mockReservation,
         user: mockUser,
         magazine: mockMagazine,
       });
 
-      expect(emailService._mockTransporter.sendMail).toHaveBeenCalledWith(
+      expect(mockTransporter.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
-          from: '"Flaschenpost Magazin" <noreply@test.com>',
+          from: 'Test Kindergarten <noreply@test.com>',
           to: 'test@example.com',
-          subject: 'Ihre Reservierung für Flaschenpost - Ausgabe 2024-01',
+          subject: expect.stringContaining('Flaschenpost'),
           html: expect.stringContaining('Reservierung bestätigt'),
           text: expect.stringContaining('Reservierung bestätigt'),
         }),
       );
     });
 
-    it('should send shipping confirmation email', async () => {
-      await emailService.sendReservationConfirmation({
-        reservation: mockReservationShipping,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      expect(emailService._mockTransporter.sendMail).toHaveBeenCalledWith(
-        expect.objectContaining({
-          html: expect.stringContaining('Lieferadresse'),
-          text: expect.stringContaining('Lieferadresse'),
-        }),
-      );
-    });
-
-    it('should include pickup location in pickup confirmation', async () => {
-      await emailService.sendReservationConfirmation({
-        reservation: mockReservationPickup,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      const callArgs = emailService._mockTransporter.sendMail.mock.calls[0][0];
-      expect(callArgs.html).toContain('Berlin Mitte');
-      expect(callArgs.text).toContain('Berlin Mitte');
-    });
-
-    it('should include shipping address in shipping confirmation', async () => {
-      await emailService.sendReservationConfirmation({
-        reservation: mockReservationShipping,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      const callArgs = emailService._mockTransporter.sendMail.mock.calls[0][0];
-      expect(callArgs.html).toContain('Test Street 123');
-      expect(callArgs.text).toContain('Test Street 123');
-    });
-
     it('should throw error on email send failure', async () => {
-      emailService._mockTransporter.sendMail.mockRejectedValue(new Error('SMTP error'));
+      mockTransporter.sendMail.mockRejectedValue(new Error('SMTP error'));
+
+      const emailService = new EmailService({
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: { user: 'test@test.com', pass: 'test-pass' },
+        from: 'noreply@test.com',
+      });
 
       await expect(
         emailService.sendReservationConfirmation({
-          reservation: mockReservationPickup,
+          reservation: mockReservation,
           user: mockUser,
           magazine: mockMagazine,
         }),
-      ).rejects.toThrow('Email konnte nicht gesendet werden');
+      ).rejects.toThrow('Failed to send confirmation email');
     });
   });
 
-  describe('sendReservationCancellation', () => {
-    it('should send cancellation email', async () => {
-      await emailService.sendReservationCancellation({
-        reservation: mockReservationPickup,
+  describe('sendCancellationConfirmation', () => {
+    it('should send cancellation confirmation email', async () => {
+      const emailService = new EmailService({
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: { user: 'test@test.com', pass: 'test-pass' },
+        from: 'noreply@test.com',
+      });
+
+      await emailService.sendCancellationConfirmation({
+        reservation: mockReservation,
         user: mockUser,
         magazine: mockMagazine,
       });
 
-      expect(emailService._mockTransporter.sendMail).toHaveBeenCalledWith(
+      expect(mockTransporter.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
-          subject: 'Reservierung storniert: Flaschenpost - 2024-01',
-          html: expect.stringContaining('Reservierung storniert'),
-          text: expect.stringContaining('Reservierung storniert'),
+          subject: expect.stringContaining('storniert'),
+          html: expect.stringContaining('storniert'),
+          text: expect.stringContaining('storniert'),
         }),
       );
-    });
-
-    it('should not throw on cancellation email failure', async () => {
-      emailService._mockTransporter.sendMail.mockRejectedValue(new Error('SMTP error'));
-
-      // Should not throw
-      await expect(
-        emailService.sendReservationCancellation({
-          reservation: mockReservationPickup,
-          user: mockUser,
-          magazine: mockMagazine,
-        }),
-      ).resolves.not.toThrow();
     });
   });
 
   describe('sendPickupReminder', () => {
     it('should send pickup reminder email', async () => {
+      const emailService = new EmailService({
+        host: 'smtp.test.com',
+        port: 587,
+        secure: false,
+        auth: { user: 'test@test.com', pass: 'test-pass' },
+        from: 'noreply@test.com',
+      });
+
       await emailService.sendPickupReminder({
-        reservation: mockReservationPickup,
+        reservation: mockReservation,
         user: mockUser,
         magazine: mockMagazine,
       });
 
-      expect(emailService._mockTransporter.sendMail).toHaveBeenCalledWith(
+      expect(mockTransporter.sendMail).toHaveBeenCalledWith(
         expect.objectContaining({
-          subject: 'Erinnerung: Abholung Flaschenpost - 2024-01',
+          subject: expect.stringContaining('Erinnerung'),
           html: expect.stringContaining('Erinnerung'),
           text: expect.stringContaining('Erinnerung'),
         }),
       );
-    });
-
-    it('should skip reminder for shipping reservations', async () => {
-      await emailService.sendPickupReminder({
-        reservation: mockReservationShipping,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      expect(emailService._mockTransporter.sendMail).not.toHaveBeenCalled();
-    });
-
-    it('should skip reminder without pickup details', async () => {
-      const reservationWithoutPickup = {
-        ...mockReservationPickup,
-        pickupLocation: undefined,
-      };
-
-      await emailService.sendPickupReminder({
-        reservation: reservationWithoutPickup,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      expect(emailService._mockTransporter.sendMail).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Email content', () => {
-    it('should include reservation ID in confirmation email', async () => {
-      await emailService.sendReservationConfirmation({
-        reservation: mockReservationPickup,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      const callArgs = emailService._mockTransporter.sendMail.mock.calls[0][0];
-      expect(callArgs.html).toContain('res-123');
-      expect(callArgs.text).toContain('res-123');
-    });
-
-    it('should include user name in emails', async () => {
-      await emailService.sendReservationConfirmation({
-        reservation: mockReservationPickup,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      const callArgs = emailService._mockTransporter.sendMail.mock.calls[0][0];
-      expect(callArgs.html).toContain('Test User');
-      expect(callArgs.text).toContain('Test User');
-    });
-
-    it('should include magazine details in emails', async () => {
-      await emailService.sendReservationConfirmation({
-        reservation: mockReservationPickup,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      const callArgs = emailService._mockTransporter.sendMail.mock.calls[0][0];
-      expect(callArgs.html).toContain('Flaschenpost');
-      expect(callArgs.html).toContain('2024-01');
-      expect(callArgs.text).toContain('Flaschenpost');
-      expect(callArgs.text).toContain('2024-01');
-    });
-
-    it('should include quantity in confirmation', async () => {
-      await emailService.sendReservationConfirmation({
-        reservation: mockReservationPickup,
-        user: mockUser,
-        magazine: mockMagazine,
-      });
-
-      const callArgs = emailService._mockTransporter.sendMail.mock.calls[0][0];
-      expect(callArgs.html).toContain('2 Exemplare');
-      expect(callArgs.text).toContain('2 Exemplare');
     });
   });
 });
