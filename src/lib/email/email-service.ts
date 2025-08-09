@@ -780,24 +780,16 @@ export const emailService = (() => {
     // Return a stub that throws meaningful errors
     return {
       sendReservationConfirmation: async () => {
-        throw new Error(
-          "Email service not configured. Please set SMTP_USER and SMTP_PASS environment variables.",
-        );
+        throw new Error("Email service not configured");
       },
       sendCancellationConfirmation: async () => {
-        throw new Error(
-          "Email service not configured. Please set SMTP_USER and SMTP_PASS environment variables.",
-        );
+        throw new Error("Email service not configured");
       },
       sendPickupReminder: async () => {
-        throw new Error(
-          "Email service not configured. Please set SMTP_USER and SMTP_PASS environment variables.",
-        );
+        throw new Error("Email service not configured");
       },
       verifyConnection: async () => {
-        throw new Error(
-          "Email service not configured. Please set SMTP_USER and SMTP_PASS environment variables.",
-        );
+        throw new Error("Email service not configured");
       },
     };
   }

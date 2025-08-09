@@ -4,6 +4,9 @@ describe("Email Service - Import Coverage Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
+    
+    // Unmock the email service to test actual implementation
+    vi.unmock("@/lib/email/email-service");
 
     // Mock console to reduce noise
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -172,7 +175,21 @@ describe("Email Service - Import Coverage Tests", () => {
 
   describe("Template Generation Code Paths", () => {
     it("exercises email template generation without sending", async () => {
-      vi.mock("nodemailer", () => ({
+      // Set up environment variables before importing the module
+      vi.stubGlobal("import", {
+        meta: {
+          env: {
+            ...import.meta.env,
+            SMTP_USER: "test@test.com",
+            SMTP_PASS: "password123",
+            SMTP_HOST: "smtp.test.com",
+            SMTP_PORT: "587",
+          },
+        },
+      });
+      
+      // Mock nodemailer before importing email service
+      vi.doMock("nodemailer", () => ({
         default: {
           createTransport: vi.fn(() => ({
             sendMail: vi.fn().mockImplementation((mailOptions) => {
@@ -263,7 +280,20 @@ describe("Email Service - Import Coverage Tests", () => {
     });
 
     it("handles shipping method in templates", async () => {
-      vi.mock("nodemailer", () => ({
+      // Set up environment variables before importing the module
+      vi.stubGlobal("import", {
+        meta: {
+          env: {
+            ...import.meta.env,
+            SMTP_USER: "test@test.com",
+            SMTP_PASS: "password123",
+            SMTP_HOST: "smtp.test.com",
+            SMTP_PORT: "587",
+          },
+        },
+      });
+      
+      vi.doMock("nodemailer", () => ({
         default: {
           createTransport: vi.fn(() => ({
             sendMail: vi.fn().mockImplementation((mailOptions) => {
@@ -340,7 +370,20 @@ describe("Email Service - Import Coverage Tests", () => {
     });
 
     it("handles picture orders in templates", async () => {
-      vi.mock("nodemailer", () => ({
+      // Set up environment variables before importing the module
+      vi.stubGlobal("import", {
+        meta: {
+          env: {
+            ...import.meta.env,
+            SMTP_USER: "test@test.com",
+            SMTP_PASS: "password123",
+            SMTP_HOST: "smtp.test.com",
+            SMTP_PORT: "587",
+          },
+        },
+      });
+      
+      vi.doMock("nodemailer", () => ({
         default: {
           createTransport: vi.fn(() => ({
             sendMail: vi.fn().mockImplementation((mailOptions) => {
@@ -493,7 +536,7 @@ describe("Email Service - Import Coverage Tests", () => {
     }, 15000); // 15 second test timeout to allow for the 10 second email timeout
 
     it("handles verification failure", async () => {
-      vi.mock("nodemailer", () => ({
+      vi.doMock("nodemailer", () => ({
         default: {
           createTransport: vi.fn(() => ({
             verify: vi

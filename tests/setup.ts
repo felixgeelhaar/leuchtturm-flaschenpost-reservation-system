@@ -93,12 +93,20 @@ vi.mock("nodemailer", () => ({
 vi.mock("@/lib/email/email-service", () => ({
   emailService: {
     sendReservationConfirmation: vi.fn().mockResolvedValue(undefined),
+    sendCancellationConfirmation: vi.fn().mockResolvedValue(undefined),
     sendReservationCancellation: vi.fn().mockResolvedValue(undefined),
     sendPickupReminder: vi.fn().mockResolvedValue(undefined),
     verifyConnection: vi.fn().mockResolvedValue(true),
   },
+  getEmailService: vi.fn().mockReturnValue({
+    sendReservationConfirmation: vi.fn().mockResolvedValue(undefined),
+    sendCancellationConfirmation: vi.fn().mockResolvedValue(undefined),
+    sendPickupReminder: vi.fn().mockResolvedValue(undefined),
+    verifyConnection: vi.fn().mockResolvedValue(true),
+  }),
   EmailService: vi.fn().mockImplementation(() => ({
     sendReservationConfirmation: vi.fn().mockResolvedValue(undefined),
+    sendCancellationConfirmation: vi.fn().mockResolvedValue(undefined),
     sendReservationCancellation: vi.fn().mockResolvedValue(undefined),
     sendPickupReminder: vi.fn().mockResolvedValue(undefined),
     verifyConnection: vi.fn().mockResolvedValue(true),
