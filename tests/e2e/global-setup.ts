@@ -1,4 +1,4 @@
-import { chromium, type FullConfig } from "@playwright/test";
+import { chromium, type FullConfig } from '@playwright/test';
 
 async function globalSetup(config: FullConfig) {
   const { baseURL } = config.projects[0].use;
@@ -10,10 +10,10 @@ async function globalSetup(config: FullConfig) {
   try {
     // Wait for server to be ready
     await page.goto(baseURL!);
-    await page.waitForSelector("h1", { timeout: 30000 });
-    console.log("✅ Server is ready for testing");
+    await page.waitForSelector('h1', { timeout: 30000 });
+    console.log('✅ Server is ready for testing');
   } catch (error) {
-    console.error("❌ Server failed to start:", error);
+    console.error('❌ Server failed to start:', error);
     throw error;
   } finally {
     await browser.close();

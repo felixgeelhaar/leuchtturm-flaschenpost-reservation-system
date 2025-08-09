@@ -1,10 +1,11 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 
 /**
  * Health check script for production validation
  */
 
-const BASE_URL = process.env.BASE_URL || "http://localhost:4321";
+const BASE_URL = process.env.BASE_URL || 'http://localhost:4321';
 
 async function checkEndpoint(path, expectedStatus = 200) {
   try {
@@ -23,19 +24,19 @@ async function checkEndpoint(path, expectedStatus = 200) {
 }
 
 async function runHealthChecks() {
-  console.log("Running health checks for:", BASE_URL);
-  console.log("================================\n");
+  console.log('Running health checks for:', BASE_URL);
+  console.log('================================\n');
 
   const checks = [
-    { path: "/", name: "Homepage" },
+    { path: '/', name: 'Homepage' },
     {
-      path: "/api/health",
-      name: "Health endpoint",
+      path: '/api/health',
+      name: 'Health endpoint',
       expectedStatus: [200, 404],
     },
-    { path: "/api/magazines", name: "Magazines API" },
-    { path: "/privacy", name: "Privacy page" },
-    { path: "/impressum", name: "Impressum page" },
+    { path: '/api/magazines', name: 'Magazines API' },
+    { path: '/privacy', name: 'Privacy page' },
+    { path: '/impressum', name: 'Impressum page' },
   ];
 
   let allPassed = true;
@@ -58,12 +59,12 @@ async function runHealthChecks() {
     }
   }
 
-  console.log("\n================================");
+  console.log('\n================================');
   if (allPassed) {
-    console.log("✅ All health checks passed!");
+    console.log('✅ All health checks passed!');
     process.exit(0);
   } else {
-    console.log("❌ Some health checks failed!");
+    console.log('❌ Some health checks failed!');
     process.exit(1);
   }
 }
