@@ -405,7 +405,7 @@ export const createErrorReport = (error: Error | AppError, url?: string, userAge
     url,
     userAgent,
     timestamp: new Date().toISOString(),
-    context: error instanceof AppError ? error.context : {}
+    context: error instanceof AppError ? error.context : {},
   };
 };
 

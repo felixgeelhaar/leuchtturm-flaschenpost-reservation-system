@@ -74,7 +74,7 @@ export class DatabaseService {
     return this.mapUserFromDB(data);
   }
 
-  async updateUserActivity(userId: string): Promise<void> {
+  async updateUserActivity(_userId: string): Promise<void> {
     // Skip updating last_activity as column doesn't exist
     // This method is kept for compatibility but does nothing
     return;
@@ -312,7 +312,7 @@ export class DatabaseService {
   }
 
   // GDPR Data operations
-  async exportUserData(userId: string): Promise<any> {
+  async exportUserData(userId: string): Promise<Record<string, unknown>> {
     // Get user data
     const { data: userData } = await this.supabase
       .from('users')
@@ -356,7 +356,7 @@ export class DatabaseService {
 
   async deleteUserData(userId: string, reason: string = 'user_request'): Promise<void> {
     // Export data before deletion for compliance records
-    const exportData = await this.exportUserData(userId);
+    await this.exportUserData(userId);
 
     // Delete in correct order due to foreign key constraints
     await this.supabase.from('user_consents').delete().eq('user_id', userId);
@@ -401,7 +401,7 @@ export class DatabaseService {
     // Skip logging if table doesn't exist to avoid blocking operations
     // This is a temporary fix - the table should be created in production
     try {
-      const { data, error } = await this.supabase
+      const { error } = await this.supabase
         .from('data_processing_activity')
         .insert({
           user_id: log.userId || null,

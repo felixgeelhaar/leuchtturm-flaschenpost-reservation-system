@@ -156,7 +156,7 @@ describe('EmailService with proper mocking', () => {
       expect.objectContaining({
         to: mockUser.email,
         subject: expect.stringContaining('Reservierung'),
-      })
+      }),
     );
   });
   

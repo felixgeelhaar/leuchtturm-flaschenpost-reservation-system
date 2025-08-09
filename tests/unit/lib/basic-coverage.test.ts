@@ -284,7 +284,7 @@ describe('Basic Coverage Tests', () => {
         () => Number(undefined),
         () => Boolean(undefined),
         () => Array.from([] as any),
-        () => Object.keys({})
+        () => Object.keys({}),
       ];
       
       testFunctions.forEach(fn => {
@@ -299,7 +299,7 @@ describe('Basic Coverage Tests', () => {
         () => Number(''),
         () => Boolean(''),
         () => Array.isArray([]),
-        () => Object.keys({})
+        () => Object.keys({}),
       ];
       
       testCases.forEach(fn => {

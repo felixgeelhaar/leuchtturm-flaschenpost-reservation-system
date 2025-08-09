@@ -39,7 +39,8 @@
       "mcp__github__get_job_logs",
       "mcp__github__get_workflow_run",
       "Bash(npm outdated)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": []
   }

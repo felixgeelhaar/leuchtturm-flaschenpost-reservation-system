@@ -204,7 +204,7 @@ export default {
   },
   plugins: [
     // Custom components for consistent styling
-    function({ addComponents, theme }) {
+    function({ addComponents }) {
       addComponents({
         // Form Components
         '.form-container': {

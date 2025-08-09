@@ -1,7 +1,6 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
-import type { ConsentData } from '@/types';
 
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
@@ -34,7 +33,7 @@ export const POST: APIRoute = async ({ request }) => {
     let body;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return new Response(
         JSON.stringify({
           success: false,
@@ -211,7 +210,7 @@ export const DELETE: APIRoute = async ({ request }) => {
 };
 
 // Get user consents
-export const GET: APIRoute = async ({ request, url }) => {
+export const GET: APIRoute = async ({ url }) => {
   const db = new DatabaseService();
   
   try {

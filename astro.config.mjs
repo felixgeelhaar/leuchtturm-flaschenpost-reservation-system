@@ -15,7 +15,7 @@ export default defineConfig({
   output: 'server',
   adapter: netlify(),
 
-  site: process.env.SITE_URL || 'http://localhost:3000',
+  site: import.meta.env.SITE_URL || 'http://localhost:3000',
   
   // Performance optimizations
   build: {

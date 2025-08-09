@@ -4,8 +4,6 @@ import { paymentConfig, generatePaymentReference, formatCurrency } from '@/confi
 import { websiteContent } from '@/config/content';
 
 const kindergarten = websiteContent.kindergarten;
-const magazineConfig = websiteContent.magazine;
-const emailConfig = websiteContent.email;
 const pricing = websiteContent.pricing;
 
 // Email configuration interface
@@ -139,7 +137,7 @@ export class EmailService {
       
       // Log success only in development
       if (import.meta.env.MODE === 'development' && info) {
-        console.log(`Email sent to ${user.email} (${(info as any).messageId})`);
+        console.log(`Email sent to ${user.email} (${(info as Record<string, unknown>).messageId})`);
       }
     } catch (error) {
       // Log error with essential details only

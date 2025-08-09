@@ -1,11 +1,11 @@
 import { test, expect, Page } from '@playwright/test';
 
 // Test data
-const testMagazine = {
-  id: '304db363-ab60-4e3c-8aec-98c4c16d45f2',
-  title: 'Flaschenpost Magazin',
-  issueNumber: 'Ausgabe 2024 / 2025',
-};
+// const testMagazine = {
+//   id: '304db363-ab60-4e3c-8aec-98c4c16d45f2',
+//   title: 'Flaschenpost Magazin',
+//   issueNumber: 'Ausgabe 2024 / 2025',
+// };
 
 const fillPersonalInfo = async (page: Page) => {
   await page.fill('#firstName', 'Test');

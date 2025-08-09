@@ -232,7 +232,7 @@ export const POST: APIRoute = async ({ request }) => {
 };
 
 // Helper function to send deletion confirmation email
-async function sendDeletionConfirmationEmail(userId: string): Promise<void> {
+async function sendDeletionConfirmationEmail(_userId: string): Promise<void> {
   // In a real implementation, this would send an email confirming the deletion
   // Deletion confirmation would be sent to user
   

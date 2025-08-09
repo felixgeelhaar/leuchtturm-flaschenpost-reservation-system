@@ -341,7 +341,7 @@ export const isDevelopment = getConfigValue(
  * Get site URL
  */
 export const siteUrl = getConfigValue(
-  (server) => serverEnv?.SITE_URL,
+  (_server) => serverEnv?.SITE_URL,
   (client) => client?.site.url,
   'http://localhost:3000',
 );

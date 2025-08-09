@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { DatabaseService } from '@/lib/database';
 import { getEmailService } from '@/lib/email/email-service';
 // import { pictureClaimsService } from '@/lib/picture-claims'; // Disabled until picture_claims table exists
-import type { ReservationFormData, ConsentData } from '@/types';
+import type { ReservationFormData } from '@/types';
 
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
@@ -36,7 +36,7 @@ const reservationSchema = z.object({
     .toLowerCase()
     .trim(),
   phone: z.string()
-    .transform(val => val.replace(/[\s\-\(\)]/g, '')) // Remove spaces, dashes, and parentheses
+    .transform(val => val.replace(/[\s\-()]/g, '')) // Remove spaces, dashes, and parentheses
     .refine(val => !val || /^\+?[1-9]\d{1,14}$/.test(val), 'Bitte geben Sie eine gültige Telefonnummer ein')
     .optional()
     .or(z.literal(''))
@@ -216,7 +216,7 @@ export const POST: APIRoute = async ({ request }) => {
     let body;
     try {
       body = await request.json();
-    } catch (error) {
+    } catch {
       return new Response(
         JSON.stringify({
           success: false,
@@ -511,21 +511,16 @@ async function sendConfirmationEmail(
   reservation: any, 
   magazine: any,
 ): Promise<void> {
-  try {
-    const emailService = getEmailService();
-    await emailService.sendReservationConfirmation({
-      reservation,
-      user,
-      magazine,
-    });
-  } catch (error) {
-    // Re-throw to let the caller handle logging
-    throw error;
-  }
+  const emailService = getEmailService();
+  await emailService.sendReservationConfirmation({
+    reservation,
+    user,
+    magazine,
+  });
 }
 
 // GET endpoint for retrieving user reservations (requires authentication)
-export const GET: APIRoute = async ({ request, url }) => {
+export const GET: APIRoute = async () => {
   try {
     // This would require authentication in a real app
     // For demo purposes, we'll just return an empty array

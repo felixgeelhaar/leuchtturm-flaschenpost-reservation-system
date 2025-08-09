@@ -1,5 +1,5 @@
 // Payment Configuration for Magazine
-import { pricing, payment, kindergarten } from './content';
+import { pricing, payment } from './content';
 
 export const paymentConfig = {
   // Magazine base price in euros
