@@ -1,132 +1,195 @@
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { DatabaseService } from '@/lib/database';
-import { getEmailService } from '@/lib/email/email-service';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { DatabaseService } from "@/lib/database";
+import { getEmailService } from "@/lib/email/email-service";
 // import { pictureClaimsService } from '@/lib/picture-claims'; // Disabled until picture_claims table exists
-import type { ReservationFormData } from '@/types';
+import type { ReservationFormData } from "@/types";
 
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
 
 // Address validation schema - fields are validated conditionally based on delivery method
-const addressSchema = z.object({
-  street: z.string().max(200, 'Straße ist zu lang').trim().optional(),
-  houseNumber: z.string().max(20, 'Hausnummer ist zu lang').trim().optional(),
-  postalCode: z.string().max(20, 'Postleitzahl ist zu lang').trim().optional(),
-  city: z.string().max(100, 'Stadt ist zu lang').trim().optional(),
-  country: z.enum(['DE', 'AT', 'CH'], {
-    errorMap: () => ({ message: 'Wir liefern nur nach Deutschland, Österreich und in die Schweiz' }),
-  }).optional(),
-  addressLine2: z.string().max(200, 'Adresszusatz ist zu lang').optional().transform(val => val?.trim() || undefined),
-}).optional();
+const addressSchema = z
+  .object({
+    street: z.string().max(200, "Straße ist zu lang").trim().optional(),
+    houseNumber: z.string().max(20, "Hausnummer ist zu lang").trim().optional(),
+    postalCode: z
+      .string()
+      .max(20, "Postleitzahl ist zu lang")
+      .trim()
+      .optional(),
+    city: z.string().max(100, "Stadt ist zu lang").trim().optional(),
+    country: z
+      .enum(["DE", "AT", "CH"], {
+        errorMap: () => ({
+          message:
+            "Wir liefern nur nach Deutschland, Österreich und in die Schweiz",
+        }),
+      })
+      .optional(),
+    addressLine2: z
+      .string()
+      .max(200, "Adresszusatz ist zu lang")
+      .optional()
+      .transform((val) => val?.trim() || undefined),
+  })
+  .optional();
 
 // Validation schema for reservation data
-const reservationSchema = z.object({
-  firstName: z.string()
-    .min(2, 'Vorname muss mindestens 2 Zeichen lang sein')
-    .max(100, 'Vorname darf maximal 100 Zeichen lang sein')
-    .trim(),
-  lastName: z.string()
-    .min(2, 'Nachname muss mindestens 2 Zeichen lang sein')
-    .max(100, 'Nachname darf maximal 100 Zeichen lang sein')
-    .trim(),
-  email: z.string()
-    .email('Bitte geben Sie eine gültige E-Mail-Adresse ein')
-    .max(254, 'E-Mail-Adresse ist zu lang')
-    .toLowerCase()
-    .trim(),
-  phone: z.string()
-    .transform(val => val.replace(/[\s\-()]/g, '')) // Remove spaces, dashes, and parentheses
-    .refine(val => !val || /^\+?[1-9]\d{1,14}$/.test(val), 'Bitte geben Sie eine gültige Telefonnummer ein')
-    .optional()
-    .or(z.literal(''))
-    .transform(val => val === '' ? undefined : val),
-  magazineId: z.string()
-    .min(1, 'Bitte wählen Sie eine Magazin-Ausgabe')
-    .uuid('Ungültige Magazin-ID'),
-  quantity: z.number()
-    .int('Anzahl muss eine ganze Zahl sein')
-    .min(1, 'Mindestens 1 Exemplar erforderlich')
-    .max(5, 'Maximal 5 Exemplare pro Reservierung'),
-  deliveryMethod: z.enum(['pickup', 'shipping'], {
-    errorMap: () => ({ message: 'Ungültige Liefermethode' }),
-  }),
-  pickupLocation: z.string()
-    .max(200, 'Abholort ist zu lang')
-    .optional(),
-  pickupDate: z.string()
-    .optional()
-    .refine((date) => {
-      if (!date) return true;
-      const pickupDate = new Date(date);
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-      return pickupDate >= tomorrow;
-    }, 'Abholdatum muss mindestens einen Tag in der Zukunft liegen'),
-  address: addressSchema,
-  notes: z.string()
-    .max(500, 'Anmerkungen dürfen maximal 500 Zeichen lang sein')
-    .optional()
-    .transform(val => val?.trim() || undefined),
-  consents: z.object({
-    essential: z.boolean().refine(val => val === true, 'Erforderliche Einwilligung muss erteilt werden'),
-    functional: z.boolean(),
-    analytics: z.boolean(),
-    marketing: z.boolean(),
-  }),
-  // Picture order fields
-  orderGroupPicture: z.boolean().optional(),
-  childGroupName: z.string().max(100).optional(),
-  orderVorschulPicture: z.boolean().optional(),
-  childIsVorschueler: z.boolean().optional(),
-  childName: z.string().max(200).trim().optional(),
-}).refine((data) => {
-  // If pickup method, pickupLocation is required
-  if (data.deliveryMethod === 'pickup') {
-    return data.pickupLocation && data.pickupLocation.length > 0;
-  }
-  return true;
-}, {
-  message: 'Bitte wählen Sie einen Abholort',
-  path: ['pickupLocation'],
-}).refine((data) => {
-  // If shipping method, validate all address fields are present
-  if (data.deliveryMethod === 'shipping') {
-    if (!data.address) return false;
-    
-    const hasStreet = data.address.street && data.address.street.trim().length > 0;
-    const hasHouseNumber = data.address.houseNumber && data.address.houseNumber.trim().length > 0;
-    const hasPostalCode = data.address.postalCode && data.address.postalCode.trim().length >= 4;
-    const hasCity = data.address.city && data.address.city.trim().length > 0;
-    const hasCountry = data.address.country && data.address.country.length === 2;
-    
-    return hasStreet && hasHouseNumber && hasPostalCode && hasCity && hasCountry;
-  }
-  return true;
-}, {
-  message: 'Alle Adressfelder sind bei Versand erforderlich',
-  path: ['address'],
-}).refine((data) => {
-  // If ordering group picture, group name and child name are required
-  if (data.orderGroupPicture) {
-    return data.childGroupName && data.childGroupName.length > 0 && 
-           data.childName && data.childName.length > 0;
-  }
-  return true;
-}, {
-  message: 'Gruppenname und Kindername sind für die Bildbestellung erforderlich',
-  path: ['childGroupName'],
-}).refine((data) => {
-  // If ordering Vorschüler picture, child must be marked as Vorschüler and name is required
-  if (data.orderVorschulPicture) {
-    return data.childIsVorschueler === true && 
-           data.childName && data.childName.length > 0;
-  }
-  return true;
-}, {
-  message: 'Für die Vorschüler-Bildbestellung muss das Kind als Vorschüler markiert sein',
-  path: ['orderVorschulPicture'],
-});
+const reservationSchema = z
+  .object({
+    firstName: z
+      .string()
+      .min(2, "Vorname muss mindestens 2 Zeichen lang sein")
+      .max(100, "Vorname darf maximal 100 Zeichen lang sein")
+      .trim(),
+    lastName: z
+      .string()
+      .min(2, "Nachname muss mindestens 2 Zeichen lang sein")
+      .max(100, "Nachname darf maximal 100 Zeichen lang sein")
+      .trim(),
+    email: z
+      .string()
+      .email("Bitte geben Sie eine gültige E-Mail-Adresse ein")
+      .max(254, "E-Mail-Adresse ist zu lang")
+      .toLowerCase()
+      .trim(),
+    phone: z
+      .string()
+      .transform((val) => val.replace(/[\s\-()]/g, "")) // Remove spaces, dashes, and parentheses
+      .refine(
+        (val) => !val || /^\+?[1-9]\d{1,14}$/.test(val),
+        "Bitte geben Sie eine gültige Telefonnummer ein",
+      )
+      .optional()
+      .or(z.literal(""))
+      .transform((val) => (val === "" ? undefined : val)),
+    magazineId: z
+      .string()
+      .min(1, "Bitte wählen Sie eine Magazin-Ausgabe")
+      .uuid("Ungültige Magazin-ID"),
+    quantity: z
+      .number()
+      .int("Anzahl muss eine ganze Zahl sein")
+      .min(1, "Mindestens 1 Exemplar erforderlich")
+      .max(5, "Maximal 5 Exemplare pro Reservierung"),
+    deliveryMethod: z.enum(["pickup", "shipping"], {
+      errorMap: () => ({ message: "Ungültige Liefermethode" }),
+    }),
+    pickupLocation: z.string().max(200, "Abholort ist zu lang").optional(),
+    pickupDate: z
+      .string()
+      .optional()
+      .refine((date) => {
+        if (!date) return true;
+        const pickupDate = new Date(date);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        return pickupDate >= tomorrow;
+      }, "Abholdatum muss mindestens einen Tag in der Zukunft liegen"),
+    address: addressSchema,
+    notes: z
+      .string()
+      .max(500, "Anmerkungen dürfen maximal 500 Zeichen lang sein")
+      .optional()
+      .transform((val) => val?.trim() || undefined),
+    consents: z.object({
+      essential: z
+        .boolean()
+        .refine(
+          (val) => val === true,
+          "Erforderliche Einwilligung muss erteilt werden",
+        ),
+      functional: z.boolean(),
+      analytics: z.boolean(),
+      marketing: z.boolean(),
+    }),
+    // Picture order fields
+    orderGroupPicture: z.boolean().optional(),
+    childGroupName: z.string().max(100).optional(),
+    orderVorschulPicture: z.boolean().optional(),
+    childIsVorschueler: z.boolean().optional(),
+    childName: z.string().max(200).trim().optional(),
+  })
+  .refine(
+    (data) => {
+      // If pickup method, pickupLocation is required
+      if (data.deliveryMethod === "pickup") {
+        return data.pickupLocation && data.pickupLocation.length > 0;
+      }
+      return true;
+    },
+    {
+      message: "Bitte wählen Sie einen Abholort",
+      path: ["pickupLocation"],
+    },
+  )
+  .refine(
+    (data) => {
+      // If shipping method, validate all address fields are present
+      if (data.deliveryMethod === "shipping") {
+        if (!data.address) return false;
+
+        const hasStreet =
+          data.address.street && data.address.street.trim().length > 0;
+        const hasHouseNumber =
+          data.address.houseNumber &&
+          data.address.houseNumber.trim().length > 0;
+        const hasPostalCode =
+          data.address.postalCode && data.address.postalCode.trim().length >= 4;
+        const hasCity =
+          data.address.city && data.address.city.trim().length > 0;
+        const hasCountry =
+          data.address.country && data.address.country.length === 2;
+
+        return (
+          hasStreet && hasHouseNumber && hasPostalCode && hasCity && hasCountry
+        );
+      }
+      return true;
+    },
+    {
+      message: "Alle Adressfelder sind bei Versand erforderlich",
+      path: ["address"],
+    },
+  )
+  .refine(
+    (data) => {
+      // If ordering group picture, group name and child name are required
+      if (data.orderGroupPicture) {
+        return (
+          data.childGroupName &&
+          data.childGroupName.length > 0 &&
+          data.childName &&
+          data.childName.length > 0
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "Gruppenname und Kindername sind für die Bildbestellung erforderlich",
+      path: ["childGroupName"],
+    },
+  )
+  .refine(
+    (data) => {
+      // If ordering Vorschüler picture, child must be marked as Vorschüler and name is required
+      if (data.orderVorschulPicture) {
+        return (
+          data.childIsVorschueler === true &&
+          data.childName &&
+          data.childName.length > 0
+        );
+      }
+      return true;
+    },
+    {
+      message:
+        "Für die Vorschüler-Bildbestellung muss das Kind als Vorschüler markiert sein",
+      path: ["orderVorschulPicture"],
+    },
+  );
 
 // Rate limiting (simple in-memory implementation)
 const rateLimitMap = new Map<string, { count: number; lastRequest: number }>();
@@ -154,59 +217,60 @@ export const OPTIONS: APIRoute = async () => {
   return new Response(null, {
     status: 204,
     headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Max-Age': '86400',
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Max-Age": "86400",
     },
   });
 };
 
 export const POST: APIRoute = async ({ request }) => {
   const db = new DatabaseService();
-  
+
   try {
     // Get client information
     // x-forwarded-for can contain multiple IPs, get the first one
-    const forwardedFor = request.headers.get('x-forwarded-for');
-    const clientIP = forwardedFor 
-                    ? forwardedFor.split(',')[0].trim() 
-                    : request.headers.get('x-real-ip') || 'unknown';
-    const userAgent = request.headers.get('user-agent') || 'unknown';
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const clientIP = forwardedFor
+      ? forwardedFor.split(",")[0].trim()
+      : request.headers.get("x-real-ip") || "unknown";
+    const userAgent = request.headers.get("user-agent") || "unknown";
 
     // Check rate limiting
     if (!checkRateLimit(clientIP)) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Rate limit exceeded',
-          message: 'Zu viele Anfragen. Bitte versuchen Sie es in 15 Minuten erneut.',
+          error: "Rate limit exceeded",
+          message:
+            "Zu viele Anfragen. Bitte versuchen Sie es in 15 Minuten erneut.",
         }),
         {
           status: 429,
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Retry-After': '900', // 15 minutes
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "Retry-After": "900", // 15 minutes
           },
         },
       );
     }
 
     // Validate Content-Type (allow charset specification)
-    const contentType = request.headers.get('content-type') || '';
-    if (!contentType.includes('application/json')) {
+    const contentType = request.headers.get("content-type") || "";
+    if (!contentType.includes("application/json")) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid content type',
-          message: 'Content-Type muss application/json sein.',
+          error: "Invalid content type",
+          message: "Content-Type muss application/json sein.",
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
         },
       );
@@ -220,14 +284,14 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid JSON',
-          message: 'Ungültiger JSON-Body.',
+          error: "Invalid JSON",
+          message: "Ungültiger JSON-Body.",
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
         },
       );
@@ -236,23 +300,27 @@ export const POST: APIRoute = async ({ request }) => {
     // Validate data with Zod
     const validationResult = reservationSchema.safeParse(body);
     if (!validationResult.success) {
-      const errors = (validationResult.error.issues || validationResult.error.errors || []).map(err => ({
-        field: err.path.join('.'),
+      const errors = (
+        validationResult.error.issues ||
+        validationResult.error.errors ||
+        []
+      ).map((err) => ({
+        field: err.path.join("."),
         message: err.message,
       }));
 
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Validation failed',
-          message: 'Eingabedaten sind ungültig.',
+          error: "Validation failed",
+          message: "Eingabedaten sind ungültig.",
           errors,
         }),
         {
           status: 400,
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
         },
       );
@@ -266,14 +334,14 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Magazine not found',
-          message: 'Die gewählte Magazin-Ausgabe ist nicht verfügbar.',
+          error: "Magazine not found",
+          message: "Die gewählte Magazin-Ausgabe ist nicht verfügbar.",
         }),
         {
           status: 404,
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
         },
       );
@@ -283,14 +351,14 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Insufficient copies',
+          error: "Insufficient copies",
           message: `Nur noch ${magazine.availableCopies} Exemplare verfügbar.`,
         }),
         {
           status: 409,
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
           },
         },
       );
@@ -298,7 +366,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Check if user already exists
     let user = await db.getUserByEmail(formData.email);
-    
+
     if (!user) {
       // Create new user
       user = await db.createUser({
@@ -306,8 +374,9 @@ export const POST: APIRoute = async ({ request }) => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         // phone: formData.phone, // phone column doesn't exist in users table
-        address: formData.deliveryMethod === 'shipping' ? formData.address : undefined,
-        consentVersion: '1.0',
+        address:
+          formData.deliveryMethod === "shipping" ? formData.address : undefined,
+        consentVersion: "1.0",
       });
 
       // Record initial consent
@@ -322,10 +391,12 @@ export const POST: APIRoute = async ({ request }) => {
       // Update consent if different
       const existingConsents = await db.getUserConsents(user.id);
       const latestConsent = existingConsents[0];
-      
-      if (!latestConsent || 
-          latestConsent.consentType !== 'essential' || 
-          !latestConsent.consentGiven) {
+
+      if (
+        !latestConsent ||
+        latestConsent.consentType !== "essential" ||
+        !latestConsent.consentGiven
+      ) {
         await db.recordConsent(user.id, formData.consents, {
           ipAddress: clientIP,
           userAgent,
@@ -407,18 +478,18 @@ export const POST: APIRoute = async ({ request }) => {
       await sendConfirmationEmail(user, reservation, magazine);
     } catch (error) {
       // Log error but don't fail the reservation
-      console.error('Email send failed:', {
+      console.error("Email send failed:", {
         reservationId: reservation.id,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
 
     // Log successful reservation
     await db.logDataProcessing({
       userId: user.id,
-      action: 'reservation_created',
-      dataType: 'reservation',
-      legalBasis: 'consent',
+      action: "reservation_created",
+      dataType: "reservation",
+      legalBasis: "consent",
       ipAddress: clientIP,
       details: JSON.stringify({
         reservationId: reservation.id,
@@ -439,23 +510,22 @@ export const POST: APIRoute = async ({ request }) => {
             issueNumber: magazine.issueNumber,
           },
         },
-        message: 'Reservierung erfolgreich erstellt!',
+        message: "Reservierung erfolgreich erstellt!",
       }),
       {
         status: 201,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'X-Content-Type-Options': 'nosniff',
-          'X-Frame-Options': 'DENY',
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "X-Content-Type-Options": "nosniff",
+          "X-Frame-Options": "DENY",
         },
       },
     );
-
   } catch (error) {
-    console.error('Reservation creation error:', error);
-    console.error('Error details:', {
-      message: error instanceof Error ? error.message : 'Unknown error',
+    console.error("Reservation creation error:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
       stack: error instanceof Error ? error.stack : undefined,
       type: error?.constructor?.name,
       // Log specific database errors
@@ -465,28 +535,32 @@ export const POST: APIRoute = async ({ request }) => {
     });
 
     // Log the error for monitoring
-    await db.logDataProcessing({
-      action: 'created',
-      dataType: 'processing_log',
-      legalBasis: 'legitimate_interest',
-      details: JSON.stringify({
-        error: error instanceof Error ? error.message : 'Unknown error',
-        endpoint: '/api/reservations',
-        method: 'POST',
-      }),
-    }).catch(logError => {
-      console.error('Failed to log error:', logError);
-    });
+    await db
+      .logDataProcessing({
+        action: "created",
+        dataType: "processing_log",
+        legalBasis: "legitimate_interest",
+        details: JSON.stringify({
+          error: error instanceof Error ? error.message : "Unknown error",
+          endpoint: "/api/reservations",
+          method: "POST",
+        }),
+      })
+      .catch((logError) => {
+        console.error("Failed to log error:", logError);
+      });
 
     // In development, provide more details about the error
-    const isDevelopment = process.env.NODE_ENV === 'development' || 
-                         import.meta.env.MODE === 'development';
-    
+    const isDevelopment =
+      process.env.NODE_ENV === "development" ||
+      import.meta.env.MODE === "development";
+
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Internal server error',
-        message: 'Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.',
+        error: "Internal server error",
+        message:
+          "Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
         ...(isDevelopment && {
           debug: {
             error: error instanceof Error ? error.message : String(error),
@@ -497,8 +571,8 @@ export const POST: APIRoute = async ({ request }) => {
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
       },
     );
@@ -507,8 +581,8 @@ export const POST: APIRoute = async ({ request }) => {
 
 // Email notification function using the EmailService
 async function sendConfirmationEmail(
-  user: any, 
-  reservation: any, 
+  user: any,
+  reservation: any,
   magazine: any,
 ): Promise<void> {
   const emailService = getEmailService();
@@ -524,49 +598,49 @@ export const GET: APIRoute = async () => {
   try {
     // This would require authentication in a real app
     // For demo purposes, we'll just return an empty array
-    
-    const clientIP = request.headers.get('x-forwarded-for') || 
-                    request.headers.get('x-real-ip') || 
-                    'unknown';
+
+    const clientIP =
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
 
     // Log the access attempt
     await db.logDataProcessing({
-      action: 'accessed',
-      dataType: 'reservation',
-      legalBasis: 'legitimate_interest',
+      action: "accessed",
+      dataType: "reservation",
+      legalBasis: "legitimate_interest",
       ipAddress: clientIP,
-      details: JSON.stringify({ endpoint: '/api/reservations', method: 'GET' }),
+      details: JSON.stringify({ endpoint: "/api/reservations", method: "GET" }),
     });
 
     return new Response(
       JSON.stringify({
         success: true,
         data: [],
-        message: 'Authentication required for this endpoint',
+        message: "Authentication required for this endpoint",
       }),
       {
         status: 200,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
       },
     );
-
   } catch (error) {
-    console.error('Error fetching reservations:', error);
+    console.error("Error fetching reservations:", error);
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Internal server error',
-        message: 'Es ist ein Fehler beim Laden der Reservierungen aufgetreten.',
+        error: "Internal server error",
+        message: "Es ist ein Fehler beim Laden der Reservierungen aufgetreten.",
       }),
       {
         status: 500,
         headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
         },
       },
     );

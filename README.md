@@ -5,6 +5,7 @@ A production-ready magazine reservation system built with modern web technologie
 ## 🏗️ Architecture Overview
 
 ### Technology Stack
+
 - **Frontend**: Astro framework with Vue.js components
 - **Styling**: Tailwind CSS
 - **Language**: TypeScript
@@ -15,6 +16,7 @@ A production-ready magazine reservation system built with modern web technologie
 - **Performance**: Lighthouse CI, Web Vitals tracking
 
 ### Infrastructure Components
+
 - **Security**: Comprehensive security headers, CSRF protection, rate limiting
 - **Performance**: Image optimization, code splitting, caching strategies
 - **Monitoring**: Error tracking, performance monitoring, uptime checks
@@ -24,6 +26,7 @@ A production-ready magazine reservation system built with modern web technologie
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18+ and npm 9+
 - Supabase account and project
 - Netlify account
@@ -32,6 +35,7 @@ A production-ready magazine reservation system built with modern web technologie
 ### Environment Setup
 
 1. **Clone and install dependencies**:
+
    ```bash
    git clone <repository-url>
    cd leuchtturm-flaschenpost-reservation-system
@@ -39,19 +43,21 @@ A production-ready magazine reservation system built with modern web technologie
    ```
 
 2. **Configure environment variables**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your actual values
    ```
 
 3. **Set up Supabase**:
+
    ```bash
    # Generate TypeScript types
    npm run db:generate
-   
+
    # Run migrations
    npm run db:migrate
-   
+
    # Seed database (optional)
    npm run db:seed
    ```
@@ -107,6 +113,7 @@ npm run analyze
 ## 🔒 Security Features
 
 ### Implemented Security Measures
+
 - **HTTPS Enforcement**: Strict Transport Security headers
 - **Content Security Policy**: Comprehensive CSP configuration
 - **CSRF Protection**: Token-based CSRF protection
@@ -117,21 +124,23 @@ npm run analyze
 - **GDPR Compliance**: Data sanitization and retention policies
 
 ### Security Configuration
+
 ```typescript
 // Security headers automatically applied
 const securityHeaders = {
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-  'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'X-XSS-Protection': '1; mode=block',
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'Content-Security-Policy': '...' // Comprehensive CSP
+  "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "X-XSS-Protection": "1; mode=block",
+  "Referrer-Policy": "strict-origin-when-cross-origin",
+  "Content-Security-Policy": "...", // Comprehensive CSP
 };
 ```
 
 ## ⚡ Performance Optimization
 
 ### Implemented Optimizations
+
 - **Image Optimization**: Automatic WebP/AVIF conversion
 - **Code Splitting**: Dynamic imports and lazy loading
 - **Caching Strategy**: Multi-layer caching (memory, storage, CDN)
@@ -140,6 +149,7 @@ const securityHeaders = {
 - **Resource Preloading**: Critical resource preloading
 
 ### Performance Budgets
+
 - **First Contentful Paint**: < 2s
 - **Largest Contentful Paint**: < 2.5s
 - **Total Bundle Size**: < 1.2MB
@@ -149,6 +159,7 @@ const securityHeaders = {
 ## 📊 Monitoring & Observability
 
 ### Monitoring Stack
+
 - **Error Tracking**: Sentry integration with GDPR compliance
 - **Performance Monitoring**: Custom Web Vitals collection
 - **Uptime Monitoring**: Automated health checks
@@ -156,6 +167,7 @@ const securityHeaders = {
 - **User Analytics**: Privacy-compliant user tracking
 
 ### Key Metrics Tracked
+
 - Application errors and exceptions
 - Performance metrics (FCP, LCP, FID, CLS)
 - API response times
@@ -166,6 +178,7 @@ const securityHeaders = {
 ## 🔄 Backup & Disaster Recovery
 
 ### Backup Strategy
+
 - **Automated Backups**: Daily database and file backups
 - **Retention Policy**: 7 daily, 4 weekly, 12 monthly backups
 - **Encryption**: AES-256-GCM encryption for all backups
@@ -173,6 +186,7 @@ const securityHeaders = {
 - **Integrity Checks**: Automated backup verification
 
 ### Recovery Objectives
+
 - **RTO (Recovery Time Objective)**: 1 hour
 - **RPO (Recovery Point Objective)**: 15 minutes
 - **Automated Recovery**: Script-based recovery procedures
@@ -181,6 +195,7 @@ const securityHeaders = {
 ## 🚀 CI/CD Pipeline
 
 ### Pipeline Stages
+
 1. **Code Quality**: ESLint, Prettier, TypeScript checks
 2. **Security Scanning**: SAST, dependency audits, vulnerability scans
 3. **Testing**: Unit, integration, and E2E testing
@@ -190,12 +205,14 @@ const securityHeaders = {
 7. **Validation**: Post-deployment health checks
 
 ### Deployment Environments
+
 - **Staging**: `https://staging--leuchtturm-flaschenpost.netlify.app`
 - **Production**: `https://leuchtturm-flaschenpost.netlify.app`
 
 ### Quick Deployment to Netlify
 
 1. **Connect Repository**
+
    ```bash
    # Push to GitHub
    git init
@@ -213,6 +230,7 @@ const securityHeaders = {
 
 3. **Configure Environment Variables**
    Required variables in Netlify dashboard:
+
    ```
    PUBLIC_SUPABASE_URL
    PUBLIC_SUPABASE_ANON_KEY
@@ -233,6 +251,7 @@ See [Deployment Guide](docs/deployment-guide.md) for detailed instructions.
 ## 🌍 GDPR Compliance
 
 ### Data Protection Measures
+
 - **Data Minimization**: Collect only necessary data
 - **Purpose Limitation**: Data used only for stated purposes
 - **Storage Limitation**: Automated data retention and deletion
@@ -241,6 +260,7 @@ See [Deployment Guide](docs/deployment-guide.md) for detailed instructions.
 - **Right to Erasure**: Automated data deletion procedures
 
 ### Privacy Features
+
 - **Cookie Consent**: Granular cookie consent management
 - **Data Export**: User data export functionality
 - **Audit Logging**: Privacy-compliant audit trails
@@ -249,12 +269,14 @@ See [Deployment Guide](docs/deployment-guide.md) for detailed instructions.
 ## 📱 Browser Support
 
 ### Supported Browsers
+
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
 - Edge 90+
 
 ### Progressive Enhancement
+
 - Core functionality works without JavaScript
 - Enhanced features with JavaScript enabled
 - Responsive design for all device types
@@ -263,12 +285,14 @@ See [Deployment Guide](docs/deployment-guide.md) for detailed instructions.
 ## 🛠️ Development Workflow
 
 ### Git Workflow
+
 - **Main Branch**: Production-ready code
 - **Develop Branch**: Integration branch for features
 - **Feature Branches**: Individual feature development
 - **Pull Requests**: Code review and CI/CD integration
 
 ### Code Quality
+
 - **ESLint**: JavaScript/TypeScript linting
 - **Prettier**: Code formatting
 - **Husky**: Git hooks for quality gates
@@ -278,6 +302,7 @@ See [Deployment Guide](docs/deployment-guide.md) for detailed instructions.
 ## 📚 Documentation
 
 ### Available Documentation
+
 - **API Documentation**: Auto-generated API docs
 - **Component Library**: Storybook component documentation
 - **Architecture Decisions**: ADR documentation
@@ -287,6 +312,7 @@ See [Deployment Guide](docs/deployment-guide.md) for detailed instructions.
 ## 🤝 Contributing
 
 ### Development Setup
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -294,6 +320,7 @@ See [Deployment Guide](docs/deployment-guide.md) for detailed instructions.
 5. Submit a pull request
 
 ### Code Standards
+
 - Follow TypeScript best practices
 - Write comprehensive tests
 - Document public APIs
@@ -303,11 +330,13 @@ See [Deployment Guide](docs/deployment-guide.md) for detailed instructions.
 ## 📞 Support & Maintenance
 
 ### Support Channels
+
 - **Technical Issues**: GitHub Issues
 - **Security Issues**: security@company.com
 - **General Questions**: support@company.com
 
 ### Maintenance Schedule
+
 - **Security Updates**: Weekly
 - **Dependency Updates**: Monthly
 - **Performance Reviews**: Quarterly
@@ -319,8 +348,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ using modern web technologies and production-ready infrastructure.**# Trigger redeploy Fri Aug  8 13:30:44 CEST 2025
-# Trigger redeploy for updated password Fri Aug  8 13:55:09 CEST 2025
-# Trigger redeploy - SMTP_SECURE corrected Fri Aug  8 14:16:15 CEST 2025
-# Trigger redeploy - new Gmail app password Fri Aug  8 14:37:51 CEST 2025
-# Trigger redeploy - corrected SMTP_USER with dot Fri Aug  8 15:18:49 CEST 2025
+**Built with ❤️ using modern web technologies and production-ready infrastructure.**# Trigger redeploy Fri Aug 8 13:30:44 CEST 2025
+
+# Trigger redeploy for updated password Fri Aug 8 13:55:09 CEST 2025
+
+# Trigger redeploy - SMTP_SECURE corrected Fri Aug 8 14:16:15 CEST 2025
+
+# Trigger redeploy - new Gmail app password Fri Aug 8 14:37:51 CEST 2025
+
+# Trigger redeploy - corrected SMTP_USER with dot Fri Aug 8 15:18:49 CEST 2025

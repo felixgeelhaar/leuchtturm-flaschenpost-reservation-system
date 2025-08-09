@@ -46,6 +46,7 @@ npm run security:scan    # Run security analysis
 ## Project Architecture
 
 ### Directory Structure
+
 ```
 src/
 ├── components/          # Vue.js components
@@ -70,17 +71,19 @@ src/
 ### Core Components
 
 #### 1. Reservation Form (Vue.js)
+
 - Mobile-first responsive design
 - Real-time validation with Zod schema
 - GDPR consent integration
 - Accessible form controls (WCAG 2.1 AA)
 
 #### 2. Database Schema (Supabase)
+
 ```sql
 -- Users with GDPR compliance
 users (
   id, email, first_name, last_name, phone,
-  consent_version, consent_timestamp, 
+  consent_version, consent_timestamp,
   data_retention_until, created_at
 )
 
@@ -99,6 +102,7 @@ user_consents (
 ```
 
 #### 3. API Endpoints
+
 - `POST /api/reservations` - Create new reservation
 - `GET /api/reservations/:id` - Get reservation details
 - `POST /api/gdpr/export` - Export user data
@@ -108,6 +112,7 @@ user_consents (
 ## GDPR Compliance Requirements
 
 ### Essential Implementation
+
 1. **Consent Management**
    - Granular consent options (essential, functional, analytics)
    - Consent withdrawal mechanisms
@@ -126,6 +131,7 @@ user_consents (
    - Regular security audits
 
 ### Privacy Policy Requirements
+
 - Clear data usage explanation
 - Cookie policy and management
 - Contact information for data requests
@@ -135,18 +141,20 @@ user_consents (
 ## Security Best Practices
 
 ### Input Validation
+
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const reservationSchema = z.object({
   firstName: z.string().min(2).max(50),
   lastName: z.string().min(2).max(50),
   email: z.string().email(),
-  quantity: z.number().min(1).max(5)
+  quantity: z.number().min(1).max(5),
 });
 ```
 
 ### API Security
+
 - CSRF protection with tokens
 - Rate limiting (10 requests per minute per IP)
 - Input sanitization against XSS
@@ -154,6 +162,7 @@ const reservationSchema = z.object({
 - Secure session management with HTTP-only cookies
 
 ### Environment Variables
+
 ```bash
 # Database
 PUBLIC_SUPABASE_URL=your-supabase-url
@@ -176,18 +185,21 @@ SENTRY_DSN=your-sentry-dsn
 ## Testing Strategy
 
 ### Unit Tests
+
 - Form validation logic
 - API endpoint functionality
 - GDPR compliance utilities
 - Email notification system
 
 ### Integration Tests
+
 - Database operations
 - API request/response cycles
 - Email delivery confirmation
 - GDPR data export/deletion
 
 ### End-to-End Tests
+
 - Complete reservation workflow
 - Consent management flow
 - Mobile responsive behavior
@@ -196,12 +208,14 @@ SENTRY_DSN=your-sentry-dsn
 ## Performance Optimization
 
 ### Core Web Vitals Targets
+
 - First Contentful Paint: < 2s
 - Largest Contentful Paint: < 2.5s
 - Cumulative Layout Shift: < 0.1
 - First Input Delay: < 100ms
 
 ### Implementation Strategies
+
 - Image optimization (WebP/AVIF with fallbacks)
 - Code splitting and lazy loading
 - Critical CSS inlining
@@ -211,6 +225,7 @@ SENTRY_DSN=your-sentry-dsn
 ## Deployment Configuration
 
 ### Netlify Settings
+
 ```toml
 [build]
   command = "npm run build"
@@ -230,6 +245,7 @@ SENTRY_DSN=your-sentry-dsn
 ```
 
 ### CI/CD Pipeline
+
 - Automated testing on pull requests
 - Security scanning with npm audit
 - Performance testing with Lighthouse
@@ -239,12 +255,14 @@ SENTRY_DSN=your-sentry-dsn
 ## User Experience Guidelines
 
 ### Design Principles
+
 - **Mobile-first**: Optimize for parent users on mobile devices
 - **Accessibility**: WCAG 2.1 AA compliance for inclusive design
 - **Simplicity**: Maximum 2-minute reservation completion time
 - **Transparency**: Clear privacy information and data usage
 
 ### Form UX Patterns
+
 - Progressive disclosure for complex fields
 - Real-time validation with helpful error messages
 - Auto-save functionality for form persistence
@@ -254,6 +272,7 @@ SENTRY_DSN=your-sentry-dsn
 ## Monitoring and Analytics
 
 ### Key Metrics
+
 - Reservation conversion rate (target: >70%)
 - Form abandonment rate (target: <20%)
 - Page load performance (target: <3s)
@@ -261,6 +280,7 @@ SENTRY_DSN=your-sentry-dsn
 - User satisfaction scores
 
 ### Error Tracking
+
 - Sentry integration for error monitoring
 - GDPR-compliant user session tracking
 - Performance monitoring with Web Vitals
@@ -269,6 +289,7 @@ SENTRY_DSN=your-sentry-dsn
 ## Common Development Tasks
 
 ### Adding New Form Fields
+
 1. Update TypeScript types in `src/types/`
 2. Extend Zod validation schema
 3. Update Vue.js form component
@@ -277,6 +298,7 @@ SENTRY_DSN=your-sentry-dsn
 6. Add corresponding tests
 
 ### GDPR Compliance Updates
+
 1. Review legal requirements changes
 2. Update consent management logic
 3. Modify data retention policies
@@ -284,6 +306,7 @@ SENTRY_DSN=your-sentry-dsn
 5. Test data export/deletion functionality
 
 ### Performance Optimization
+
 1. Analyze bundle size with `npm run analyze`
 2. Optimize images and assets
 3. Review and update caching strategies
@@ -293,12 +316,14 @@ SENTRY_DSN=your-sentry-dsn
 ## Troubleshooting
 
 ### Common Issues
+
 - **Form submission failures**: Check CSRF token and rate limiting
 - **Email delivery issues**: Verify SMTP configuration and DNS settings
 - **Database connection errors**: Check Supabase credentials and network
 - **GDPR compliance failures**: Review consent logging and data handling
 
 ### Debug Commands
+
 ```bash
 # Check build issues
 npm run build -- --verbose

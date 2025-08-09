@@ -1,49 +1,49 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
-describe('/api/health - Simple Coverage Tests', () => {
+describe("/api/health - Simple Coverage Tests", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.resetModules();
-    
+
     // Mock console to avoid noise
-    vi.spyOn(console, 'error').mockImplementation(() => {});
-    vi.spyOn(console, 'warn').mockImplementation(() => {});
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
-  describe('Health Endpoint Basic Functionality', () => {
-    it('imports health endpoint without errors', async () => {
+  describe("Health Endpoint Basic Functionality", () => {
+    it("imports health endpoint without errors", async () => {
       expect(async () => {
-        await import('@/pages/api/health');
+        await import("@/pages/api/health");
       }).not.toThrow();
     });
 
-    it('exports GET function', async () => {
-      const module = await import('@/pages/api/health');
-      
+    it("exports GET function", async () => {
+      const module = await import("@/pages/api/health");
+
       expect(module.GET).toBeDefined();
-      expect(typeof module.GET).toBe('function');
+      expect(typeof module.GET).toBe("function");
     });
 
-    it('handles basic request structure', async () => {
+    it("handles basic request structure", async () => {
       // Mock environment for a working scenario
-      vi.stubGlobal('import', {
+      vi.stubGlobal("import", {
         meta: {
           env: {
-            NODE_ENV: 'test',
-            SMTP_USER: 'test@example.com',
-            SMTP_PASS: 'password123',
-            PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
-            PUBLIC_SUPABASE_ANON_KEY: 'test-key',
-            MODE: 'test',
+            NODE_ENV: "test",
+            SMTP_USER: "test@example.com",
+            SMTP_PASS: "password123",
+            PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+            PUBLIC_SUPABASE_ANON_KEY: "test-key",
+            MODE: "test",
           },
         },
       });
 
-      const { GET } = await import('@/pages/api/health');
-      
-      const mockRequest = new Request('http://localhost:3000/api/health', {
-        method: 'GET',
+      const { GET } = await import("@/pages/api/health");
+
+      const mockRequest = new Request("http://localhost:3000/api/health", {
+        method: "GET",
       });
 
       // Should not throw when called
@@ -52,154 +52,158 @@ describe('/api/health - Simple Coverage Tests', () => {
       expect(response.status).toBe(200);
     });
 
-    it('returns JSON response structure', async () => {
-      vi.stubGlobal('import', {
+    it("returns JSON response structure", async () => {
+      vi.stubGlobal("import", {
         meta: {
           env: {
-            NODE_ENV: 'test',
-            MODE: 'test',
+            NODE_ENV: "test",
+            MODE: "test",
           },
         },
       });
 
-      const { GET } = await import('@/pages/api/health');
-      
-      const mockRequest = new Request('http://localhost:3000/api/health');
+      const { GET } = await import("@/pages/api/health");
+
+      const mockRequest = new Request("http://localhost:3000/api/health");
       const response = await GET({ request: mockRequest } as any);
-      
+
       expect(response.status).toBe(200);
-      expect(response.headers.get('Content-Type')).toContain('application/json');
-      
+      expect(response.headers.get("Content-Type")).toContain(
+        "application/json",
+      );
+
       const data = await response.json();
       expect(data.status).toBeDefined();
       expect(data.timestamp).toBeDefined();
       expect(data.environment).toBeDefined();
     });
 
-    it('handles missing environment variables gracefully', async () => {
-      vi.stubGlobal('import', {
+    it("handles missing environment variables gracefully", async () => {
+      vi.stubGlobal("import", {
         meta: {
           env: {},
         },
       });
 
-      const { GET } = await import('@/pages/api/health');
-      
-      const mockRequest = new Request('http://localhost:3000/api/health');
+      const { GET } = await import("@/pages/api/health");
+
+      const mockRequest = new Request("http://localhost:3000/api/health");
       const response = await GET({ request: mockRequest } as any);
-      
+
       expect(response.status).toBe(200);
-      
+
       const data = await response.json();
-      expect(data.status).toBe('ok');
+      expect(data.status).toBe("ok");
       expect(data.environment).toBeDefined();
       expect(data.environment.hasSmtpConfig).toBe(false);
       expect(data.environment.hasSupabaseConfig).toBe(false);
     });
 
-    it('masks sensitive information properly', async () => {
-      vi.stubGlobal('import', {
+    it("masks sensitive information properly", async () => {
+      vi.stubGlobal("import", {
         meta: {
           env: {
-            SMTP_USER: 'sensitive@email.com',
-            PUBLIC_SUPABASE_URL: 'https://sensitive.supabase.co',
+            SMTP_USER: "sensitive@email.com",
+            PUBLIC_SUPABASE_URL: "https://sensitive.supabase.co",
           },
         },
       });
 
-      const { GET } = await import('@/pages/api/health');
-      
-      const mockRequest = new Request('http://localhost:3000/api/health');
+      const { GET } = await import("@/pages/api/health");
+
+      const mockRequest = new Request("http://localhost:3000/api/health");
       const response = await GET({ request: mockRequest } as any);
-      
+
       const data = await response.json();
-      
+
       // Should mask the email but show it's configured
-      expect(data.environment.smtpUser).not.toBe('sensitive@email.com');
-      expect(data.environment.smtpUser).toContain('sen...');
+      expect(data.environment.smtpUser).not.toBe("sensitive@email.com");
+      expect(data.environment.smtpUser).toContain("sen...");
     });
 
-    it('handles different NODE_ENV values', async () => {
-      const environments = ['development', 'production', 'test', undefined, ''];
+    it("handles different NODE_ENV values", async () => {
+      const environments = ["development", "production", "test", undefined, ""];
 
       for (const env of environments) {
         vi.resetModules();
-        vi.stubGlobal('import', {
+        vi.stubGlobal("import", {
           meta: {
             env: {
               NODE_ENV: env,
-              MODE: env || 'development',
+              MODE: env || "development",
             },
           },
         });
 
-        const { GET } = await import('@/pages/api/health');
-        
-        const mockRequest = new Request('http://localhost:3000/api/health');
+        const { GET } = await import("@/pages/api/health");
+
+        const mockRequest = new Request("http://localhost:3000/api/health");
         const response = await GET({ request: mockRequest } as any);
-        
+
         expect(response.status).toBe(200);
-        
+
         const data = await response.json();
         expect(data.environment.NODE_ENV).toBeDefined();
       }
     });
 
-    it('includes CORS headers', async () => {
-      vi.stubGlobal('import', {
+    it("includes CORS headers", async () => {
+      vi.stubGlobal("import", {
         meta: {
           env: {
-            NODE_ENV: 'test',
+            NODE_ENV: "test",
           },
         },
       });
 
-      const { GET } = await import('@/pages/api/health');
-      
-      const mockRequest = new Request('http://localhost:3000/api/health');
+      const { GET } = await import("@/pages/api/health");
+
+      const mockRequest = new Request("http://localhost:3000/api/health");
       const response = await GET({ request: mockRequest } as any);
-      
+
       // Should include appropriate headers
-      expect(response.headers.get('Content-Type')).toContain('application/json');
+      expect(response.headers.get("Content-Type")).toContain(
+        "application/json",
+      );
     });
 
-    it('validates timestamp format', async () => {
-      vi.stubGlobal('import', {
+    it("validates timestamp format", async () => {
+      vi.stubGlobal("import", {
         meta: {
           env: {
-            NODE_ENV: 'test',
+            NODE_ENV: "test",
           },
         },
       });
 
-      const { GET } = await import('@/pages/api/health');
-      
-      const mockRequest = new Request('http://localhost:3000/api/health');
+      const { GET } = await import("@/pages/api/health");
+
+      const mockRequest = new Request("http://localhost:3000/api/health");
       const response = await GET({ request: mockRequest } as any);
-      
+
       const data = await response.json();
-      
+
       // Timestamp should be valid ISO string
       expect(data.timestamp).toBeDefined();
       expect(() => new Date(data.timestamp)).not.toThrow();
-      
+
       const parsedDate = new Date(data.timestamp);
-      expect(parsedDate.toString()).not.toBe('Invalid Date');
+      expect(parsedDate.toString()).not.toBe("Invalid Date");
     });
   });
 
-  describe('Configuration Detection', () => {
-    it('detects SMTP configuration presence', async () => {
+  describe("Configuration Detection", () => {
+    it("detects SMTP configuration presence", async () => {
       const testCases = [
-        { user: 'test@example.com', pass: 'password', expected: true },
-        { user: 'test@example.com', pass: '', expected: false },
-        { user: '', pass: 'password', expected: false },
-        { user: '', pass: '', expected: false },
+        { user: "test@example.com", pass: "password", expected: true },
+        { user: "test@example.com", pass: "", expected: false },
+        { user: "", pass: "password", expected: false },
+        { user: "", pass: "", expected: false },
       ];
 
       for (const testCase of testCases) {
         vi.resetModules();
-        vi.stubGlobal('import', {
+        vi.stubGlobal("import", {
           meta: {
             env: {
               SMTP_USER: testCase.user,
@@ -208,27 +212,27 @@ describe('/api/health - Simple Coverage Tests', () => {
           },
         });
 
-        const { GET } = await import('@/pages/api/health');
-        
-        const mockRequest = new Request('http://localhost:3000/api/health');
+        const { GET } = await import("@/pages/api/health");
+
+        const mockRequest = new Request("http://localhost:3000/api/health");
         const response = await GET({ request: mockRequest } as any);
-        
+
         const data = await response.json();
         expect(data.environment.hasSmtpConfig).toBe(testCase.expected);
       }
     });
 
-    it('detects Supabase configuration presence', async () => {
+    it("detects Supabase configuration presence", async () => {
       const testCases = [
-        { url: 'https://test.supabase.co', key: 'test-key', expected: true },
-        { url: 'https://test.supabase.co', key: '', expected: false },
-        { url: '', key: 'test-key', expected: false },
-        { url: '', key: '', expected: false },
+        { url: "https://test.supabase.co", key: "test-key", expected: true },
+        { url: "https://test.supabase.co", key: "", expected: false },
+        { url: "", key: "test-key", expected: false },
+        { url: "", key: "", expected: false },
       ];
 
       for (const testCase of testCases) {
         vi.resetModules();
-        vi.stubGlobal('import', {
+        vi.stubGlobal("import", {
           meta: {
             env: {
               PUBLIC_SUPABASE_URL: testCase.url,
@@ -237,11 +241,11 @@ describe('/api/health - Simple Coverage Tests', () => {
           },
         });
 
-        const { GET } = await import('@/pages/api/health');
-        
-        const mockRequest = new Request('http://localhost:3000/api/health');
+        const { GET } = await import("@/pages/api/health");
+
+        const mockRequest = new Request("http://localhost:3000/api/health");
         const response = await GET({ request: mockRequest } as any);
-        
+
         const data = await response.json();
         expect(data.environment.hasSupabaseConfig).toBe(testCase.expected);
       }

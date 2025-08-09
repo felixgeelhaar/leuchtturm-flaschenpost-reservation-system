@@ -5,6 +5,7 @@ This document provides comprehensive information about the testing infrastructur
 ## 📋 Overview
 
 The testing setup includes:
+
 - **Unit Tests**: Component and utility function testing with Vitest + Vue Test Utils
 - **Integration Tests**: API endpoint and service integration testing
 - **E2E Tests**: Complete user workflow testing with Playwright
@@ -76,17 +77,17 @@ npm run test:coverage
 Create unit tests in `tests/unit/` directory:
 
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { mountComponent } from '../../helpers/vue-test-utils';
-import MyComponent from '@/components/MyComponent.vue';
+import { describe, it, expect } from "vitest";
+import { mountComponent } from "../../helpers/vue-test-utils";
+import MyComponent from "@/components/MyComponent.vue";
 
-describe('MyComponent', () => {
-  it('should render correctly', () => {
+describe("MyComponent", () => {
+  it("should render correctly", () => {
     const wrapper = mountComponent(MyComponent, {
-      props: { title: 'Test Title' }
+      props: { title: "Test Title" },
     });
-    
-    expect(wrapper.text()).toContain('Test Title');
+
+    expect(wrapper.text()).toContain("Test Title");
   });
 });
 ```
@@ -96,19 +97,20 @@ describe('MyComponent', () => {
 Create integration tests in `tests/integration/` directory:
 
 ```typescript
-import { describe, it, expect } from 'vitest';
-import { apiTestUtils } from '../../helpers/api-test-utils';
+import { describe, it, expect } from "vitest";
+import { apiTestUtils } from "../../helpers/api-test-utils";
 
-describe('API Integration', () => {
-  it('should handle API requests', async () => {
-    const mockApi = apiTestUtils.createMockApi()
-      .success('GET', '/api/test', { data: 'test' });
+describe("API Integration", () => {
+  it("should handle API requests", async () => {
+    const mockApi = apiTestUtils
+      .createMockApi()
+      .success("GET", "/api/test", { data: "test" });
     mockApi.apply();
-    
-    const response = await fetch('/api/test');
+
+    const response = await fetch("/api/test");
     const result = await response.json();
-    
-    expect(result.data).toBe('test');
+
+    expect(result.data).toBe("test");
   });
 });
 ```
@@ -118,13 +120,13 @@ describe('API Integration', () => {
 Create E2E tests in `tests/e2e/` directory:
 
 ```typescript
-import { test, expect } from '@playwright/test';
-import { ReservationFormHelpers } from './utils/test-helpers';
+import { test, expect } from "@playwright/test";
+import { ReservationFormHelpers } from "./utils/test-helpers";
 
-test('should complete reservation flow', async ({ page }) => {
+test("should complete reservation flow", async ({ page }) => {
   const form = new ReservationFormHelpers(page);
-  
-  await page.goto('/');
+
+  await page.goto("/");
   await form.fillCompletePickupForm();
   await form.submitForm();
   await form.expectSuccessMessage();
@@ -170,29 +172,30 @@ Test data is now defined inline within each test file to avoid mock dependencies
 ```typescript
 // Example from database.test.ts
 const mockUser = {
-  id: 'user-123',
-  email: 'test@example.com',
-  firstName: 'Test',
-  lastName: 'User',
-  phone: '+49123456789',
-  createdAt: '2024-01-01T00:00:00Z'
+  id: "user-123",
+  email: "test@example.com",
+  firstName: "Test",
+  lastName: "User",
+  phone: "+49123456789",
+  createdAt: "2024-01-01T00:00:00Z",
 };
 
 const validFormDataPickup = {
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@example.com',
-  magazineId: '123e4567-e89b-12d3-a456-426614174000',
+  firstName: "John",
+  lastName: "Doe",
+  email: "john@example.com",
+  magazineId: "123e4567-e89b-12d3-a456-426614174000",
   quantity: 1,
-  deliveryMethod: 'pickup',
-  pickupLocation: 'Berlin Mitte',
-  consents: { essential: true }
+  deliveryMethod: "pickup",
+  pickupLocation: "Berlin Mitte",
+  consents: { essential: true },
 };
 ```
 
 ### Production-Ready Approach
 
 This approach ensures:
+
 - **No mock dependencies**: Tests are self-contained with inline data
 - **Production readiness**: No mock files or demo data in the codebase
 - **Test isolation**: Each test defines its own required data
@@ -211,6 +214,7 @@ The project targets >80% test coverage with specific thresholds:
 ### Coverage Reports
 
 Coverage reports are generated in `coverage/` directory:
+
 - `coverage/index.html`: Interactive HTML report
 - `coverage/lcov.info`: LCOV format for CI/CD
 - `coverage/junit.xml`: JUnit format for test results
@@ -223,6 +227,7 @@ Main config: `vitest.config.ts`
 Integration config: `vitest.config.integration.ts`
 
 Key features:
+
 - Vue SFC support
 - TypeScript integration
 - Path alias resolution
@@ -234,6 +239,7 @@ Key features:
 Config: `playwright.config.ts`
 
 Features:
+
 - Multi-browser testing (Chrome, Firefox, Safari)
 - Mobile device simulation
 - Screenshot and video capture
@@ -243,6 +249,7 @@ Features:
 ### TypeScript Configuration
 
 Tests are included in `tsconfig.json` with:
+
 - Vitest globals
 - Playwright types
 - Test directory includes
@@ -267,6 +274,7 @@ Package.json includes optimized test scripts:
 ### GitHub Actions Ready
 
 Tests are configured for CI/CD with:
+
 - Parallel test execution
 - Artifact collection (screenshots, videos)
 - Coverage reporting
@@ -308,20 +316,20 @@ npx playwright show-report
 ### Component Testing Pattern
 
 ```typescript
-describe('Component Name', () => {
-  describe('Rendering', () => {
+describe("Component Name", () => {
+  describe("Rendering", () => {
     // Test what gets rendered
   });
-  
-  describe('User Interactions', () => {
+
+  describe("User Interactions", () => {
     // Test user events and responses
   });
-  
-  describe('Props and Events', () => {
+
+  describe("Props and Events", () => {
     // Test component API
   });
-  
-  describe('Edge Cases', () => {
+
+  describe("Edge Cases", () => {
     // Test error conditions and boundaries
   });
 });
@@ -330,20 +338,20 @@ describe('Component Name', () => {
 ### API Testing Pattern
 
 ```typescript
-describe('API Endpoint', () => {
-  describe('Success Cases', () => {
+describe("API Endpoint", () => {
+  describe("Success Cases", () => {
     // Test happy path scenarios
   });
-  
-  describe('Validation', () => {
+
+  describe("Validation", () => {
     // Test input validation
   });
-  
-  describe('Error Handling', () => {
+
+  describe("Error Handling", () => {
     // Test error responses
   });
-  
-  describe('Security', () => {
+
+  describe("Security", () => {
     // Test authentication, authorization
   });
 });
@@ -352,16 +360,16 @@ describe('API Endpoint', () => {
 ### E2E Testing Pattern
 
 ```typescript
-test.describe('Feature Name', () => {
-  test('happy path @smoke', async ({ page }) => {
+test.describe("Feature Name", () => {
+  test("happy path @smoke", async ({ page }) => {
     // Test main user journey
   });
-  
-  test('error scenarios', async ({ page }) => {
+
+  test("error scenarios", async ({ page }) => {
     // Test error handling
   });
-  
-  test('edge cases', async ({ page }) => {
+
+  test("edge cases", async ({ page }) => {
     // Test boundary conditions
   });
 });

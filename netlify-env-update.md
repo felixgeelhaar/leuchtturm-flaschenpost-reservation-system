@@ -5,6 +5,7 @@
 Please add or update the following environment variables in your Netlify project settings:
 
 ### SMTP Configuration (Email Service)
+
 ```
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -15,6 +16,7 @@ SMTP_FROM=leuchtturm.elternbeirat@gmail.com
 ```
 
 ### Supabase Configuration
+
 ```
 PUBLIC_SUPABASE_URL=(keep your existing value)
 PUBLIC_SUPABASE_ANON_KEY=(keep your existing value)
@@ -39,5 +41,6 @@ SUPABASE_SERVICE_ROLE_KEY=(keep your existing value)
 ## Testing After Deployment
 
 Once deployed, you can test the configuration by:
+
 1. Visiting `/api/health` to check if services are configured
 2. Creating a test reservation to verify email sending works

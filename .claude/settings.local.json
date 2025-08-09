@@ -40,7 +40,9 @@
       "mcp__github__get_workflow_run",
       "Bash(npm outdated)",
       "Bash(gh run view:*)",
-      "Bash(npm run lint:*)"
+      "Bash(npm run lint:*)",
+      "Bash(npm run format:check:*)",
+      "Bash(npm run format:*)"
     ],
     "deny": []
   }

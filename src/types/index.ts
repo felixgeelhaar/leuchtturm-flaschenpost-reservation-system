@@ -45,7 +45,7 @@ export interface Reservation {
   quantity: number;
   status: ReservationStatus;
   reservationDate: string;
-  deliveryMethod: 'pickup' | 'shipping';
+  deliveryMethod: "pickup" | "shipping";
   pickupDate?: string;
   pickupLocation?: string;
   paymentMethod?: string;
@@ -63,14 +63,19 @@ export interface Reservation {
   expiresAt: string;
 }
 
-export type ReservationStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'expired';
+export type ReservationStatus =
+  | "pending"
+  | "confirmed"
+  | "cancelled"
+  | "completed"
+  | "expired";
 
 // Picture claim tracking
 export interface PictureClaim {
   id: string;
   familyEmail: string; // Email used to identify family
   groupName: string; // Which kindergarten group
-  pictureType: 'group' | 'vorschul';
+  pictureType: "group" | "vorschul";
   childName: string;
   claimedAt: string;
   reservationId: string; // Link to the reservation
@@ -85,8 +90,8 @@ export interface ReservationFormData {
   quantity: number;
   pickupLocation: string;
   pickupDate?: string;
-  deliveryMethod: 'pickup' | 'shipping';
-  paymentMethod?: 'paypal' | '';
+  deliveryMethod: "pickup" | "shipping";
+  paymentMethod?: "paypal" | "";
   notes?: string;
   consents: ConsentData;
   // Picture order fields
@@ -99,10 +104,10 @@ export interface ReservationFormData {
 
 // GDPR Consent Types
 export interface ConsentData {
-  essential: boolean;        // Required for service
-  functional: boolean;       // Enhanced functionality  
-  analytics: boolean;        // Usage analytics
-  marketing: boolean;        // Marketing communications
+  essential: boolean; // Required for service
+  functional: boolean; // Enhanced functionality
+  analytics: boolean; // Usage analytics
+  marketing: boolean; // Marketing communications
 }
 
 export interface ConsentRecord {
@@ -129,29 +134,29 @@ export interface DataProcessingLog {
   details?: string;
 }
 
-export type DataProcessingAction = 
-  | 'created' 
-  | 'updated' 
-  | 'accessed' 
-  | 'exported' 
-  | 'deleted'
-  | 'consent_given'
-  | 'consent_withdrawn'
-  | 'reservation_created'
-  | 'reservation_updated'
-  | 'reservation_cancelled';
+export type DataProcessingAction =
+  | "created"
+  | "updated"
+  | "accessed"
+  | "exported"
+  | "deleted"
+  | "consent_given"
+  | "consent_withdrawn"
+  | "reservation_created"
+  | "reservation_updated"
+  | "reservation_cancelled";
 
-export type DataType = 
-  | 'user_data' 
-  | 'reservation' 
-  | 'consent'
-  | 'processing_log';
+export type DataType =
+  | "user_data"
+  | "reservation"
+  | "consent"
+  | "processing_log";
 
-export type LegalBasis = 
-  | 'consent' 
-  | 'contract' 
-  | 'legitimate_interest'
-  | 'user_request';
+export type LegalBasis =
+  | "consent"
+  | "contract"
+  | "legitimate_interest"
+  | "user_request";
 
 // API Response Types
 export interface ApiResponse<T> {
@@ -187,31 +192,31 @@ export interface FormState {
 
 // Environment Variables
 export interface EnvironmentConfig {
-  NODE_ENV: 'development' | 'production' | 'test';
+  NODE_ENV: "development" | "production" | "test";
   SITE_URL: string;
-  
+
   // Supabase
   PUBLIC_SUPABASE_URL: string;
   PUBLIC_SUPABASE_ANON_KEY: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
-  
+
   // Security
   JWT_SECRET: string;
   SESSION_SECRET: string;
   ENCRYPTION_KEY: string;
   CSRF_SECRET: string;
-  
+
   // Email
   SMTP_HOST?: string;
   SMTP_PORT?: string;
   SMTP_USER?: string;
   SMTP_PASS?: string;
   SMTP_FROM?: string;
-  
+
   // Monitoring
   SENTRY_DSN?: string;
   GA_MEASUREMENT_ID?: string;
-  
+
   // Features
   ENABLE_ANALYTICS: boolean;
   ENABLE_MONITORING: boolean;
@@ -220,7 +225,8 @@ export interface EnvironmentConfig {
 
 // Utility Types
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-export type RequiredOnly<T, K extends keyof T> = Pick<T, K> & Partial<Omit<T, K>>;
+export type RequiredOnly<T, K extends keyof T> = Pick<T, K> &
+  Partial<Omit<T, K>>;
 
 // Event Types for Analytics
 export interface AnalyticsEvent {
@@ -258,28 +264,28 @@ export interface Database {
     Tables: {
       users: {
         Row: User;
-        Insert: Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
-        Update: Partial<Omit<User, 'id' | 'createdAt'>>;
+        Insert: Omit<User, "id" | "createdAt" | "updatedAt">;
+        Update: Partial<Omit<User, "id" | "createdAt">>;
       };
       magazines: {
         Row: Magazine;
-        Insert: Omit<Magazine, 'id' | 'createdAt' | 'updatedAt'>;
-        Update: Partial<Omit<Magazine, 'id' | 'createdAt'>>;
+        Insert: Omit<Magazine, "id" | "createdAt" | "updatedAt">;
+        Update: Partial<Omit<Magazine, "id" | "createdAt">>;
       };
       reservations: {
         Row: Reservation;
-        Insert: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt'>;
-        Update: Partial<Omit<Reservation, 'id' | 'createdAt'>>;
+        Insert: Omit<Reservation, "id" | "createdAt" | "updatedAt">;
+        Update: Partial<Omit<Reservation, "id" | "createdAt">>;
       };
       user_consents: {
         Row: ConsentRecord;
-        Insert: Omit<ConsentRecord, 'id'>;
-        Update: Partial<Omit<ConsentRecord, 'id'>>;
+        Insert: Omit<ConsentRecord, "id">;
+        Update: Partial<Omit<ConsentRecord, "id">>;
       };
       data_processing_logs: {
         Row: DataProcessingLog;
-        Insert: Omit<DataProcessingLog, 'id'>;
-        Update: Partial<Omit<DataProcessingLog, 'id'>>;
+        Insert: Omit<DataProcessingLog, "id">;
+        Update: Partial<Omit<DataProcessingLog, "id">>;
       };
     };
   };

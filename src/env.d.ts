@@ -1,7 +1,12 @@
-import '../.astro/types.d.ts';
+/// <reference path="../.astro/types.d.ts" />
+import "../.astro/types.d.ts";
 
-declare module '*.vue' {
-  import type { DefineComponent } from 'vue';
-  const component: DefineComponent<Record<string, never>, Record<string, never>, unknown>;
+declare module "*.vue" {
+  import type { DefineComponent } from "vue";
+  const component: DefineComponent<
+    Record<string, never>,
+    Record<string, never>,
+    unknown
+  >;
   export default component;
 }

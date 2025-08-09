@@ -14,34 +14,34 @@
   --ocean-deep: #29b6f6;
   --ocean-dark: #0288d1;
   --ocean-night: #01579b;
-  
+
   /* Sandy Beach - Warm accent colors */
   --sand-light: #fff8e1;
   --sand-warm: #ffe0b2;
   --sand-golden: #ffcc80;
   --sand-sunset: #ffb74d;
   --sand-deep: #ff9800;
-  
+
   /* Lighthouse Red - Alert/Highlight colors */
   --lighthouse-red: #ef5350;
   --lighthouse-red-light: #ffcdd2;
   --lighthouse-beam: #fff59d;
-  
+
   /* Sea Foam - Success colors */
   --seafoam-light: #e0f2f1;
   --seafoam-medium: #80cbc4;
   --seafoam-deep: #26a69a;
-  
+
   /* Ship Wood - Neutral tones */
   --wood-light: #efebe9;
   --wood-medium: #8d6e63;
   --wood-dark: #5d4037;
-  
+
   /* Sky Colors - Background gradients */
   --sky-dawn: #fce4ec;
   --sky-day: #e3f2fd;
   --sky-dusk: #f3e5f5;
-  
+
   /* Nautical Shadows */
   --wave-shadow: 0 4px 6px rgba(41, 182, 246, 0.1);
   --ship-shadow: 0 8px 16px rgba(93, 64, 55, 0.15);
@@ -59,13 +59,13 @@
 }
 
 .nautical-bg::before {
-  content: '';
+  content: "";
   position: fixed;
   width: 100%;
   height: 100%;
   top: 0;
   left: 0;
-  background-image: 
+  background-image:
     radial-gradient(circle at 20% 80%, #e0f2fe 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, #fff8e1 0%, transparent 50%),
     radial-gradient(circle at 40% 40%, #f0f9ff 0%, transparent 50%);
@@ -96,25 +96,32 @@
 }
 
 .wave-1 {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2393c5fd' fill-opacity='0.3' d='M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2393c5fd' fill-opacity='0.3' d='M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E")
+    repeat-x;
   animation: wave 10s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
 }
 
 .wave-2 {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23bae6fd' fill-opacity='0.25' d='M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,197.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23bae6fd' fill-opacity='0.25' d='M0,96L48,112C96,128,192,160,288,186.7C384,213,480,235,576,213.3C672,192,768,128,864,128C960,128,1056,192,1152,197.3C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E")
+    repeat-x;
   animation: wave 12s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
   animation-delay: -5s;
 }
 
 .wave-3 {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23e0f2fe' fill-opacity='0.2' d='M0,64L48,85.3C96,107,192,149,288,154.7C384,160,480,128,576,128C672,128,768,160,864,176C960,192,1056,192,1152,165.3C1248,139,1344,85,1392,58.7L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E") repeat-x;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%23e0f2fe' fill-opacity='0.2' d='M0,64L48,85.3C96,107,192,149,288,154.7C384,160,480,128,576,128C672,128,768,160,864,176C960,192,1056,192,1152,165.3C1248,139,1344,85,1392,58.7L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E")
+    repeat-x;
   animation: wave 15s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
   animation-delay: -2s;
 }
 
 @keyframes wave {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 /* ==================
@@ -126,22 +133,31 @@
 }
 
 .lighthouse-beacon::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -20%;
   left: 50%;
   transform: translateX(-50%);
   width: 200px;
   height: 200px;
-  background: linear-gradient(45deg, transparent 40%, var(--lighthouse-beam) 50%, transparent 60%);
+  background: linear-gradient(
+    45deg,
+    transparent 40%,
+    var(--lighthouse-beam) 50%,
+    transparent 60%
+  );
   animation: lighthouse-rotate 8s linear infinite;
   opacity: 0.3;
   pointer-events: none;
 }
 
 @keyframes lighthouse-rotate {
-  0% { transform: translateX(-50%) rotate(0deg); }
-  100% { transform: translateX(-50%) rotate(360deg); }
+  0% {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  100% {
+    transform: translateX(-50%) rotate(360deg);
+  }
 }
 
 /* ==================
@@ -161,14 +177,26 @@
 }
 
 @keyframes floating {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
 }
 
 @keyframes floatingClouds {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -30px) scale(1.05); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(30px, -30px) scale(1.05);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.95);
+  }
 }
 
 /* ==================
@@ -180,8 +208,13 @@
 }
 
 @keyframes shipRocking {
-  0%, 100% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
 }
 
 /* ==================
@@ -196,7 +229,11 @@
 .bubble {
   position: absolute;
   bottom: -100px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.7) 0%,
+    rgba(255, 255, 255, 0.3) 100%
+  );
   border-radius: 50%;
   opacity: 0.6;
   animation: rise 8s infinite ease-in;
@@ -271,7 +308,7 @@
 }
 
 .nautical-card::before {
-  content: '⚓';
+  content: "⚓";
   position: absolute;
   top: -20px;
   right: -20px;
@@ -292,7 +329,7 @@
 .porthole {
   border-radius: 50%;
   border: 8px solid var(--wood-medium);
-  box-shadow: 
+  box-shadow:
     inset 0 0 20px rgba(0, 0, 0, 0.2),
     0 0 30px rgba(0, 0, 0, 0.3);
   position: relative;
@@ -300,13 +337,17 @@
 }
 
 .porthole::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 10%;
   left: 10%;
   width: 30%;
   height: 30%;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.8) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
 }
 
@@ -319,7 +360,7 @@
 }
 
 .rope-border::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -352,13 +393,18 @@
 }
 
 .btn-nautical::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -384,8 +430,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 /* ==================
@@ -398,7 +449,7 @@
 }
 
 .compass-rose::before {
-  content: '⊹';
+  content: "⊹";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -409,8 +460,12 @@
 }
 
 @keyframes compass-spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 /* ==================
@@ -464,12 +519,24 @@
   animation: swim 10s ease-in-out infinite;
 }
 
-.fish:nth-child(1) { animation-delay: 0s; top: 20%; }
-.fish:nth-child(2) { animation-delay: 3s; top: 50%; font-size: 20px; }
-.fish:nth-child(3) { animation-delay: 5s; top: 70%; font-size: 25px; }
+.fish:nth-child(1) {
+  animation-delay: 0s;
+  top: 20%;
+}
+.fish:nth-child(2) {
+  animation-delay: 3s;
+  top: 50%;
+  font-size: 20px;
+}
+.fish:nth-child(3) {
+  animation-delay: 5s;
+  top: 70%;
+  font-size: 25px;
+}
 
 @keyframes swim {
-  0%, 100% {
+  0%,
+  100% {
     left: -60px;
     transform: scaleX(1);
   }
@@ -502,7 +569,7 @@
 
 .ship-wheel-loader::before,
 .ship-wheel-loader::after {
-  content: '';
+  content: "";
   position: absolute;
   background: var(--wood-dark);
 }
@@ -522,8 +589,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==================
@@ -542,8 +613,13 @@
 }
 
 @keyframes starfish-wiggle {
-  0%, 100% { transform: rotate(15deg) scale(1); }
-  50% { transform: rotate(-15deg) scale(1.1); }
+  0%,
+  100% {
+    transform: rotate(15deg) scale(1);
+  }
+  50% {
+    transform: rotate(-15deg) scale(1.1);
+  }
 }
 
 .shell {
@@ -554,16 +630,28 @@
 }
 
 @keyframes shell-rock {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(5deg); }
-  75% { transform: rotate(-5deg); }
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(5deg);
+  }
+  75% {
+    transform: rotate(-5deg);
+  }
 }
 
 /* ==================
    Nautical Text Effects
    ================== */
 .text-wave {
-  background: linear-gradient(90deg, var(--ocean-dark), var(--ocean-medium), var(--ocean-dark));
+  background: linear-gradient(
+    90deg,
+    var(--ocean-dark),
+    var(--ocean-medium),
+    var(--ocean-dark)
+  );
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -572,8 +660,13 @@
 }
 
 @keyframes wave-text {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* ==================
@@ -590,8 +683,13 @@
 }
 
 @keyframes float-ring {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(10deg); }
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(10deg);
+  }
 }
 
 /* ==================
@@ -607,15 +705,24 @@
 }
 
 @keyframes anchor-swing {
-  0%, 100% { transform: rotate(-5deg); }
-  50% { transform: rotate(5deg); }
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
 }
 
 /* ==================
    Message in a Bottle Effect
    ================== */
 .message-bottle {
-  background: linear-gradient(135deg, rgba(255, 251, 235, 0.6), rgba(254, 243, 199, 0.4));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 251, 235, 0.6),
+    rgba(254, 243, 199, 0.4)
+  );
   border: 2px solid #fed7aa;
   border-radius: 15px;
   padding: 20px;
@@ -624,7 +731,7 @@
 }
 
 .message-bottle::before {
-  content: '🍾';
+  content: "🍾";
   position: absolute;
   top: -15px;
   right: 20px;
@@ -636,11 +743,29 @@
    Treasure Map Background
    ================== */
 .treasure-map-bg {
-  background: 
-    linear-gradient(135deg, transparent 25%, rgba(255, 248, 225, 0.1) 25%, rgba(255, 248, 225, 0.1) 50%, transparent 50%, transparent 75%, rgba(255, 248, 225, 0.1) 75%),
-    linear-gradient(45deg, transparent 25%, rgba(255, 236, 179, 0.1) 25%, rgba(255, 236, 179, 0.1) 50%, transparent 50%, transparent 75%, rgba(255, 236, 179, 0.1) 75%);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 25%,
+      rgba(255, 248, 225, 0.1) 25%,
+      rgba(255, 248, 225, 0.1) 50%,
+      transparent 50%,
+      transparent 75%,
+      rgba(255, 248, 225, 0.1) 75%
+    ),
+    linear-gradient(
+      45deg,
+      transparent 25%,
+      rgba(255, 236, 179, 0.1) 25%,
+      rgba(255, 236, 179, 0.1) 50%,
+      transparent 50%,
+      transparent 75%,
+      rgba(255, 236, 179, 0.1) 75%
+    );
   background-size: 50px 50px;
-  background-position: 0 0, 25px 25px;
+  background-position:
+    0 0,
+    25px 25px;
 }
 
 /* ==================
@@ -650,20 +775,20 @@
   .wave-container {
     height: 100px;
   }
-  
+
   .lighthouse-beacon::after {
     width: 150px;
     height: 150px;
   }
-  
+
   .nautical-card::before {
     font-size: 60px;
   }
-  
+
   .seagull {
     font-size: 18px;
   }
-  
+
   .fish {
     font-size: 20px;
   }
@@ -673,20 +798,29 @@
    Accessibility - Reduced Motion
    ================== */
 @media (prefers-reduced-motion: reduce) {
-  .wave-1, .wave-2, .wave-3,
-  .floating, .floating-slow, .floating-delayed,
-  .ship-rock, .bubble, .seagull, .fish,
+  .wave-1,
+  .wave-2,
+  .wave-3,
+  .floating,
+  .floating-slow,
+  .floating-delayed,
+  .ship-rock,
+  .bubble,
+  .seagull,
+  .fish,
   .lighthouse-beacon::after,
   .compass-rose::before,
-  .starfish, .shell,
-  .life-ring, .anchor-decoration {
+  .starfish,
+  .shell,
+  .life-ring,
+  .anchor-decoration {
     animation: none;
   }
-  
+
   .btn-nautical::before {
     transition: none;
   }
-  
+
   .text-wave {
     background-size: 100% 100%;
     animation: none;

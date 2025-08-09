@@ -26,7 +26,12 @@
       "@/utils/*": ["./src/utils/*"],
       "@/styles/*": ["./src/styles/*"]
     },
-    "types": ["vite/client", "@types/node", "vitest/globals", "@playwright/test"],
+    "types": [
+      "vite/client",
+      "@types/node",
+      "vitest/globals",
+      "@playwright/test"
+    ],
     "jsx": "preserve",
     "jsxImportSource": "vue"
   },
@@ -40,10 +45,5 @@
     "vitest.config.ts",
     "playwright.config.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    ".astro",
-    "dimensional-debris"
-  ]
+  "exclude": ["node_modules", "dist", ".astro", "dimensional-debris"]
 }

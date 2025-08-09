@@ -1,24 +1,31 @@
-import type { APIRoute } from 'astro';
-import { createServerSupabaseClient } from '@/lib/supabase';
+import type { APIRoute } from "astro";
+import { createServerSupabaseClient } from "@/lib/supabase";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ url }) => {
   try {
-    const email = url.searchParams.get('email');
+    const email = url.searchParams.get("email");
     if (!email) {
       return new Response(
-        JSON.stringify({ error: 'Email parameter required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } },
+        JSON.stringify({ error: "Email parameter required" }),
+        {
+          status: 400,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        },
       );
     }
 
     const supabase = createServerSupabaseClient();
-    
+
     // Get reservation details
     const { data, error } = await supabase
-      .from('reservations')
-      .select(`
+      .from("reservations")
+      .select(
+        `
         id,
         delivery_method,
         payment_method,
@@ -32,20 +39,27 @@ export const GET: APIRoute = async ({ url }) => {
         child_name,
         status,
         users!inner(email)
-      `)
-      .eq('users.email', email)
-      .order('created_at', { ascending: false })
+      `,
+      )
+      .eq("users.email", email)
+      .order("created_at", { ascending: false })
       .limit(1)
       .single();
 
     if (error) {
       return new Response(
-        JSON.stringify({ 
-          success: false, 
+        JSON.stringify({
+          success: false,
           error: error.message,
-          code: error.code, 
+          code: error.code,
         }),
-        { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } },
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+        },
       );
     }
 
@@ -54,7 +68,10 @@ export const GET: APIRoute = async ({ url }) => {
         success: true,
         reservation: data,
         analysis: {
-          paymentMethodCorrect: data?.delivery_method === 'pickup' ? data?.payment_method === null : data?.payment_method === 'paypal',
+          paymentMethodCorrect:
+            data?.delivery_method === "pickup"
+              ? data?.payment_method === null
+              : data?.payment_method === "paypal",
           pictureFieldsStored: {
             groupPicture: data?.order_group_picture,
             groupName: data?.child_group_name,
@@ -64,19 +81,27 @@ export const GET: APIRoute = async ({ url }) => {
           },
         },
       }),
-      { 
-        status: 200, 
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }, 
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
       },
     );
-    
   } catch (error) {
     return new Response(
       JSON.stringify({
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       }),
-      { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } },
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      },
     );
   }
 };
