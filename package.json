@@ -44,7 +44,7 @@
     "@supabase/supabase-js": "2.54.0",
     "@types/nodemailer": "6.4.17",
     "astro": "5.12.9",
-    "nodemailer": "7.0.5",
+    "nodemailer": "7.0.7",
     "tailwindcss": "3.4.17",
     "vue": "^3.3.0"
   },
