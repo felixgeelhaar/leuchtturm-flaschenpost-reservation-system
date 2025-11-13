@@ -43,7 +43,7 @@
     "@heroicons/vue": "2.2.0",
     "@supabase/supabase-js": "2.54.0",
     "@types/nodemailer": "6.4.17",
-    "astro": "5.12.9",
+    "astro": "5.15.6",
     "nodemailer": "7.0.5",
     "tailwindcss": "3.4.17",
     "vue": "^3.3.0"
