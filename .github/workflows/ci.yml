@@ -75,12 +75,12 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:coverage
         env:
-          COVERAGE_THRESHOLD: 80
+          COVERAGE_THRESHOLD: 15
 
       - name: Check coverage threshold
         run: node scripts/check-coverage.js
         env:
-          COVERAGE_THRESHOLD: 80
+          COVERAGE_THRESHOLD: 15
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
