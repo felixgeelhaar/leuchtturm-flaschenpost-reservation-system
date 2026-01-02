@@ -1,5 +1,5 @@
 // Payment Configuration for Magazine
-import { pricing, payment } from "./content";
+import { pricing, payment } from './content';
 
 export const paymentConfig = {
   // Magazine base price in euros
@@ -31,7 +31,7 @@ export const paymentConfig = {
   // Email templates
   emailTemplates: {
     paypal: {
-      subject: "Ihre Flaschenpost Magazin Reservierung - Zahlungsinformationen",
+      subject: 'Ihre Flaschenpost Magazin Reservierung - Zahlungsinformationen',
       body: `Vielen Dank für Ihre Reservierung!
 
 Ihre Reservierungs-ID: {{reservationId}}
@@ -48,7 +48,7 @@ Mit freundlichen Grüßen
 BRK Haus für Kinder - Leuchtturm`,
     },
     bankTransfer: {
-      subject: "Ihre Flaschenpost Magazin Reservierung - Zahlungsinformationen",
+      subject: 'Ihre Flaschenpost Magazin Reservierung - Zahlungsinformationen',
       body: `Vielen Dank für Ihre Reservierung!
 
 Ihre Reservierungs-ID: {{reservationId}}
@@ -69,7 +69,7 @@ Mit freundlichen Grüßen
 BRK Haus für Kinder - Leuchtturm`,
     },
     confirmation: {
-      subject: "Ihre Flaschenpost Magazin Reservierung - Bestätigung",
+      subject: 'Ihre Flaschenpost Magazin Reservierung - Bestätigung',
       body: `Vielen Dank für Ihre Reservierung!
 
 Ihre Reservierungs-ID: {{reservationId}}
@@ -91,9 +91,9 @@ export function generatePaymentReference(reservationId: string): string {
 
 // Helper function to format currency
 export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("de-DE", {
-    style: "currency",
-    currency: "EUR",
+  return new Intl.NumberFormat('de-DE', {
+    style: 'currency',
+    currency: 'EUR',
   }).format(amount);
 }
 

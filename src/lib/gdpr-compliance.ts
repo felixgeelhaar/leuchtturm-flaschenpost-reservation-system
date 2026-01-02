@@ -1,8 +1,8 @@
 // GDPR Compliance Utilities
-import type { ConsentData, DataProcessingLog, User } from "@/types";
+import type { ConsentData, DataProcessingLog, User } from '@/types';
 
 export class GDPRComplianceManager {
-  private static readonly CONSENT_VERSION = "1.0";
+  private static readonly CONSENT_VERSION = '1.0';
   private static readonly RETENTION_PERIOD_DAYS = 365; // 1 year
 
   // Consent Management
@@ -26,22 +26,22 @@ export class GDPRComplianceManager {
 
     // Store consent in database
     try {
-      const response = await fetch("/api/gdpr/consent", {
-        method: "POST",
+      const response = await fetch('/api/gdpr/consent', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(consentData),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to record consent");
+        throw new Error('Failed to record consent');
       }
 
       // Store locally for quick access
       this.storeLocalConsent(consents);
     } catch (error) {
-      console.error("Failed to record consent:", error);
+      console.error('Failed to record consent:', error);
       throw error;
     }
   }
@@ -51,10 +51,10 @@ export class GDPRComplianceManager {
     consentType: keyof ConsentData,
   ): Promise<void> {
     try {
-      const response = await fetch("/api/gdpr/consent/withdraw", {
-        method: "POST",
+      const response = await fetch('/api/gdpr/consent/withdraw', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
@@ -64,7 +64,7 @@ export class GDPRComplianceManager {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to withdraw consent");
+        throw new Error('Failed to withdraw consent');
       }
 
       // Update local storage
@@ -74,14 +74,14 @@ export class GDPRComplianceManager {
         this.storeLocalConsent(localConsent);
       }
     } catch (error) {
-      console.error("Failed to withdraw consent:", error);
+      console.error('Failed to withdraw consent:', error);
       throw error;
     }
   }
 
   static getLocalConsent(): ConsentData | null {
     try {
-      const stored = localStorage.getItem("gdpr-consent");
+      const stored = localStorage.getItem('gdpr-consent');
       if (!stored) return null;
 
       const parsed = JSON.parse(stored);
@@ -98,7 +98,7 @@ export class GDPRComplianceManager {
 
       return parsed.consents;
     } catch (error) {
-      console.error("Failed to get local consent:", error);
+      console.error('Failed to get local consent:', error);
       return null;
     }
   }
@@ -111,27 +111,27 @@ export class GDPRComplianceManager {
         timestamp: new Date().toISOString(),
       };
 
-      localStorage.setItem("gdpr-consent", JSON.stringify(consentData));
+      localStorage.setItem('gdpr-consent', JSON.stringify(consentData));
     } catch (error) {
-      console.error("Failed to store local consent:", error);
+      console.error('Failed to store local consent:', error);
     }
   }
 
   static clearLocalConsent(): void {
     try {
-      localStorage.removeItem("gdpr-consent");
+      localStorage.removeItem('gdpr-consent');
     } catch (error) {
-      console.error("Failed to clear local consent:", error);
+      console.error('Failed to clear local consent:', error);
     }
   }
 
   // Data Subject Rights
   static async requestDataExport(userId: string): Promise<Blob> {
     try {
-      const response = await fetch("/api/gdpr/export-data", {
-        method: "POST",
+      const response = await fetch('/api/gdpr/export-data', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
@@ -140,25 +140,25 @@ export class GDPRComplianceManager {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to export data");
+        throw new Error('Failed to export data');
       }
 
       return await response.blob();
     } catch (error) {
-      console.error("Failed to export user data:", error);
+      console.error('Failed to export user data:', error);
       throw error;
     }
   }
 
   static async requestDataDeletion(
     userId: string,
-    reason: string = "user_request",
+    reason: string = 'user_request',
   ): Promise<void> {
     try {
-      const response = await fetch("/api/gdpr/delete-data", {
-        method: "DELETE",
+      const response = await fetch('/api/gdpr/delete-data', {
+        method: 'DELETE',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
@@ -168,14 +168,14 @@ export class GDPRComplianceManager {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete data");
+        throw new Error('Failed to delete data');
       }
 
       // Clear local data
       this.clearLocalConsent();
       this.clearLocalUserData();
     } catch (error) {
-      console.error("Failed to delete user data:", error);
+      console.error('Failed to delete user data:', error);
       throw error;
     }
   }
@@ -185,10 +185,10 @@ export class GDPRComplianceManager {
     updates: Partial<User>,
   ): Promise<void> {
     try {
-      const response = await fetch("/api/gdpr/rectify-data", {
-        method: "PATCH",
+      const response = await fetch('/api/gdpr/rectify-data', {
+        method: 'PATCH',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
@@ -198,10 +198,10 @@ export class GDPRComplianceManager {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to rectify data");
+        throw new Error('Failed to rectify data');
       }
     } catch (error) {
-      console.error("Failed to rectify user data:", error);
+      console.error('Failed to rectify user data:', error);
       throw error;
     }
   }
@@ -209,16 +209,16 @@ export class GDPRComplianceManager {
   // Data Processing Logging
   static async logDataProcessing(logEntry: {
     userId?: string;
-    action: DataProcessingLog["action"];
-    dataType: DataProcessingLog["dataType"];
-    legalBasis: DataProcessingLog["legalBasis"];
+    action: DataProcessingLog['action'];
+    dataType: DataProcessingLog['dataType'];
+    legalBasis: DataProcessingLog['legalBasis'];
     details?: any;
   }): Promise<void> {
     try {
-      const response = await fetch("/api/gdpr/log-processing", {
-        method: "POST",
+      const response = await fetch('/api/gdpr/log-processing', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...logEntry,
@@ -230,10 +230,10 @@ export class GDPRComplianceManager {
       });
 
       if (!response.ok) {
-        console.error("Failed to log data processing");
+        console.error('Failed to log data processing');
       }
     } catch (error) {
-      console.error("Failed to log data processing:", error);
+      console.error('Failed to log data processing:', error);
     }
   }
 
@@ -247,7 +247,7 @@ export class GDPRComplianceManager {
       path?: string;
       domain?: string;
       secure?: boolean;
-      sameSite?: "strict" | "lax" | "none";
+      sameSite?: 'strict' | 'lax' | 'none';
       httpOnly?: boolean;
     } = {},
   ): void {
@@ -270,20 +270,20 @@ export class GDPRComplianceManager {
       cookieString += `; max-age=${options.maxAge}`;
     }
 
-    cookieString += `; path=${options.path || "/"}`;
+    cookieString += `; path=${options.path || '/'}`;
 
     if (options.domain) {
       cookieString += `; domain=${options.domain}`;
     }
 
-    if (options.secure || window.location.protocol === "https:") {
-      cookieString += "; secure";
+    if (options.secure || window.location.protocol === 'https:') {
+      cookieString += '; secure';
     }
 
-    cookieString += `; samesite=${options.sameSite || "lax"}`;
+    cookieString += `; samesite=${options.sameSite || 'lax'}`;
 
     if (options.httpOnly) {
-      cookieString += "; httponly";
+      cookieString += '; httponly';
     }
 
     document.cookie = cookieString;
@@ -297,10 +297,10 @@ export class GDPRComplianceManager {
       return null;
     }
 
-    const cookies = document.cookie.split(";");
+    const cookies = document.cookie.split(';');
 
     for (const cookie of cookies) {
-      const [cookieName, cookieValue] = cookie.trim().split("=");
+      const [cookieName, cookieValue] = cookie.trim().split('=');
       if (decodeURIComponent(cookieName) === name) {
         return decodeURIComponent(cookieValue);
       }
@@ -309,7 +309,7 @@ export class GDPRComplianceManager {
     return null;
   }
 
-  static deleteCookie(name: string, path: string = "/", domain?: string): void {
+  static deleteCookie(name: string, path: string = '/', domain?: string): void {
     let cookieString = `${encodeURIComponent(name)}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=${path}`;
 
     if (domain) {
@@ -330,7 +330,7 @@ export class GDPRComplianceManager {
 
     // Truncate long text fields
     if (sanitized.notes && sanitized.notes.length > 500) {
-      sanitized.notes = sanitized.notes.substring(0, 500) + "...";
+      sanitized.notes = sanitized.notes.substring(0, 500) + '...';
     }
 
     return sanitized;
@@ -341,23 +341,23 @@ export class GDPRComplianceManager {
 
     // Replace identifying information with anonymous placeholders
     if (anonymized.email) {
-      anonymized.email = "anonymized@example.com";
+      anonymized.email = 'anonymized@example.com';
     }
 
     if (anonymized.firstName) {
-      anonymized.firstName = "Anonymous";
+      anonymized.firstName = 'Anonymous';
     }
 
     if (anonymized.lastName) {
-      anonymized.lastName = "User";
+      anonymized.lastName = 'User';
     }
 
     if (anonymized.phone) {
-      anonymized.phone = "+49 XXX XXXXXXX";
+      anonymized.phone = '+49 XXX XXXXXXX';
     }
 
     // Keep non-identifying fields for analytics
-    const keepFields = ["id", "createdAt", "updatedAt", "country", "ageGroup"];
+    const keepFields = ['id', 'createdAt', 'updatedAt', 'country', 'ageGroup'];
     const filtered: any = {};
 
     keepFields.forEach((field) => {
@@ -373,18 +373,18 @@ export class GDPRComplianceManager {
   private static getCookieType(cookieName: string): keyof ConsentData {
     // Map cookie names to consent types
     const cookieTypeMap: Record<string, keyof ConsentData> = {
-      session: "essential",
-      csrf: "essential",
-      auth: "essential",
-      preferences: "functional",
-      language: "functional",
-      theme: "functional",
-      analytics: "analytics",
-      ga: "analytics",
-      gtag: "analytics",
-      marketing: "marketing",
-      ads: "marketing",
-      facebook: "marketing",
+      session: 'essential',
+      csrf: 'essential',
+      auth: 'essential',
+      preferences: 'functional',
+      language: 'functional',
+      theme: 'functional',
+      analytics: 'analytics',
+      ga: 'analytics',
+      gtag: 'analytics',
+      marketing: 'marketing',
+      ads: 'marketing',
+      facebook: 'marketing',
     };
 
     // Check if cookie name contains any of the mapped types
@@ -395,7 +395,7 @@ export class GDPRComplianceManager {
     }
 
     // Default to functional for unknown cookies
-    return "functional";
+    return 'functional';
   }
 
   private static hasConsentForCookieType(
@@ -404,7 +404,7 @@ export class GDPRComplianceManager {
   ): boolean {
     if (!consent) {
       // Only allow essential cookies without explicit consent
-      return cookieType === "essential";
+      return cookieType === 'essential';
     }
 
     return consent[cookieType] === true;
@@ -413,7 +413,7 @@ export class GDPRComplianceManager {
   private static getClientIP(): string {
     // This would typically be set by the server and passed to the client
     // For client-side, we can't reliably get the real IP
-    return "client-side-unknown";
+    return 'client-side-unknown';
   }
 
   private static clearLocalUserData(): void {
@@ -425,9 +425,9 @@ export class GDPRComplianceManager {
         const key = localStorage.key(i);
         if (
           key &&
-          (key.includes("user") ||
-            key.includes("reservation") ||
-            key.includes("session"))
+          (key.includes('user') ||
+            key.includes('reservation') ||
+            key.includes('session'))
         ) {
           keysToRemove.push(key);
         }
@@ -435,7 +435,7 @@ export class GDPRComplianceManager {
 
       keysToRemove.forEach((key) => localStorage.removeItem(key));
     } catch (error) {
-      console.error("Failed to clear local user data:", error);
+      console.error('Failed to clear local user data:', error);
     }
   }
 
@@ -446,30 +446,30 @@ export class GDPRComplianceManager {
     legalBasis: string,
   ): boolean {
     const validActions = [
-      "created",
-      "updated",
-      "accessed",
-      "exported",
-      "deleted",
-      "consent_given",
-      "consent_withdrawn",
-      "reservation_created",
-      "reservation_updated",
-      "reservation_cancelled",
+      'created',
+      'updated',
+      'accessed',
+      'exported',
+      'deleted',
+      'consent_given',
+      'consent_withdrawn',
+      'reservation_created',
+      'reservation_updated',
+      'reservation_cancelled',
     ];
 
     const validDataTypes = [
-      "user_data",
-      "reservation",
-      "consent",
-      "processing_log",
+      'user_data',
+      'reservation',
+      'consent',
+      'processing_log',
     ];
 
     const validLegalBases = [
-      "consent",
-      "contract",
-      "legitimate_interest",
-      "user_request",
+      'consent',
+      'contract',
+      'legitimate_interest',
+      'user_request',
     ];
 
     return (
@@ -495,27 +495,27 @@ export class GDPRComplianceManager {
     description: string;
     affectedUsers: number;
     dataTypes: string[];
-    severity: "low" | "medium" | "high" | "critical";
+    severity: 'low' | 'medium' | 'high' | 'critical';
     containmentMeasures: string;
   }): Promise<void> {
     try {
-      const response = await fetch("/api/gdpr/report-breach", {
-        method: "POST",
+      const response = await fetch('/api/gdpr/report-breach', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           ...breachDetails,
           timestamp: new Date().toISOString(),
-          reportedBy: "system",
+          reportedBy: 'system',
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to report data breach");
+        throw new Error('Failed to report data breach');
       }
     } catch (error) {
-      console.error("Failed to report data breach:", error);
+      console.error('Failed to report data breach:', error);
       throw error;
     }
   }

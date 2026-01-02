@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect } from 'vitest';
 
-describe("Coverage Summary", () => {
-  it("should confirm test suite is running", () => {
+describe('Coverage Summary', () => {
+  it('should confirm test suite is running', () => {
     // This test exists to ensure the test runner works
     expect(true).toBe(true);
   });
 
-  it("should verify coverage targets", () => {
+  it('should verify coverage targets', () => {
     // Based on the project structure and tests we've created:
     // - ErrorMessage component: 100% coverage (17 passing tests)
     // - ConsentBanner component: High coverage (25 passing tests)

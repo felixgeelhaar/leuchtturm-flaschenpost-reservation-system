@@ -1,43 +1,43 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import type { Reservation, User, Magazine } from "@/types";
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import type { Reservation, User, Magazine } from '@/types';
 
 // Unmock the EmailService to test the actual implementation
-vi.unmock("@/lib/email/email-service");
+vi.unmock('@/lib/email/email-service');
 
 // Mock nodemailer - create transporter mock before mocking
 const mockTransporter = {
-  sendMail: vi.fn().mockResolvedValue({ messageId: "test-message-id" }),
+  sendMail: vi.fn().mockResolvedValue({ messageId: 'test-message-id' }),
   verify: vi.fn().mockResolvedValue(true),
 };
 
-vi.mock("nodemailer", () => ({
+vi.mock('nodemailer', () => ({
   default: {
     createTransport: vi.fn(() => mockTransporter),
   },
 }));
 
 // Mock website config modules
-vi.mock("@/config/content", () => ({
+vi.mock('@/config/content', () => ({
   websiteContent: {
     kindergarten: {
-      name: "Test Kindergarten",
+      name: 'Test Kindergarten',
       contact: {
-        email: "info@test.de",
+        email: 'info@test.de',
         address: {
-          street: "Test St. 123",
-          postalCode: "12345",
-          city: "Berlin",
+          street: 'Test St. 123',
+          postalCode: '12345',
+          city: 'Berlin',
         },
       },
     },
     magazine: {
-      title: "Test Magazine",
-      subtitle: "Test Subtitle",
+      title: 'Test Magazine',
+      subtitle: 'Test Subtitle',
     },
     email: {
-      from: "test@example.com",
-      replyTo: "noreply@example.com",
-      signature: "Test Signature",
+      from: 'test@example.com',
+      replyTo: 'noreply@example.com',
+      signature: 'Test Signature',
     },
     pricing: {
       magazinePrice: 5.99,
@@ -46,101 +46,101 @@ vi.mock("@/config/content", () => ({
   },
 }));
 
-vi.mock("@/config/payment", () => ({
+vi.mock('@/config/payment', () => ({
   paymentConfig: {
     paypal: {
       enabled: true,
-      paypalMeLink: "https://paypal.me/test",
+      paypalMeLink: 'https://paypal.me/test',
     },
   },
-  generatePaymentReference: vi.fn(() => "PAY-123456"),
+  generatePaymentReference: vi.fn(() => 'PAY-123456'),
   formatCurrency: vi.fn((amount) => `€${amount.toFixed(2)}`),
 }));
 
 // Mock import.meta.env
-vi.stubGlobal("import", {
+vi.stubGlobal('import', {
   meta: {
     env: {
-      SMTP_HOST: "smtp.test.com",
-      SMTP_PORT: "587",
-      SMTP_SECURE: "false",
-      SMTP_USER: "test@example.com",
-      SMTP_PASS: "password123",
-      SMTP_FROM: "noreply@example.com",
-      MODE: "test",
+      SMTP_HOST: 'smtp.test.com',
+      SMTP_PORT: '587',
+      SMTP_SECURE: 'false',
+      SMTP_USER: 'test@example.com',
+      SMTP_PASS: 'password123',
+      SMTP_FROM: 'noreply@example.com',
+      MODE: 'test',
     },
   },
 });
 
-const { EmailService } = await import("@/lib/email/email-service");
+const { EmailService } = await import('@/lib/email/email-service');
 
-describe("EmailService - Real Implementation", () => {
+describe('EmailService - Real Implementation', () => {
   let emailService: EmailService;
 
   const mockUser: User = {
-    id: "user-123",
-    email: "test@example.com",
-    firstName: "John",
-    lastName: "Doe",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    consentVersion: "1.0",
-    consentTimestamp: "2024-01-01T00:00:00Z",
-    dataRetentionUntil: "2025-01-01T00:00:00Z",
-    lastActivity: "2024-01-01T00:00:00Z",
+    id: 'user-123',
+    email: 'test@example.com',
+    firstName: 'John',
+    lastName: 'Doe',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    consentVersion: '1.0',
+    consentTimestamp: '2024-01-01T00:00:00Z',
+    dataRetentionUntil: '2025-01-01T00:00:00Z',
+    lastActivity: '2024-01-01T00:00:00Z',
   };
 
   const mockMagazine: Magazine = {
-    id: "mag-123",
-    title: "Flaschenpost",
-    issueNumber: "2024-01",
-    publishDate: "2024-01-01T00:00:00Z",
-    description: "Test Magazine",
+    id: 'mag-123',
+    title: 'Flaschenpost',
+    issueNumber: '2024-01',
+    publishDate: '2024-01-01T00:00:00Z',
+    description: 'Test Magazine',
     totalCopies: 100,
     availableCopies: 95,
-    coverImageUrl: "https://example.com/cover.jpg",
+    coverImageUrl: 'https://example.com/cover.jpg',
     isActive: true,
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
   };
 
   const mockReservationPickup: Reservation = {
-    id: "res-123",
-    userId: "user-123",
-    magazineId: "mag-123",
+    id: 'res-123',
+    userId: 'user-123',
+    magazineId: 'mag-123',
     quantity: 1,
-    status: "confirmed",
-    reservationDate: "2024-01-01T00:00:00Z",
-    deliveryMethod: "pickup",
-    pickupDate: "2024-01-15T10:00:00Z",
-    pickupLocation: "Test Kindergarten",
+    status: 'confirmed',
+    reservationDate: '2024-01-01T00:00:00Z',
+    deliveryMethod: 'pickup',
+    pickupDate: '2024-01-15T10:00:00Z',
+    pickupLocation: 'Test Kindergarten',
     paymentMethod: null,
-    consentReference: "consent-123",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    expiresAt: "2024-01-08T00:00:00Z",
+    consentReference: 'consent-123',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    expiresAt: '2024-01-08T00:00:00Z',
   };
 
   const mockReservationShipping: Reservation = {
-    id: "res-124",
-    userId: "user-123",
-    magazineId: "mag-123",
+    id: 'res-124',
+    userId: 'user-123',
+    magazineId: 'mag-123',
     quantity: 1,
-    status: "confirmed",
-    reservationDate: "2024-01-01T00:00:00Z",
-    deliveryMethod: "shipping",
-    paymentMethod: "paypal",
+    status: 'confirmed',
+    reservationDate: '2024-01-01T00:00:00Z',
+    deliveryMethod: 'shipping',
+    paymentMethod: 'paypal',
     shippingAddress: {
-      street: "Test Street",
-      houseNumber: "123",
-      postalCode: "10115",
-      city: "Berlin",
-      country: "DE",
+      street: 'Test Street',
+      houseNumber: '123',
+      postalCode: '10115',
+      city: 'Berlin',
+      country: 'DE',
     },
-    consentReference: "consent-124",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
-    expiresAt: "2024-01-08T00:00:00Z",
+    consentReference: 'consent-124',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
+    expiresAt: '2024-01-08T00:00:00Z',
   };
 
   beforeEach(() => {
@@ -148,15 +148,15 @@ describe("EmailService - Real Implementation", () => {
     mockTransporter.sendMail.mockClear();
     mockTransporter.verify.mockClear();
     mockTransporter.sendMail.mockResolvedValue({
-      messageId: "test-message-id",
+      messageId: 'test-message-id',
     });
     mockTransporter.verify.mockResolvedValue(true);
     emailService = new EmailService({
-      host: "smtp.test.com",
+      host: 'smtp.test.com',
       port: 587,
       secure: false,
-      auth: { user: "test@test.com", pass: "test-pass" },
-      from: "noreply@test.com",
+      auth: { user: 'test@test.com', pass: 'test-pass' },
+      from: 'noreply@test.com',
     });
   });
 
@@ -164,47 +164,47 @@ describe("EmailService - Real Implementation", () => {
     vi.clearAllMocks();
   });
 
-  describe("Email Service Initialization", () => {
-    it("creates email service with default configuration", () => {
+  describe('Email Service Initialization', () => {
+    it('creates email service with default configuration', () => {
       const service = new EmailService({
-        host: "smtp.test.com",
+        host: 'smtp.test.com',
         port: 587,
         secure: false,
-        auth: { user: "test@test.com", pass: "test-pass" },
-        from: "noreply@test.com",
+        auth: { user: 'test@test.com', pass: 'test-pass' },
+        from: 'noreply@test.com',
       });
       expect(service).toBeDefined();
     });
 
-    it("creates email service with custom configuration", () => {
+    it('creates email service with custom configuration', () => {
       const customConfig = {
-        host: "custom.smtp.com",
+        host: 'custom.smtp.com',
         port: 465,
         secure: true,
-        auth: { user: "custom@example.com", pass: "custompass" },
-        from: "custom@example.com",
+        auth: { user: 'custom@example.com', pass: 'custompass' },
+        from: 'custom@example.com',
       };
 
       const customEmailService = new EmailService(customConfig);
       expect(customEmailService).toBeDefined();
     });
 
-    it("handles missing SMTP credentials gracefully", () => {
+    it('handles missing SMTP credentials gracefully', () => {
       expect(
         () =>
           new EmailService({
-            host: "smtp.test.com",
+            host: 'smtp.test.com',
             port: 587,
             secure: false,
-            auth: { user: "", pass: "" },
-            from: "noreply@test.com",
+            auth: { user: '', pass: '' },
+            from: 'noreply@test.com',
           }),
-      ).toThrow("SMTP credentials not configured");
+      ).toThrow('SMTP credentials not configured');
     });
   });
 
-  describe("Connection Verification", () => {
-    it("verifies email connection successfully", async () => {
+  describe('Connection Verification', () => {
+    it('verifies email connection successfully', async () => {
       mockTransporter.verify.mockResolvedValue(true);
 
       await expect(emailService.verifyConnection()).resolves.not.toThrow();
@@ -212,8 +212,8 @@ describe("EmailService - Real Implementation", () => {
       expect(mockTransporter.verify).toHaveBeenCalledTimes(1);
     });
 
-    it("handles connection verification failure", async () => {
-      mockTransporter.verify.mockRejectedValue(new Error("Connection failed"));
+    it('handles connection verification failure', async () => {
+      mockTransporter.verify.mockRejectedValue(new Error('Connection failed'));
 
       await expect(emailService.verifyConnection()).rejects.toThrow();
 
@@ -221,8 +221,8 @@ describe("EmailService - Real Implementation", () => {
     });
   });
 
-  describe("Reservation Confirmation Emails", () => {
-    it("sends pickup confirmation email", async () => {
+  describe('Reservation Confirmation Emails', () => {
+    it('sends pickup confirmation email', async () => {
       await emailService.sendReservationConfirmation({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -233,14 +233,14 @@ describe("EmailService - Real Implementation", () => {
 
       const emailArgs = mockTransporter.sendMail.mock.calls[0][0];
       expect(emailArgs.to).toBe(mockUser.email);
-      expect(emailArgs.subject).toContain("Reservierung");
+      expect(emailArgs.subject).toContain('Reservierung');
       expect(emailArgs.subject).toContain(mockMagazine.title);
-      expect(emailArgs.html).toContain("Abholung");
+      expect(emailArgs.html).toContain('Abholung');
       expect(emailArgs.html).toContain(mockReservationPickup.pickupLocation);
       expect(emailArgs.html).toContain(mockUser.firstName);
     });
 
-    it("sends shipping confirmation email", async () => {
+    it('sends shipping confirmation email', async () => {
       await emailService.sendReservationConfirmation({
         reservation: mockReservationShipping,
         user: mockUser,
@@ -250,12 +250,12 @@ describe("EmailService - Real Implementation", () => {
       expect(mockTransporter.sendMail).toHaveBeenCalledTimes(1);
 
       const emailArgs = mockTransporter.sendMail.mock.calls[0][0];
-      expect(emailArgs.subject).toContain("Reservierung");
-      expect(emailArgs.html).toContain("Versand");
-      expect(emailArgs.html).toContain("PayPal");
+      expect(emailArgs.subject).toContain('Reservierung');
+      expect(emailArgs.html).toContain('Versand');
+      expect(emailArgs.html).toContain('PayPal');
     });
 
-    it("includes reservation details in confirmation email", async () => {
+    it('includes reservation details in confirmation email', async () => {
       await emailService.sendReservationConfirmation({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -263,15 +263,15 @@ describe("EmailService - Real Implementation", () => {
       });
 
       const emailArgs = mockTransporter.sendMail.mock.calls[0][0];
-      expect(emailArgs.html).toContain("RES-123"); // First 8 characters uppercase
+      expect(emailArgs.html).toContain('RES-123'); // First 8 characters uppercase
       expect(emailArgs.html).toContain(mockMagazine.issueNumber);
       expect(emailArgs.html).toContain(
         mockReservationPickup.quantity.toString(),
       );
     });
 
-    it("handles email sending errors", async () => {
-      mockTransporter.sendMail.mockRejectedValue(new Error("Send failed"));
+    it('handles email sending errors', async () => {
+      mockTransporter.sendMail.mockRejectedValue(new Error('Send failed'));
 
       await expect(
         emailService.sendReservationConfirmation({
@@ -279,12 +279,12 @@ describe("EmailService - Real Implementation", () => {
           user: mockUser,
           magazine: mockMagazine,
         }),
-      ).rejects.toThrow("Send failed");
+      ).rejects.toThrow('Send failed');
     });
   });
 
-  describe("Reservation Cancellation Emails", () => {
-    it("sends cancellation email successfully", async () => {
+  describe('Reservation Cancellation Emails', () => {
+    it('sends cancellation email successfully', async () => {
       await emailService.sendCancellationConfirmation({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -295,13 +295,13 @@ describe("EmailService - Real Implementation", () => {
 
       const emailArgs = mockTransporter.sendMail.mock.calls[0][0];
       expect(emailArgs.to).toBe(mockUser.email);
-      expect(emailArgs.subject).toContain("storniert");
-      expect(emailArgs.html).toContain("storniert");
-      expect(emailArgs.html).toContain("RES-123");
+      expect(emailArgs.subject).toContain('storniert');
+      expect(emailArgs.html).toContain('storniert');
+      expect(emailArgs.html).toContain('RES-123');
     });
 
-    it("handles cancellation email errors gracefully", async () => {
-      mockTransporter.sendMail.mockRejectedValue(new Error("Send failed"));
+    it('handles cancellation email errors gracefully', async () => {
+      mockTransporter.sendMail.mockRejectedValue(new Error('Send failed'));
 
       await expect(
         emailService.sendCancellationConfirmation({
@@ -309,12 +309,12 @@ describe("EmailService - Real Implementation", () => {
           user: mockUser,
           magazine: mockMagazine,
         }),
-      ).rejects.toThrow("Failed to send cancellation email");
+      ).rejects.toThrow('Failed to send cancellation email');
     });
   });
 
-  describe("Pickup Reminder Emails", () => {
-    it("sends pickup reminder for pickup reservations", async () => {
+  describe('Pickup Reminder Emails', () => {
+    it('sends pickup reminder for pickup reservations', async () => {
       await emailService.sendPickupReminder({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -324,12 +324,12 @@ describe("EmailService - Real Implementation", () => {
       expect(mockTransporter.sendMail).toHaveBeenCalledTimes(1);
 
       const emailArgs = mockTransporter.sendMail.mock.calls[0][0];
-      expect(emailArgs.subject).toContain("Erinnerung");
-      expect(emailArgs.html).toContain("Abholung");
+      expect(emailArgs.subject).toContain('Erinnerung');
+      expect(emailArgs.html).toContain('Abholung');
       expect(emailArgs.html).toContain(mockReservationPickup.pickupLocation);
     });
 
-    it("sends reminder for all reservations", async () => {
+    it('sends reminder for all reservations', async () => {
       await emailService.sendPickupReminder({
         reservation: mockReservationShipping,
         user: mockUser,
@@ -339,7 +339,7 @@ describe("EmailService - Real Implementation", () => {
       expect(mockTransporter.sendMail).toHaveBeenCalledTimes(1);
     });
 
-    it("sends reminder even when pickup details are missing", async () => {
+    it('sends reminder even when pickup details are missing', async () => {
       const reservationWithoutPickup = {
         ...mockReservationPickup,
         pickupLocation: null,
@@ -356,8 +356,8 @@ describe("EmailService - Real Implementation", () => {
     });
   });
 
-  describe("Email Content Validation", () => {
-    it("includes user name in all emails", async () => {
+  describe('Email Content Validation', () => {
+    it('includes user name in all emails', async () => {
       await emailService.sendReservationConfirmation({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -370,7 +370,7 @@ describe("EmailService - Real Implementation", () => {
       );
     });
 
-    it("includes magazine details in confirmation", async () => {
+    it('includes magazine details in confirmation', async () => {
       await emailService.sendReservationConfirmation({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -382,7 +382,7 @@ describe("EmailService - Real Implementation", () => {
       expect(emailArgs.html).toContain(mockMagazine.issueNumber);
     });
 
-    it("formats dates correctly in emails", async () => {
+    it('formats dates correctly in emails', async () => {
       await emailService.sendReservationConfirmation({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -391,10 +391,10 @@ describe("EmailService - Real Implementation", () => {
 
       const emailArgs = mockTransporter.sendMail.mock.calls[0][0];
       // Should contain some date reference for pickup
-      expect(emailArgs.html).toContain("Termin");
+      expect(emailArgs.html).toContain('Termin');
     });
 
-    it("includes proper HTML structure", async () => {
+    it('includes proper HTML structure', async () => {
       await emailService.sendReservationConfirmation({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -402,12 +402,12 @@ describe("EmailService - Real Implementation", () => {
       });
 
       const emailArgs = mockTransporter.sendMail.mock.calls[0][0];
-      expect(emailArgs.html).toContain("<!DOCTYPE html>");
-      expect(emailArgs.html).toContain("<html");
-      expect(emailArgs.html).toContain("</html>");
+      expect(emailArgs.html).toContain('<!DOCTYPE html>');
+      expect(emailArgs.html).toContain('<html');
+      expect(emailArgs.html).toContain('</html>');
     });
 
-    it("includes text version of emails", async () => {
+    it('includes text version of emails', async () => {
       await emailService.sendReservationConfirmation({
         reservation: mockReservationPickup,
         user: mockUser,
@@ -416,27 +416,27 @@ describe("EmailService - Real Implementation", () => {
 
       const emailArgs = mockTransporter.sendMail.mock.calls[0][0];
       expect(emailArgs.text).toBeDefined();
-      expect(typeof emailArgs.text).toBe("string");
+      expect(typeof emailArgs.text).toBe('string');
       expect(emailArgs.text.length).toBeGreaterThan(0);
     });
   });
 
-  describe("Error Handling", () => {
-    it("throws detailed error on configuration issues", () => {
+  describe('Error Handling', () => {
+    it('throws detailed error on configuration issues', () => {
       expect(() => {
         new EmailService({
-          host: "test.com",
+          host: 'test.com',
           port: 587,
           secure: false,
-          auth: { user: "", pass: "" }, // Empty credentials
-          from: "invalid-email", // Invalid email format
+          auth: { user: '', pass: '' }, // Empty credentials
+          from: 'invalid-email', // Invalid email format
         });
-      }).toThrow("SMTP credentials not configured"); // Should throw on empty credentials
+      }).toThrow('SMTP credentials not configured'); // Should throw on empty credentials
     });
 
-    it("provides helpful error messages on send failure", async () => {
+    it('provides helpful error messages on send failure', async () => {
       mockTransporter.sendMail.mockRejectedValue(
-        new Error("Authentication failed"),
+        new Error('Authentication failed'),
       );
 
       await expect(
@@ -445,7 +445,7 @@ describe("EmailService - Real Implementation", () => {
           user: mockUser,
           magazine: mockMagazine,
         }),
-      ).rejects.toThrow("Authentication failed");
+      ).rejects.toThrow('Authentication failed');
     });
   });
 });

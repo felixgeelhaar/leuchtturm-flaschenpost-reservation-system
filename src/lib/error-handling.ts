@@ -5,7 +5,7 @@
  * for the application.
  */
 
-import { isProduction } from "./config/environment";
+import { isProduction } from './config/environment';
 
 // Error types
 export interface AppError extends Error {
@@ -33,106 +33,106 @@ export interface ErrorReport {
 
 // Error categories for better handling
 export enum ErrorCategory {
-  NETWORK = "network",
-  VALIDATION = "validation",
-  AUTHENTICATION = "authentication",
-  AUTHORIZATION = "authorization",
-  NOT_FOUND = "not_found",
-  SERVER_ERROR = "server_error",
-  CLIENT_ERROR = "client_error",
-  UNKNOWN = "unknown",
+  NETWORK = 'network',
+  VALIDATION = 'validation',
+  AUTHENTICATION = 'authentication',
+  AUTHORIZATION = 'authorization',
+  NOT_FOUND = 'not_found',
+  SERVER_ERROR = 'server_error',
+  CLIENT_ERROR = 'client_error',
+  UNKNOWN = 'unknown',
 }
 
 // Create custom error types
 export class NetworkError extends Error implements AppError {
-  code = "NETWORK_ERROR";
+  code = 'NETWORK_ERROR';
   statusCode = 0;
-  userMessage = "Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.";
+  userMessage = 'Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.';
   category = ErrorCategory.NETWORK;
   timestamp = new Date().toISOString();
   context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
-    this.name = "NetworkError";
+    this.name = 'NetworkError';
     this.context = context;
   }
 }
 
 export class ValidationError extends Error implements AppError {
-  code = "VALIDATION_ERROR";
+  code = 'VALIDATION_ERROR';
   statusCode = 400;
   userMessage =
-    "Die eingegebenen Daten sind ungültig. Bitte überprüfen Sie Ihre Eingaben.";
+    'Die eingegebenen Daten sind ungültig. Bitte überprüfen Sie Ihre Eingaben.';
   category = ErrorCategory.VALIDATION;
   timestamp = new Date().toISOString();
   context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
-    this.name = "ValidationError";
+    this.name = 'ValidationError';
     this.context = context;
   }
 }
 
 export class AuthenticationError extends Error implements AppError {
-  code = "AUTH_ERROR";
+  code = 'AUTH_ERROR';
   statusCode = 401;
   userMessage =
-    "Authentifizierung fehlgeschlagen. Bitte melden Sie sich erneut an.";
+    'Authentifizierung fehlgeschlagen. Bitte melden Sie sich erneut an.';
   category = ErrorCategory.AUTHENTICATION;
   timestamp = new Date().toISOString();
   context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
-    this.name = "AuthenticationError";
+    this.name = 'AuthenticationError';
     this.context = context;
   }
 }
 
 export class AuthorizationError extends Error implements AppError {
-  code = "AUTHORIZATION_ERROR";
+  code = 'AUTHORIZATION_ERROR';
   statusCode = 403;
-  userMessage = "Sie haben keine Berechtigung für diese Aktion.";
+  userMessage = 'Sie haben keine Berechtigung für diese Aktion.';
   category = ErrorCategory.AUTHORIZATION;
   timestamp = new Date().toISOString();
   context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
-    this.name = "AuthorizationError";
+    this.name = 'AuthorizationError';
     this.context = context;
   }
 }
 
 export class NotFoundError extends Error implements AppError {
-  code = "NOT_FOUND";
+  code = 'NOT_FOUND';
   statusCode = 404;
-  userMessage = "Die angeforderte Ressource wurde nicht gefunden.";
+  userMessage = 'Die angeforderte Ressource wurde nicht gefunden.';
   category = ErrorCategory.NOT_FOUND;
   timestamp = new Date().toISOString();
   context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
-    this.name = "NotFoundError";
+    this.name = 'NotFoundError';
     this.context = context;
   }
 }
 
 export class ServerError extends Error implements AppError {
-  code = "SERVER_ERROR";
+  code = 'SERVER_ERROR';
   statusCode = 500;
   userMessage =
-    "Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
+    'Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
   category = ErrorCategory.SERVER_ERROR;
   timestamp = new Date().toISOString();
   context?: Record<string, any>;
 
   constructor(message: string, context?: Record<string, any>) {
     super(message);
-    this.name = "ServerError";
+    this.name = 'ServerError';
     this.context = context;
   }
 }
@@ -186,25 +186,25 @@ export class ErrorHandler {
     // Convert generic errors to AppError
     const appError: AppError = {
       ...error,
-      code: "UNKNOWN_ERROR",
+      code: 'UNKNOWN_ERROR',
       statusCode: 500,
-      userMessage: "Ein unerwarteter Fehler ist aufgetreten.",
+      userMessage: 'Ein unerwarteter Fehler ist aufgetreten.',
       context,
       timestamp: new Date().toISOString(),
     };
 
     // Categorize based on error message or type
-    if (error.message.includes("network") || error.message.includes("fetch")) {
-      appError.code = "NETWORK_ERROR";
+    if (error.message.includes('network') || error.message.includes('fetch')) {
+      appError.code = 'NETWORK_ERROR';
       appError.userMessage =
-        "Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.";
+        'Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.';
     } else if (
-      error.message.includes("validation") ||
-      error.message.includes("invalid")
+      error.message.includes('validation') ||
+      error.message.includes('invalid')
     ) {
-      appError.code = "VALIDATION_ERROR";
+      appError.code = 'VALIDATION_ERROR';
       appError.statusCode = 400;
-      appError.userMessage = "Die eingegebenen Daten sind ungültig.";
+      appError.userMessage = 'Die eingegebenen Daten sind ungültig.';
     }
 
     return appError;
@@ -216,8 +216,8 @@ export class ErrorHandler {
   private isAppError(error: any): error is AppError {
     return (
       error &&
-      typeof error.code === "string" &&
-      typeof error.userMessage === "string"
+      typeof error.code === 'string' &&
+      typeof error.userMessage === 'string'
     );
   }
 
@@ -235,15 +235,15 @@ export class ErrorHandler {
     };
 
     if (isProduction) {
-      console.error("[ERROR]", JSON.stringify(logData));
+      console.error('[ERROR]', JSON.stringify(logData));
     } else {
-      console.group("🚨 Application Error");
-      console.error("Code:", error.code);
-      console.error("Message:", error.message);
-      console.error("User Message:", error.userMessage);
-      console.error("Status Code:", error.statusCode);
-      console.error("Context:", error.context);
-      console.error("Stack:", error.stack);
+      console.group('🚨 Application Error');
+      console.error('Code:', error.code);
+      console.error('Message:', error.message);
+      console.error('User Message:', error.userMessage);
+      console.error('Status Code:', error.statusCode);
+      console.error('Context:', error.context);
+      console.error('Stack:', error.stack);
       console.groupEnd();
     }
   }
@@ -258,9 +258,9 @@ export class ErrorHandler {
         stack: error.stack,
         code: error.code,
         statusCode: error.statusCode,
-        url: typeof window !== "undefined" ? window.location.href : "server",
+        url: typeof window !== 'undefined' ? window.location.href : 'server',
         userAgent:
-          typeof navigator !== "undefined" ? navigator.userAgent : "server",
+          typeof navigator !== 'undefined' ? navigator.userAgent : 'server',
         timestamp: error.timestamp || new Date().toISOString(),
         context: error.context,
       };
@@ -269,11 +269,11 @@ export class ErrorHandler {
       // Examples: Sentry, LogRocket, DataDog, etc.
 
       // For now, send to our own error endpoint
-      if (typeof fetch !== "undefined") {
+      if (typeof fetch !== 'undefined') {
         await this.sendErrorReport(report);
       }
     } catch (reportingError) {
-      console.error("Failed to report error:", reportingError);
+      console.error('Failed to report error:', reportingError);
     }
   }
 
@@ -285,10 +285,10 @@ export class ErrorHandler {
     retries: number = 0,
   ): Promise<void> {
     try {
-      const response = await fetch("/api/errors", {
-        method: "POST",
+      const response = await fetch('/api/errors', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(report),
       });
@@ -313,15 +313,15 @@ export class ErrorHandler {
   private notifyUser(error: AppError): void {
     // In a real app, you might use a toast notification library
     // For now, we'll use the browser's built-in notification
-    if (typeof window !== "undefined" && !isProduction) {
+    if (typeof window !== 'undefined' && !isProduction) {
       // Only show notifications in development
-      console.warn("User Notification:", error.userMessage);
+      console.warn('User Notification:', error.userMessage);
     }
 
     // You could dispatch a custom event that your UI components listen to
-    if (typeof window !== "undefined") {
+    if (typeof window !== 'undefined') {
       window.dispatchEvent(
-        new CustomEvent("app-error", {
+        new CustomEvent('app-error', {
           detail: {
             message: error.userMessage,
             code: error.code,
@@ -382,34 +382,34 @@ export const formatErrorForUser = (
   error: Error | AppError | null | undefined,
 ): string => {
   if (!error) {
-    return "Ein unerwarteter Fehler ist aufgetreten.";
+    return 'Ein unerwarteter Fehler ist aufgetreten.';
   }
 
   if (error instanceof NetworkError) {
-    return "Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.";
+    return 'Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.';
   }
 
   if (error instanceof ValidationError) {
-    return "Ungültige Eingabe. Bitte überprüfen Sie Ihre Daten.";
+    return 'Ungültige Eingabe. Bitte überprüfen Sie Ihre Daten.';
   }
 
   if (error instanceof AuthenticationError) {
-    return "Authentifizierungsfehler. Bitte melden Sie sich erneut an.";
+    return 'Authentifizierungsfehler. Bitte melden Sie sich erneut an.';
   }
 
   if (error instanceof AuthorizationError) {
-    return "Sie haben keine Berechtigung für diese Aktion.";
+    return 'Sie haben keine Berechtigung für diese Aktion.';
   }
 
   if (error instanceof NotFoundError) {
-    return "Die angeforderte Ressource wurde nicht gefunden.";
+    return 'Die angeforderte Ressource wurde nicht gefunden.';
   }
 
   if (error instanceof ServerError) {
-    return "Serverfehler. Bitte versuchen Sie es später erneut.";
+    return 'Serverfehler. Bitte versuchen Sie es später erneut.';
   }
 
-  return "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.";
+  return 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
 };
 
 // Enrich error with additional context
@@ -444,7 +444,7 @@ export const logError = (
   error: Error | AppError,
   context?: Record<string, any>,
 ): void => {
-  console.error("Error:", error, "Context:", context);
+  console.error('Error:', error, 'Context:', context);
 };
 
 // Create error report (stub for testing)
@@ -478,29 +478,29 @@ export const createErrorReport = (
 
 // Categorize errors based on their type or message
 export const categorizeError = (error: Error | AppError): string => {
-  if (error instanceof NetworkError) return "network";
-  if (error instanceof ValidationError) return "validation";
-  if (error instanceof AuthenticationError) return "authentication";
-  if (error instanceof AuthorizationError) return "authorization";
-  if (error instanceof NotFoundError) return "not_found";
-  if (error instanceof ServerError) return "server_error";
+  if (error instanceof NetworkError) return 'network';
+  if (error instanceof ValidationError) return 'validation';
+  if (error instanceof AuthenticationError) return 'authentication';
+  if (error instanceof AuthorizationError) return 'authorization';
+  if (error instanceof NotFoundError) return 'not_found';
+  if (error instanceof ServerError) return 'server_error';
 
   // Check error message for patterns
   const message = error.message.toLowerCase();
-  if (message.includes("fetch") || message.includes("network"))
-    return "network";
-  if (message.includes("invalid") || message.includes("validation"))
-    return "validation";
-  if (message.includes("unauthorized") || message.includes("auth"))
-    return "authentication";
-  if (message.includes("forbidden") || message.includes("permission"))
-    return "authorization";
-  if (message.includes("not found") || message.includes("404"))
-    return "not_found";
-  if (message.includes("server") || message.includes("internal"))
-    return "server_error";
+  if (message.includes('fetch') || message.includes('network'))
+    return 'network';
+  if (message.includes('invalid') || message.includes('validation'))
+    return 'validation';
+  if (message.includes('unauthorized') || message.includes('auth'))
+    return 'authentication';
+  if (message.includes('forbidden') || message.includes('permission'))
+    return 'authorization';
+  if (message.includes('not found') || message.includes('404'))
+    return 'not_found';
+  if (message.includes('server') || message.includes('internal'))
+    return 'server_error';
 
-  return "unknown";
+  return 'unknown';
 };
 
 // Check if an error is retriable
@@ -510,8 +510,8 @@ export const isRetriableError = (error: Error | AppError): boolean => {
 
   // Check for specific error codes or messages that indicate retriable errors
   const message = error.message.toLowerCase();
-  if (message.includes("timeout") || message.includes("network")) return true;
-  if (message.includes("503") || message.includes("429")) return true; // Service unavailable or rate limited
+  if (message.includes('timeout') || message.includes('network')) return true;
+  if (message.includes('503') || message.includes('429')) return true; // Service unavailable or rate limited
 
   return false;
 };
@@ -519,29 +519,29 @@ export const isRetriableError = (error: Error | AppError): boolean => {
 // Global error handlers setup
 export const setupGlobalErrorHandlers = () => {
   // Handle unhandled promise rejections
-  if (typeof window !== "undefined") {
-    window.addEventListener("unhandledrejection", (event) => {
-      console.error("Unhandled promise rejection:", event.reason);
-      handleError(new Error(event.reason || "Unhandled promise rejection"));
+  if (typeof window !== 'undefined') {
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+      handleError(new Error(event.reason || 'Unhandled promise rejection'));
       event.preventDefault();
     });
 
     // Handle global errors
-    window.addEventListener("error", (event) => {
-      console.error("Global error:", event.error);
+    window.addEventListener('error', (event) => {
+      console.error('Global error:', event.error);
       handleError(event.error || new Error(event.message));
     });
   }
 
   // Node.js process handlers (for SSR)
-  if (typeof process !== "undefined") {
-    process.on("unhandledRejection", (reason) => {
-      console.error("Unhandled Rejection:", reason);
+  if (typeof process !== 'undefined') {
+    process.on('unhandledRejection', (reason) => {
+      console.error('Unhandled Rejection:', reason);
       handleError(new Error(String(reason)));
     });
 
-    process.on("uncaughtException", (error) => {
-      console.error("Uncaught Exception:", error);
+    process.on('uncaughtException', (error) => {
+      console.error('Uncaught Exception:', error);
       handleError(error);
     });
   }
