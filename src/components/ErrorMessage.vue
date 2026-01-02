@@ -14,17 +14,17 @@
 </template>
 
 <script setup lang="ts">
-import { ExclamationCircleIcon } from "@heroicons/vue/24/solid";
+import { ExclamationCircleIcon } from '@heroicons/vue/24/solid';
 
 interface Props {
   error?: string;
   className?: string;
-  ariaLive?: "polite" | "assertive" | "off";
+  ariaLive?: 'polite' | 'assertive' | 'off';
 }
 
 withDefaults(defineProps<Props>(), {
-  error: "",
-  className: "",
-  ariaLive: "polite",
+  error: '',
+  className: '',
+  ariaLive: 'polite',
 });
 </script>

@@ -44,7 +44,7 @@
           <div class="error-actions">
             <button @click="retry" class="btn-primary" :disabled="retrying">
               <span v-if="retrying" class="loading-spinner mr-2"></span>
-              {{ retrying ? "Wird wiederholt..." : "Erneut versuchen" }}
+              {{ retrying ? 'Wird wiederholt...' : 'Erneut versuchen' }}
             </button>
 
             <button @click="goHome" class="btn-secondary ml-4">
@@ -72,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onErrorCaptured, nextTick } from "vue";
+import { ref, onMounted, onErrorCaptured, nextTick } from 'vue';
 // Removed heroicons import - using inline SVG for performance
 
 // Props
@@ -98,13 +98,13 @@ const isDevelopment = import.meta.env.DEV;
 
 // Error handling
 onErrorCaptured((err: Error, errorInfo: any) => {
-  console.error("ErrorBoundary caught error:", err);
-  console.error("Error info:", errorInfo);
+  console.error('ErrorBoundary caught error:', err);
+  console.error('Error info:', errorInfo);
 
   error.value = err;
   errorDetails.value = {
     message: err.message,
-    componentName: errorInfo?.componentName || "Unknown",
+    componentName: errorInfo?.componentName || 'Unknown',
     stack: isDevelopment ? err.stack : undefined,
   };
 
@@ -139,7 +139,7 @@ const retry = async () => {
     // Force component re-render
     await nextTick();
   } catch (err) {
-    console.error("Error during retry:", err);
+    console.error('Error during retry:', err);
     // Don't set error state again to avoid infinite loop
   } finally {
     retrying.value = false;
@@ -147,28 +147,28 @@ const retry = async () => {
 };
 
 const goHome = () => {
-  window.location.href = "/";
+  window.location.href = '/';
 };
 
 // Error reporting
 const reportError = (err: Error, errorInfo?: any) => {
   // In production, report to error tracking service
-  if (!isDevelopment && typeof window !== "undefined") {
+  if (!isDevelopment && typeof window !== 'undefined') {
     // Example: Sentry, LogRocket, etc.
     if (window.gtag) {
-      window.gtag("event", "exception", {
+      window.gtag('event', 'exception', {
         description: err.message,
         fatal: false,
         custom_map: {
-          component: errorInfo?.componentName || "Unknown",
+          component: errorInfo?.componentName || 'Unknown',
         },
       });
     }
 
     // You could also send to your own error logging endpoint
-    fetch("/api/errors", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    fetch('/api/errors', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         message: err.message,
         stack: err.stack,
@@ -194,10 +194,10 @@ if (props.resetOnPropsChange) {
     };
 
     // Reset on navigation or other significant changes
-    window.addEventListener("popstate", resetError);
+    window.addEventListener('popstate', resetError);
 
     return () => {
-      window.removeEventListener("popstate", resetError);
+      window.removeEventListener('popstate', resetError);
     };
   });
 }

@@ -10,15 +10,15 @@ export interface Props {
   sizes?: string;
 }
 
-const { 
-  src, 
-  alt, 
-  width, 
-  height, 
-  loading = 'lazy', 
+const {
+  src,
+  alt,
+  width,
+  height,
+  loading = 'lazy',
   fetchpriority = 'auto',
   class: className = '',
-  sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
+  sizes = '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
 } = Astro.props;
 
 // Extract filename without extension and path
@@ -29,7 +29,7 @@ const webpSrcset = [
   `${import.meta.env.BASE_URL}images/${imagePath}-400.webp 400w`,
   `${import.meta.env.BASE_URL}images/${imagePath}-800.webp 800w`,
   `${import.meta.env.BASE_URL}images/${imagePath}-1200.webp 1200w`,
-  `${import.meta.env.BASE_URL}images/${imagePath}.webp 1536w`
+  `${import.meta.env.BASE_URL}images/${imagePath}.webp 1536w`,
 ].join(', ');
 
 // Generate fallback srcset for original format
@@ -38,14 +38,10 @@ const fallbackSrcset = src;
 
 <picture>
   <!-- WebP sources for modern browsers -->
-  <source 
-    type="image/webp"
-    srcset={webpSrcset}
-    sizes={sizes}
-  />
-  
+  <source type="image/webp" srcset={webpSrcset} sizes={sizes} />
+
   <!-- Fallback for older browsers -->
-  <img 
+  <img
     src={src}
     alt={alt}
     width={width}

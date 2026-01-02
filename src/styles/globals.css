@@ -85,8 +85,8 @@ textarea:focus {
 /* Custom CSS Variables */
 :root {
   --font-inter:
-    "Inter Variable", "Inter", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, sans-serif;
+    'Inter Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
 }
 
 /* Base Styles */
@@ -101,8 +101,8 @@ textarea:focus {
   body {
     @apply bg-neutral-50 text-neutral-900;
     font-feature-settings:
-      "rlig" 1,
-      "calt" 1;
+      'rlig' 1,
+      'calt' 1;
   }
 
   /* Focus management for better accessibility */
@@ -190,14 +190,14 @@ textarea:focus {
     }
 
     a[href]:after {
-      content: " (" attr(href) ")";
+      content: ' (' attr(href) ')';
       font-size: 0.8em;
       color: #666;
     }
 
-    a[href^="#"]:after,
-    a[href^="javascript:"]:after {
-      content: "";
+    a[href^='#']:after,
+    a[href^='javascript:']:after {
+      content: '';
     }
   }
 }
@@ -434,11 +434,11 @@ textarea:focus {
 
   /* Custom utilities for German typography */
   .german-quotes::before {
-    content: "\201E";
+    content: '\201E';
   }
 
   .german-quotes::after {
-    content: "\201C";
+    content: '\201C';
   }
 
   /* Accessibility utilities */

@@ -10,40 +10,45 @@ export interface Props {
   noIndex?: boolean;
 }
 
-const { 
-  title, 
+const {
+  title,
   description = 'Reservieren Sie Ihr Exemplar des Flaschenpost Magazins - das Magazin für neugierige Eltern und ihre Kinder.',
   image = images.heroImage,
-  noIndex = false 
+  noIndex = false,
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const imageURL = new URL(image, Astro.site);
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    
+
     <!-- Performance hints - reduce DNS lookups -->
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+
     <!-- Preload only critical above-fold image -->
-    <link rel="preload" as="image" href="/images/hero-image-800.webp" type="image/webp">
-    
+    <link
+      rel="preload"
+      as="image"
+      href="/images/hero-image-800.webp"
+      type="image/webp"
+    />
+
     <!-- Primary Meta Tags -->
     <title>{title}</title>
     <meta name="title" content={title} />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
-    
+
     <!-- Robots -->
     {noIndex && <meta name="robots" content="noindex, nofollow" />}
-    
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
@@ -52,44 +57,58 @@ const imageURL = new URL(image, Astro.site);
     <meta property="og:image" content={imageURL} />
     <meta property="og:locale" content="de_DE" />
     <meta property="og:site_name" content="Flaschenpost Magazin" />
-    
+
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={imageURL} />
-    
+
     <!-- Security Headers (X-Frame-Options should be set via HTTP header, not meta tag) -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
-    
+    <meta
+      http-equiv="Referrer-Policy"
+      content="strict-origin-when-cross-origin"
+    />
+
     <!-- Preload Critical Resources - prioritize above-fold content -->
-    <link rel="preload" href="/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin />
-    
+    <link
+      rel="preload"
+      href="/fonts/Inter-Variable.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+
     <!-- Minimal resource hints only when needed -->
-    
+
     <!-- Theme Color -->
     <meta name="theme-color" content="#0ea5e9" />
     <meta name="msapplication-TileColor" content="#0ea5e9" />
-    
+
     <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    
+
     <!-- Manifest -->
     <link rel="manifest" href="/site.webmanifest" />
-    
+
     <!-- Critical CSS inlining -->
     <style>
       /* Critical above-the-fold styles */
-      body { 
-        font-family: Inter, system-ui, sans-serif; 
-        margin: 0; 
+      body {
+        font-family: Inter, system-ui, sans-serif;
+        margin: 0;
         background: #fafafa;
       }
       .nautical-bg {
-        background: linear-gradient(180deg, #ffffff 0%, #f0f9ff 50%, #e0f2fe 100%);
+        background: linear-gradient(
+          180deg,
+          #ffffff 0%,
+          #f0f9ff 50%,
+          #e0f2fe 100%
+        );
       }
       /* Skip link styles */
       .skip-link {
@@ -108,48 +127,91 @@ const imageURL = new URL(image, Astro.site);
         top: 6px;
       }
     </style>
-    
+
     <!-- Structured Data - minimal for performance -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"Organization","name":"Flaschenpost Magazin","url":"{Astro.site}","description":"Das Magazin für neugierige Eltern und ihre Kinder"}
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Flaschenpost Magazin",
+        "url": "{Astro.site}",
+        "description": "Das Magazin für neugierige Eltern und ihre Kinder"
+      }
     </script>
-    
+
     <!-- Critical CSS Inline - minimal for fast initial render -->
     <style>
       /* Critical above-the-fold styles only */
-      *{box-sizing:border-box}
-      html{scroll-behavior:smooth}
-      body{background:#fafafa;line-height:1.5}
-      .nautical-bg{background:linear-gradient(180deg,#fff 0%,#f0f9ff 50%,#e0f2fe 100%);position:relative}
-      .bg-gradient-to-br{background:linear-gradient(to bottom right,var(--tw-gradient-stops))}
-      .from-white{--tw-gradient-from:white;--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}
-      .to-sky-50{--tw-gradient-to:#f0f9ff}
-      .via-sky-50{--tw-gradient-stops:var(--tw-gradient-from),#f0f9ff,var(--tw-gradient-to)}
-      .to-blue-50{--tw-gradient-to:#eff6ff}
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: #fafafa;
+        line-height: 1.5;
+      }
+      .nautical-bg {
+        background: linear-gradient(180deg, #fff 0%, #f0f9ff 50%, #e0f2fe 100%);
+        position: relative;
+      }
+      .bg-gradient-to-br {
+        background: linear-gradient(to bottom right, var(--tw-gradient-stops));
+      }
+      .from-white {
+        --tw-gradient-from: white;
+        --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+      }
+      .to-sky-50 {
+        --tw-gradient-to: #f0f9ff;
+      }
+      .via-sky-50 {
+        --tw-gradient-stops:
+          var(--tw-gradient-from), #f0f9ff, var(--tw-gradient-to);
+      }
+      .to-blue-50 {
+        --tw-gradient-to: #eff6ff;
+      }
       /* Prevent layout shifts */
-      .max-w-7xl{max-width:80rem;margin:0 auto}
-      .px-4{padding-left:1rem;padding-right:1rem}
-      .py-12{padding-top:3rem;padding-bottom:3rem}
+      .max-w-7xl {
+        max-width: 80rem;
+        margin: 0 auto;
+      }
+      .px-4 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .py-12 {
+        padding-top: 3rem;
+        padding-bottom: 3rem;
+      }
     </style>
   </head>
-  
+
   <body class="bg-neutral-50 font-sans text-neutral-900 nautical-bg">
     <!-- Skip Link for Accessibility -->
-    <a href="#main-content" class="skip-link">
-      Zum Hauptinhalt springen
-    </a>
-    
+    <a href="#main-content" class="skip-link"> Zum Hauptinhalt springen </a>
+
     <!-- Header with nautical theme -->
-    <header class="bg-white shadow-sm border-b border-primary-200 relative overflow-hidden">
+    <header
+      class="bg-white shadow-sm border-b border-primary-200 relative overflow-hidden"
+    >
       <!-- Wave decoration at top -->
-      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-300 via-primary-400 to-primary-300"></div>
+      <div
+        class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-300 via-primary-400 to-primary-300"
+      >
+      </div>
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center py-6">
           <!-- Logo with lighthouse beacon effect -->
           <div class="flex-shrink-0">
-            <a href="/" class="flex items-center focus-visible lighthouse-beacon">
-              <img 
-                src={images.kindergartenLogo} 
+            <a
+              href="/"
+              class="flex items-center focus-visible lighthouse-beacon"
+            >
+              <img
+                src={images.kindergartenLogo}
                 alt={`${kindergarten.name} Logo`}
                 class="h-10 w-auto sm:h-12 floating"
                 width="120"
@@ -157,51 +219,61 @@ const imageURL = new URL(image, Astro.site);
               />
             </a>
           </div>
-          
+
           <!-- Navigation -->
           <nav class="hidden sm:flex space-x-8" aria-label="Hauptnavigation">
-            <a 
-              href="#reservation-form" 
+            <a
+              href="#reservation-form"
               class="text-ocean-dark hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200 focus-visible hover:transform hover:scale-105"
             >
               Reservierung
             </a>
-            <a 
-              href="#about-magazine" 
+            <a
+              href="#about-magazine"
               class="text-ocean-dark hover:text-primary-600 px-3 py-2 text-sm font-medium transition-all duration-200 focus-visible hover:transform hover:scale-105"
             >
               Über das Magazin
             </a>
           </nav>
-          
+
           <!-- Mobile Menu Button -->
-          <button 
+          <button
             id="mobile-menu-button"
             class="sm:hidden p-2 text-neutral-700 hover:text-primary-600 focus-visible"
             aria-expanded="false"
             aria-controls="mobile-menu"
             aria-label="Menü öffnen"
           >
-            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
         </div>
-        
+
         <!-- Mobile Menu -->
-        <nav 
-          id="mobile-menu" 
+        <nav
+          id="mobile-menu"
           class="sm:hidden hidden pb-6 space-y-1"
           aria-label="Mobile Navigation"
         >
-          <a 
-            href="#reservation-form" 
+          <a
+            href="#reservation-form"
             class="block px-3 py-2 text-base font-medium text-neutral-700 hover:text-primary-600 transition-colors duration-200 focus-visible"
           >
             Reservierung
           </a>
-          <a 
-            href="#about-magazine" 
+          <a
+            href="#about-magazine"
             class="block px-3 py-2 text-base font-medium text-neutral-700 hover:text-primary-600 transition-colors duration-200 focus-visible"
           >
             Über das Magazin
@@ -209,14 +281,16 @@ const imageURL = new URL(image, Astro.site);
         </nav>
       </div>
     </header>
-    
+
     <!-- Main Content -->
     <main id="main-content" class="flex-1">
       <slot />
     </main>
-    
+
     <!-- Footer with wave pattern -->
-    <footer class="bg-gradient-to-b from-primary-800 to-primary-950 text-white relative">
+    <footer
+      class="bg-gradient-to-b from-primary-800 to-primary-950 text-white relative"
+    >
       <!-- Wave decoration at top -->
       <div class="wave-container absolute -top-1 left-0 right-0">
         <div class="wave wave-1"></div>
@@ -226,8 +300,8 @@ const imageURL = new URL(image, Astro.site);
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <!-- Brand -->
           <div class="space-y-4">
-            <img 
-              src="/images/flaschenpost-logo-white.svg" 
+            <img
+              src="/images/flaschenpost-logo-white.svg"
               alt="Flaschenpost Magazin"
               class="h-8 w-auto"
               width="120"
@@ -235,70 +309,97 @@ const imageURL = new URL(image, Astro.site);
               loading="lazy"
             />
             <p class="text-sm text-neutral-400">
-              Das Magazin für neugierige Eltern und ihre Kinder. 
-              Entdecken, lernen und gemeinsam Spaß haben.
+              Das Magazin für neugierige Eltern und ihre Kinder. Entdecken,
+              lernen und gemeinsam Spaß haben.
             </p>
           </div>
-          
+
           <!-- Navigation -->
           <div class="space-y-4">
-            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">
+            <h3
+              class="text-sm font-semibold text-white uppercase tracking-wider"
+            >
               Navigation
             </h3>
             <ul class="space-y-2">
               <li>
-                <a href="#reservation-form" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                <a
+                  href="#reservation-form"
+                  class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible"
+                >
                   Reservierung
                 </a>
               </li>
               <li>
-                <a href="#about-magazine" class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible">
+                <a
+                  href="#about-magazine"
+                  class="text-sm text-neutral-400 hover:text-white transition-colors duration-200 focus-visible"
+                >
                   Über das Magazin
                 </a>
               </li>
             </ul>
           </div>
-          
+
           <!-- Contact Info -->
           <div class="space-y-4">
-            <h3 class="text-sm font-semibold text-white uppercase tracking-wider">
+            <h3
+              class="text-sm font-semibold text-white uppercase tracking-wider"
+            >
               Kontakt
             </h3>
             <ul class="space-y-2">
               <li class="text-sm text-neutral-400">
-                Bei Fragen zur Reservierung wenden Sie sich bitte an den Elternbeirat.
+                Bei Fragen zur Reservierung wenden Sie sich bitte an den
+                Elternbeirat.
               </li>
             </ul>
           </div>
         </div>
-        
+
         <!-- Bottom Bar -->
-        <div class="mt-8 pt-8 border-t border-primary-700 flex flex-col sm:flex-row justify-between items-center rope-border">
+        <div
+          class="mt-8 pt-8 border-t border-primary-700 flex flex-col sm:flex-row justify-between items-center rope-border"
+        >
           <p class="text-sm text-neutral-400">
             © 2024 Flaschenpost Magazin. Alle Rechte vorbehalten.
           </p>
           <div class="mt-4 sm:mt-0 flex space-x-6">
-            <a href="mailto:leuchtturm.elternbeirat@gmail.com" class="text-neutral-400 hover:text-white focus-visible">
+            <a
+              href="mailto:leuchtturm.elternbeirat@gmail.com"
+              class="text-neutral-400 hover:text-white focus-visible"
+            >
               <span class="sr-only">E-Mail</span>
-              <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              <svg
+                class="h-5 w-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
+                <path
+                  d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"
+                ></path>
+                <path
+                  d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"
+                ></path>
               </svg>
             </a>
           </div>
         </div>
       </div>
     </footer>
-    
+
     <!-- Critical Scripts Only - minimal inline JavaScript -->
     <script>
       // Ultra-minimal mobile menu - reduce main thread work
-      document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
-        const menu = document.getElementById('mobile-menu');
-        const expanded = this.getAttribute('aria-expanded') === 'true';
-        this.setAttribute('aria-expanded', String(!expanded));
-        menu?.classList.toggle('hidden');
-      });
+      document
+        .getElementById('mobile-menu-button')
+        ?.addEventListener('click', function () {
+          const menu = document.getElementById('mobile-menu');
+          const expanded = this.getAttribute('aria-expanded') === 'true';
+          this.setAttribute('aria-expanded', String(!expanded));
+          menu?.classList.toggle('hidden');
+        });
     </script>
   </body>
 </html>
@@ -312,32 +413,32 @@ const imageURL = new URL(image, Astro.site);
     font-style: normal;
     font-display: swap;
   }
-  
+
   /* Smooth scrolling for anchor links */
   html {
     scroll-behavior: smooth;
   }
-  
+
   /* Custom focus styles */
   .focus-visible:focus-visible {
     outline: 2px solid #3b82f6;
     outline-offset: 2px;
     border-radius: 4px;
   }
-  
+
   /* High contrast support */
   @media (prefers-contrast: high) {
     .text-neutral-400 {
       color: #6b7280;
     }
   }
-  
+
   /* Reduced motion support */
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
     }
-    
+
     .transition-colors,
     .transition-all {
       transition: none;

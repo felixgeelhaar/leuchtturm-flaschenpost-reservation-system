@@ -7,7 +7,15 @@ import ConsentBanner from '@/components/ConsentBanner.vue';
 import ErrorBoundary from '@/components/ErrorBoundary.vue';
 import Picture from '@/components/Picture.astro';
 import { DatabaseService } from '@/lib/database';
-import { kindergarten, magazine, homepage, faq, images, getFormattedPrice, getTotalPrice } from '@/config/content';
+import {
+  kindergarten,
+  magazine,
+  homepage,
+  faq,
+  images,
+  getFormattedPrice,
+  getTotalPrice,
+} from '@/config/content';
 
 // Fetch magazines on the server
 const db = new DatabaseService();
@@ -23,50 +31,65 @@ try {
 const totalPrice = getTotalPrice();
 ---
 
-<Layout 
+<Layout
   title={`${magazine.title} reservieren - ${kindergarten.name}`}
   description={magazine.currentIssue.description}
 >
   <!-- Hero Section with Nautical Theme -->
-  <section class="relative bg-gradient-to-br from-white via-sky-50 to-blue-50 py-12 sm:py-16 lg:py-20">
+  <section
+    class="relative bg-gradient-to-br from-white via-sky-50 to-blue-50 py-12 sm:py-16 lg:py-20"
+  >
     <!-- Minimal decorative elements -->
-    <div class="absolute top-10 left-10 text-4xl opacity-20" aria-hidden="true">⚓</div>
-    <div class="absolute bottom-10 right-10 text-4xl opacity-20" aria-hidden="true">🐚</div>
+    <div class="absolute top-10 left-10 text-4xl opacity-20" aria-hidden="true">
+      ⚓
+    </div>
+    <div
+      class="absolute bottom-10 right-10 text-4xl opacity-20"
+      aria-hidden="true"
+    >
+      🐚
+    </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <!-- Content -->
         <div class="text-center lg:text-left">
-          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900 mb-6">
+          <h1
+            class="text-4xl sm:text-5xl lg:text-6xl font-bold text-neutral-900 mb-6"
+          >
             {homepage.hero.headline}
           </h1>
           <p class="text-xl sm:text-2xl text-neutral-600 mb-8 leading-relaxed">
             {homepage.hero.subheadline}
           </p>
-          {homepage.hero.badge && (
-            <div class="inline-block px-4 py-2 bg-primary-100 text-primary-800 rounded-full text-sm font-medium mb-6">
-              {homepage.hero.badge}
-            </div>
-          )}
-          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <a 
-              href="#reservation-form" 
+          {
+            homepage.hero.badge && (
+              <div class="inline-block px-4 py-2 bg-primary-100 text-primary-800 rounded-full text-sm font-medium mb-6">
+                {homepage.hero.badge}
+              </div>
+            )
+          }
+          <div
+            class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
+          >
+            <a
+              href="#reservation-form"
               class="btn-nautical btn-lg w-full sm:w-auto text-white"
               onclick="document.getElementById('reservation-form').scrollIntoView({ behavior: 'smooth' })"
             >
               {homepage.hero.ctaText}
             </a>
-            <a 
-              href="#about-magazine" 
+            <a
+              href="#about-magazine"
               class="btn-outline btn-lg w-full sm:w-auto"
             >
               Mehr erfahren
             </a>
           </div>
         </div>
-        
+
         <!-- Hero Image with nautical decoration -->
         <div class="relative">
-          <Picture 
+          <Picture
             src={images.heroImage}
             alt={`${magazine.title} Magazin`}
             class="rounded-lg shadow-xl w-full h-auto"
@@ -82,7 +105,10 @@ const totalPrice = getTotalPrice();
   </section>
 
   <!-- About Section with beach theme -->
-  <section id="about-magazine" class="py-16 lg:py-20 bg-gradient-to-b from-white to-yellow-50/30 relative">
+  <section
+    id="about-magazine"
+    class="py-16 lg:py-20 bg-gradient-to-b from-white to-yellow-50/30 relative"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
@@ -92,25 +118,35 @@ const totalPrice = getTotalPrice();
           {homepage.about.description}
         </p>
       </div>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {homepage.about.features.map((feature) => (
-          <div class="text-center nautical-card p-6">
-            <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 porthole">
-              <svg class="h-8 w-8 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-              </svg>
+        {
+          homepage.about.features.map((feature) => (
+            <div class="text-center nautical-card p-6">
+              <div class="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 porthole">
+                <svg
+                  class="h-8 w-8 text-primary-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-neutral-900 mb-2">
+                {feature.title}
+              </h3>
+              <p class="text-neutral-600">{feature.description}</p>
             </div>
-            <h3 class="text-lg font-semibold text-neutral-900 mb-2">
-              {feature.title}
-            </h3>
-            <p class="text-neutral-600">
-              {feature.description}
-            </p>
-          </div>
-        ))}
+          ))
+        }
       </div>
-      
+
       <!-- Magazine Details with message bottle style -->
       <div class="mt-16 p-8 message-bottle rounded-lg">
         <h3 class="text-2xl font-bold text-neutral-900 mb-6">
@@ -118,30 +154,54 @@ const totalPrice = getTotalPrice();
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <h4 class="font-semibold text-neutral-900 mb-2">Inhalt dieser Ausgabe:</h4>
+            <h4 class="font-semibold text-neutral-900 mb-2">
+              Inhalt dieser Ausgabe:
+            </h4>
             <ul class="space-y-2">
-              {magazine.currentIssue.contents.map((content) => (
-                <li class="flex items-start space-x-2">
-                  <svg class="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span class="text-neutral-600">{content}</span>
-                </li>
-              ))}
+              {
+                magazine.currentIssue.contents.map((content) => (
+                  <li class="flex items-start space-x-2">
+                    <svg
+                      class="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <span class="text-neutral-600">{content}</span>
+                  </li>
+                ))
+              }
             </ul>
           </div>
           <div class="space-y-3">
             <div>
               <span class="font-semibold text-neutral-900">Format:</span>
-              <span class="ml-2 text-neutral-600">{magazine.currentIssue.format}, {magazine.currentIssue.pageCount} Seiten</span>
+              <span class="ml-2 text-neutral-600"
+                >{magazine.currentIssue.format}, {
+                  magazine.currentIssue.pageCount
+                } Seiten</span
+              >
             </div>
             <div>
               <span class="font-semibold text-neutral-900">Papier:</span>
-              <span class="ml-2 text-neutral-600">{magazine.currentIssue.paperWeight}</span>
+              <span class="ml-2 text-neutral-600"
+                >{magazine.currentIssue.paperWeight}</span
+              >
             </div>
             <div>
-              <span class="font-semibold text-neutral-900">Erscheinungsdatum:</span>
-              <span class="ml-2 text-neutral-600">{magazine.currentIssue.publicationDate}</span>
+              <span class="font-semibold text-neutral-900"
+                >Erscheinungsdatum:</span
+              >
+              <span class="ml-2 text-neutral-600"
+                >{magazine.currentIssue.publicationDate}</span
+              >
             </div>
             <div class="pt-4 border-t border-neutral-200">
               <div class="text-2xl font-bold text-primary-600">
@@ -158,34 +218,35 @@ const totalPrice = getTotalPrice();
   </section>
 
   <!-- Process Section with compass theme -->
-  <section class="py-16 lg:py-20 bg-gradient-to-b from-yellow-50/30 to-sky-50 relative">
+  <section
+    class="py-16 lg:py-20 bg-gradient-to-b from-yellow-50/30 to-sky-50 relative"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
         <h2 class="text-3xl sm:text-4xl font-bold text-neutral-900 mb-4">
           {homepage.process.title}
         </h2>
       </div>
-      
+
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {homepage.process.steps.map((step) => (
-          <div class="relative">
-            <div class="text-center">
-              <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold life-ring">
-                {step.number}
+        {
+          homepage.process.steps.map((step) => (
+            <div class="relative">
+              <div class="text-center">
+                <div class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-700 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold life-ring">
+                  {step.number}
+                </div>
+                <h3 class="text-xl font-semibold text-neutral-900 mb-2">
+                  {step.title}
+                </h3>
+                <p class="text-neutral-600">{step.description}</p>
               </div>
-              <h3 class="text-xl font-semibold text-neutral-900 mb-2">
-                {step.title}
-              </h3>
-              <p class="text-neutral-600">
-                {step.description}
-              </p>
             </div>
-          </div>
-        ))}
+          ))
+        }
       </div>
     </div>
   </section>
-  
 
   <!-- Reservation Form Section -->
   <section id="reservation-form" class="py-16 lg:py-20 bg-white">
@@ -195,12 +256,13 @@ const totalPrice = getTotalPrice();
           Ihr Exemplar reservieren
         </h2>
         <p class="text-xl text-neutral-600 max-w-2xl mx-auto">
-          Füllen Sie das Formular aus, um Ihr Exemplar des {magazine.title} Magazins zu reservieren.
+          Füllen Sie das Formular aus, um Ihr Exemplar des {magazine.title} Magazins
+          zu reservieren.
         </p>
       </div>
 
       <ErrorBoundary client:media="(max-width: 1024px)">
-        <ReservationForm 
+        <ReservationForm
           client:media="(max-width: 1024px)"
           magazines={magazines}
         />
@@ -209,7 +271,9 @@ const totalPrice = getTotalPrice();
   </section>
 
   <!-- FAQ Section with wave animations -->
-  <section class="py-16 lg:py-20 bg-gradient-to-b from-sky-50 to-white relative">
+  <section
+    class="py-16 lg:py-20 bg-gradient-to-b from-sky-50 to-white relative"
+  >
     <!-- Wave decoration at bottom -->
     <div class="wave-container absolute bottom-0 left-0 right-0">
       <div class="wave wave-1"></div>
@@ -225,39 +289,42 @@ const totalPrice = getTotalPrice();
           Antworten auf die wichtigsten Fragen zur Reservierung
         </p>
       </div>
-      
+
       <div class="space-y-6">
-        {faq.map((item) => (
-          <details class="nautical-card p-6">
-            <summary class="font-semibold text-lg text-neutral-900 cursor-pointer hover:text-primary-600 transition-colors">
-              {item.question}
-            </summary>
-            <div class="mt-4 text-neutral-600">
-              <p>{item.answer}</p>
-            </div>
-          </details>
-        ))}
+        {
+          faq.map((item) => (
+            <details class="nautical-card p-6">
+              <summary class="font-semibold text-lg text-neutral-900 cursor-pointer hover:text-primary-600 transition-colors">
+                {item.question}
+              </summary>
+              <div class="mt-4 text-neutral-600">
+                <p>{item.answer}</p>
+              </div>
+            </details>
+          ))
+        }
       </div>
     </div>
   </section>
 
   <!-- Info Section with lighthouse beacon -->
-  <section class="py-6 bg-gradient-to-b from-white to-sky-50 border-t border-sky-200 relative">
+  <section
+    class="py-6 bg-gradient-to-b from-white to-sky-50 border-t border-sky-200 relative"
+  >
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center">
         <div class="space-y-1">
           <div class="text-xl font-bold text-primary-600">DSGVO Konform</div>
-          <div class="text-sm text-neutral-600">Ihre Daten sind bei uns sicher</div>
+          <div class="text-sm text-neutral-600">
+            Ihre Daten sind bei uns sicher
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- GDPR Consent Banner -->
-  <ConsentBanner 
-    client:idle
-    isVisible={true}
-  />
+  <ConsentBanner client:idle isVisible={true} />
 </Layout>
 
 <style>
@@ -268,17 +335,17 @@ const totalPrice = getTotalPrice();
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   /* Smooth scrolling for anchor links */
   html {
     scroll-behavior: smooth;
   }
-  
+
   /* Details/summary styling */
   details > summary {
     list-style: none;
   }
-  
+
   details > summary::before {
     content: '+';
     display: inline-block;
@@ -286,11 +353,11 @@ const totalPrice = getTotalPrice();
     margin-right: 0.5em;
     transition: transform 0.2s ease;
   }
-  
+
   details[open] > summary::before {
     transform: rotate(45deg);
   }
-  
+
   details > summary::-webkit-details-marker {
     display: none;
   }
@@ -298,25 +365,31 @@ const totalPrice = getTotalPrice();
 
 <script type="module">
   // Defer scroll enhancements to reduce main thread work
-  import.meta.hot && import.meta.hot.on('vite:beforeUpdate', () => location.reload());
-  
+  import.meta.hot &&
+    import.meta.hot.on('vite:beforeUpdate', () => location.reload());
+
   // Minimal critical JavaScript only
   if ('IntersectionObserver' in window) {
     // Use intersection observer for better performance than scroll events
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.id;
-          const navLink = document.querySelector(`a[href="#${id}"]`);
-          if (navLink) {
-            document.querySelectorAll('nav a').forEach(link => link.classList.remove('active'));
-            navLink.classList.add('active');
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            const navLink = document.querySelector(`a[href="#${id}"]`);
+            if (navLink) {
+              document
+                .querySelectorAll('nav a')
+                .forEach((link) => link.classList.remove('active'));
+              navLink.classList.add('active');
+            }
           }
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '-60px 0px -60px 0px' });
-    
-    document.querySelectorAll('section[id]').forEach(section => {
+        });
+      },
+      { threshold: 0.1, rootMargin: '-60px 0px -60px 0px' },
+    );
+
+    document.querySelectorAll('section[id]').forEach((section) => {
       observer.observe(section);
     });
   }

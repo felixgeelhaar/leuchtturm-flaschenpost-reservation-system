@@ -184,19 +184,19 @@ function getSecurityHeaders(): SecurityHeaders {
 
     // Content Security Policy
     'Content-Security-Policy': [
-      'default-src \'self\'',
-      'script-src \'self\' \'unsafe-inline\' \'unsafe-eval\' https://*.supabase.co',
-      'style-src \'self\' \'unsafe-inline\' https://fonts.googleapis.com',
-      'font-src \'self\' https://fonts.gstatic.com',
-      'img-src \'self\' data: https://*.supabase.co',
-      'connect-src \'self\' https://*.supabase.co wss://*.supabase.co',
-      'frame-ancestors \'none\'',
-      'base-uri \'self\'',
-      'form-action \'self\'',
-      'object-src \'none\'',
-      'media-src \'self\'',
-      'worker-src \'self\'',
-      'manifest-src \'self\'',
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com",
+      "img-src 'self' data: https://*.supabase.co",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+      "object-src 'none'",
+      "media-src 'self'",
+      "worker-src 'self'",
+      "manifest-src 'self'",
     ].join('; '),
 
     // GDPR-related headers

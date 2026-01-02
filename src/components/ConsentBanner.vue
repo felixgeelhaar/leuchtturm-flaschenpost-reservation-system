@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted } from 'vue';
 
 // State
 const isVisible = ref(false);
@@ -61,7 +61,7 @@ const hasConsent = ref(false);
 
 // Check if user has already given consent
 onMounted(() => {
-  const consent = localStorage.getItem("gdpr-consent");
+  const consent = localStorage.getItem('gdpr-consent');
   if (consent) {
     hasConsent.value = true;
   } else {
@@ -80,16 +80,16 @@ const acceptEssentialOnly = () => {
     analytics: false,
     marketing: false,
     timestamp: new Date().toISOString(),
-    version: "1.0",
+    version: '1.0',
   };
 
-  localStorage.setItem("gdpr-consent", JSON.stringify(consentData));
+  localStorage.setItem('gdpr-consent', JSON.stringify(consentData));
   hasConsent.value = true;
   isVisible.value = false;
 
   // Emit event for parent components
   window.dispatchEvent(
-    new CustomEvent("consent-updated", { detail: consentData }),
+    new CustomEvent('consent-updated', { detail: consentData }),
   );
 };
 </script>

@@ -143,7 +143,7 @@ user_consents (
 ### Input Validation
 
 ```typescript
-import { z } from "zod";
+import { z } from 'zod';
 
 const reservationSchema = z.object({
   firstName: z.string().min(2).max(50),

@@ -221,8 +221,8 @@
               <ErrorMessage :error="formErrors.deliveryMethod" />
               <p class="form-help">
                 {{
-                  deliveryMethod === "pickup"
-                    ? "Kostenlose Abholung vor Ort."
+                  deliveryMethod === 'pickup'
+                    ? 'Kostenlose Abholung vor Ort.'
                     : `Versandkostenpauschale: ${formatCurrency(shippingCost)} (Vorauszahlung erforderlich)`
                 }}
               </p>
@@ -589,7 +589,7 @@
           />
           <ErrorMessage :error="formErrors.notes" />
           <div class="text-xs text-neutral-500 mt-1">
-            {{ (formData.notes || "").length }}/500 Zeichen
+            {{ (formData.notes || '').length }}/500 Zeichen
           </div>
         </div>
 
@@ -705,22 +705,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch, nextTick } from "vue";
-import { z } from "zod";
+import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue';
+import { z } from 'zod';
 import type {
   Magazine,
   ReservationFormData,
   ConsentData,
   FormErrors,
-} from "@/types";
-import ErrorMessage from "./ErrorMessage.vue";
+} from '@/types';
+import ErrorMessage from './ErrorMessage.vue';
 // Removed heroicons imports - using inline SVGs for performance
 import {
   paymentConfig,
   formatCurrency,
   calculateTotalCost,
-} from "@/config/payment";
-import { forms, magazine } from "@/config/content";
+} from '@/config/payment';
+import { forms, magazine } from '@/config/content';
 
 // Props
 interface Props {
@@ -736,8 +736,8 @@ const props = withDefaults(defineProps<Props>(), {
 // Reactive state
 const isSubmitting = ref(false);
 const showSuccess = ref(false);
-const serverError = ref("");
-const reservationId = ref("");
+const serverError = ref('');
+const reservationId = ref('');
 const availableMagazines = ref<Magazine[]>(props.magazines || []);
 
 // Pricing configuration
@@ -745,29 +745,29 @@ const magazinePrice = ref(paymentConfig.magazinePrice);
 const shippingCost = ref(paymentConfig.shippingCost);
 
 // Separate ref for delivery method to ensure reactivity
-const deliveryMethod = ref("pickup");
+const deliveryMethod = ref('pickup');
 
 // Form data
 const formData = reactive<ReservationFormData>({
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "", // Added phone field
-  magazineId: "",
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '', // Added phone field
+  magazineId: '',
   quantity: 1,
-  deliveryMethod: "pickup", // Default to pickup (cheaper option)
-  pickupLocation: "BRK Haus für Kinder - Leuchtturm", // Used for pickup
-  pickupDate: "", // Used for pickup
-  paymentMethod: "", // Required for shipping only
+  deliveryMethod: 'pickup', // Default to pickup (cheaper option)
+  pickupLocation: 'BRK Haus für Kinder - Leuchtturm', // Used for pickup
+  pickupDate: '', // Used for pickup
+  paymentMethod: '', // Required for shipping only
   address: {
-    street: "",
-    houseNumber: "",
-    postalCode: "",
-    city: "",
-    country: "DE",
-    addressLine2: "",
+    street: '',
+    houseNumber: '',
+    postalCode: '',
+    city: '',
+    country: 'DE',
+    addressLine2: '',
   },
-  notes: "",
+  notes: '',
   consents: {
     essential: false,
     functional: false,
@@ -776,10 +776,10 @@ const formData = reactive<ReservationFormData>({
   },
   // Picture order fields
   orderGroupPicture: false,
-  childGroupName: "",
+  childGroupName: '',
   orderVorschulPicture: false,
   childIsVorschueler: false,
-  childName: "",
+  childName: '',
 });
 
 // Form errors
@@ -788,12 +788,12 @@ const formErrors = reactive<FormErrors>({});
 // Validation schema - address fields are only required when shipping
 const addressSchema = z
   .object({
-    street: z.string().max(200, "Straße ist zu lang").optional(),
-    houseNumber: z.string().max(20, "Hausnummer ist zu lang").optional(),
-    postalCode: z.string().max(20, "Postleitzahl ist zu lang").optional(),
-    city: z.string().max(100, "Stadt ist zu lang").optional(),
-    country: z.string().max(2, "Ungültiger Ländercode").optional(),
-    addressLine2: z.string().max(200, "Adresszusatz ist zu lang").optional(),
+    street: z.string().max(200, 'Straße ist zu lang').optional(),
+    houseNumber: z.string().max(20, 'Hausnummer ist zu lang').optional(),
+    postalCode: z.string().max(20, 'Postleitzahl ist zu lang').optional(),
+    city: z.string().max(100, 'Stadt ist zu lang').optional(),
+    country: z.string().max(2, 'Ungültiger Ländercode').optional(),
+    addressLine2: z.string().max(200, 'Adresszusatz ist zu lang').optional(),
   })
   .optional();
 
@@ -801,43 +801,43 @@ const reservationSchema = z
   .object({
     firstName: z
       .string()
-      .min(2, "Vorname muss mindestens 2 Zeichen lang sein")
-      .max(100, "Vorname darf maximal 100 Zeichen lang sein"),
+      .min(2, 'Vorname muss mindestens 2 Zeichen lang sein')
+      .max(100, 'Vorname darf maximal 100 Zeichen lang sein'),
     lastName: z
       .string()
-      .min(2, "Nachname muss mindestens 2 Zeichen lang sein")
-      .max(100, "Nachname darf maximal 100 Zeichen lang sein"),
+      .min(2, 'Nachname muss mindestens 2 Zeichen lang sein')
+      .max(100, 'Nachname darf maximal 100 Zeichen lang sein'),
     email: z
       .string()
-      .email("Bitte geben Sie eine gültige E-Mail-Adresse ein")
-      .max(254, "E-Mail-Adresse ist zu lang"),
+      .email('Bitte geben Sie eine gültige E-Mail-Adresse ein')
+      .max(254, 'E-Mail-Adresse ist zu lang'),
     phone: z.string().optional(), // Phone is optional
-    magazineId: z.string().min(1, "Bitte wählen Sie eine Magazin-Ausgabe"),
+    magazineId: z.string().min(1, 'Bitte wählen Sie eine Magazin-Ausgabe'),
     quantity: z
       .number()
-      .min(1, "Mindestens 1 Exemplar erforderlich")
-      .max(1, "Maximal 1 Exemplar pro Familie"), // Fixed to 1 magazine per family
-    deliveryMethod: z.enum(["pickup", "shipping"]), // Both pickup and shipping supported
+      .min(1, 'Mindestens 1 Exemplar erforderlich')
+      .max(1, 'Maximal 1 Exemplar pro Familie'), // Fixed to 1 magazine per family
+    deliveryMethod: z.enum(['pickup', 'shipping']), // Both pickup and shipping supported
     pickupLocation: z.string().optional(), // Used for pickup
     pickupDate: z.string().optional(), // Used for pickup
     paymentMethod: z.string().optional(), // Required only for shipping
     address: addressSchema,
     notes: z
       .string()
-      .max(500, "Anmerkungen dürfen maximal 500 Zeichen lang sein")
+      .max(500, 'Anmerkungen dürfen maximal 500 Zeichen lang sein')
       .optional(),
     // Picture order fields
     orderGroupPicture: z.boolean().optional(),
     childGroupName: z.string().optional(),
     orderVorschulPicture: z.boolean().optional(),
     childIsVorschueler: z.boolean().optional(),
-    childName: z.string().max(200, "Name ist zu lang").optional(),
+    childName: z.string().max(200, 'Name ist zu lang').optional(),
     consents: z.object({
       essential: z
         .boolean()
         .refine(
           (val) => val === true,
-          "Erforderliche Einwilligung muss erteilt werden",
+          'Erforderliche Einwilligung muss erteilt werden',
         ),
       functional: z.boolean(),
       analytics: z.boolean(),
@@ -847,7 +847,7 @@ const reservationSchema = z
   .refine(
     (data) => {
       // If shipping method, address fields are required
-      if (data.deliveryMethod === "shipping") {
+      if (data.deliveryMethod === 'shipping') {
         if (!data.address) return false;
 
         // Check each required field
@@ -867,21 +867,21 @@ const reservationSchema = z
       return true;
     },
     {
-      message: "Alle Adressfelder sind bei Versand erforderlich",
-      path: ["address"],
+      message: 'Alle Adressfelder sind bei Versand erforderlich',
+      path: ['address'],
     },
   )
   .refine(
     (data) => {
       // If pickup method, pickupLocation is required
-      if (data.deliveryMethod === "pickup") {
+      if (data.deliveryMethod === 'pickup') {
         return data.pickupLocation && data.pickupLocation.length > 0;
       }
       return true;
     },
     {
-      message: "Bitte wählen Sie einen Abholort",
-      path: ["pickupLocation"],
+      message: 'Bitte wählen Sie einen Abholort',
+      path: ['pickupLocation'],
     },
   )
   .refine(
@@ -899,8 +899,8 @@ const reservationSchema = z
     },
     {
       message:
-        "Gruppenname und Kindername sind für die Bildbestellung erforderlich",
-      path: ["childGroupName"],
+        'Gruppenname und Kindername sind für die Bildbestellung erforderlich',
+      path: ['childGroupName'],
     },
   )
   .refine(
@@ -917,8 +917,8 @@ const reservationSchema = z
     },
     {
       message:
-        "Für die Vorschüler-Bildbestellung muss das Kind als Vorschüler markiert sein",
-      path: ["orderVorschulPicture"],
+        'Für die Vorschüler-Bildbestellung muss das Kind als Vorschüler markiert sein',
+      path: ['orderVorschulPicture'],
     },
   );
 
@@ -932,13 +932,13 @@ const maxQuantity = computed(() => 1); // Fixed to 1 magazine per family
 const minPickupDate = computed(() => {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
-  return tomorrow.toISOString().split("T")[0];
+  return tomorrow.toISOString().split('T')[0];
 });
 
 const maxPickupDate = computed(() => {
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 30); // 30 days from now
-  return maxDate.toISOString().split("T")[0];
+  return maxDate.toISOString().split('T')[0];
 });
 
 const isFormValid = computed(() => {
@@ -947,14 +947,14 @@ const isFormValid = computed(() => {
 });
 
 const totalCost = computed(() => {
-  const isShipping = deliveryMethod.value === "shipping";
+  const isShipping = deliveryMethod.value === 'shipping';
   return calculateTotalCost(isShipping);
 });
 
 // Methods
 const getFieldClass = (fieldName: string) => {
-  const baseClass = "form-field";
-  const errorClass = "form-field-error";
+  const baseClass = 'form-field';
+  const errorClass = 'form-field-error';
 
   return formErrors[fieldName] ? `${baseClass} ${errorClass}` : baseClass;
 };
@@ -971,7 +971,7 @@ const validateForm = (): boolean => {
       // In Zod v4, 'errors' was renamed to 'issues'
       const issues = error.issues || error.errors || [];
       issues.forEach((err) => {
-        const path = err.path.join(".");
+        const path = err.path.join('.');
         formErrors[path] = err.message;
       });
     }
@@ -993,34 +993,34 @@ watch(deliveryMethod, async (newValue) => {
   await nextTick();
 
   // Clear pickup location when switching to shipping
-  if (newValue === "shipping") {
-    formData.pickupLocation = "";
-    formData.pickupDate = "";
+  if (newValue === 'shipping') {
+    formData.pickupLocation = '';
+    formData.pickupDate = '';
   }
 
   // Set default pickup location and clear address when switching to pickup
-  if (newValue === "pickup") {
-    formData.pickupLocation = "BRK Haus für Kinder - Leuchtturm"; // Restore default pickup location
+  if (newValue === 'pickup') {
+    formData.pickupLocation = 'BRK Haus für Kinder - Leuchtturm'; // Restore default pickup location
     formData.address = {
-      street: "",
-      houseNumber: "",
-      postalCode: "",
-      city: "",
-      country: "DE",
-      addressLine2: "",
+      street: '',
+      houseNumber: '',
+      postalCode: '',
+      city: '',
+      country: 'DE',
+      addressLine2: '',
     };
-    formData.paymentMethod = "";
+    formData.paymentMethod = '';
   }
 
   // Clear validation errors for switched fields
-  if (newValue === "shipping") {
+  if (newValue === 'shipping') {
     delete formErrors.pickupLocation;
     delete formErrors.pickupDate;
   } else {
-    delete formErrors["address.street"];
-    delete formErrors["address.houseNumber"];
-    delete formErrors["address.postalCode"];
-    delete formErrors["address.city"];
+    delete formErrors['address.street'];
+    delete formErrors['address.houseNumber'];
+    delete formErrors['address.postalCode'];
+    delete formErrors['address.city'];
     delete formErrors.paymentMethod;
   }
 });
@@ -1028,22 +1028,22 @@ watch(deliveryMethod, async (newValue) => {
 const handleSubmit = async () => {
   if (!validateForm()) {
     // Scroll to first error
-    const firstErrorElement = document.querySelector(".form-field-error");
+    const firstErrorElement = document.querySelector('.form-field-error');
     if (firstErrorElement) {
-      firstErrorElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      firstErrorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     return;
   }
 
   isSubmitting.value = true;
-  serverError.value = "";
+  serverError.value = '';
 
   try {
-    const response = await fetch("/api/reservations", {
-      method: "POST",
+    const response = await fetch('/api/reservations', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        "X-Requested-With": "XMLHttpRequest",
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
       },
       body: JSON.stringify(formData),
     });
@@ -1051,11 +1051,11 @@ const handleSubmit = async () => {
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.error || "Fehler beim Absenden der Reservierung");
+      throw new Error(result.error || 'Fehler beim Absenden der Reservierung');
     }
 
     // Success
-    reservationId.value = result.data?.id || "";
+    reservationId.value = result.data?.id || '';
     showSuccess.value = true;
 
     // Reset form after success
@@ -1066,22 +1066,22 @@ const handleSubmit = async () => {
 
     // Scroll to success message
     setTimeout(() => {
-      const successElement = document.querySelector(".alert-success");
+      const successElement = document.querySelector('.alert-success');
       if (successElement) {
-        successElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        successElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 100);
   } catch (error) {
     serverError.value =
       error instanceof Error
         ? error.message
-        : "Ein unerwarteter Fehler ist aufgetreten.";
+        : 'Ein unerwarteter Fehler ist aufgetreten.';
 
     // Scroll to error message
     setTimeout(() => {
-      const errorElement = document.querySelector(".alert-error");
+      const errorElement = document.querySelector('.alert-error');
       if (errorElement) {
-        errorElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 100);
   } finally {
@@ -1090,22 +1090,22 @@ const handleSubmit = async () => {
 };
 
 const resetForm = () => {
-  deliveryMethod.value = "pickup";
+  deliveryMethod.value = 'pickup';
   Object.keys(formData).forEach((key) => {
-    if (key === "quantity") {
+    if (key === 'quantity') {
       (formData as any)[key] = 1;
-    } else if (key === "deliveryMethod") {
-      formData.deliveryMethod = "pickup";
-    } else if (key === "address") {
+    } else if (key === 'deliveryMethod') {
+      formData.deliveryMethod = 'pickup';
+    } else if (key === 'address') {
       formData.address = {
-        street: "",
-        houseNumber: "",
-        postalCode: "",
-        city: "",
-        country: "DE",
-        addressLine2: "",
+        street: '',
+        houseNumber: '',
+        postalCode: '',
+        city: '',
+        country: 'DE',
+        addressLine2: '',
       };
-    } else if (key === "consents") {
+    } else if (key === 'consents') {
       formData.consents = {
         essential: false,
         functional: false,
@@ -1113,28 +1113,28 @@ const resetForm = () => {
         marketing: false,
       };
     } else if (
-      key === "orderGroupPicture" ||
-      key === "orderVorschulPicture" ||
-      key === "childIsVorschueler"
+      key === 'orderGroupPicture' ||
+      key === 'orderVorschulPicture' ||
+      key === 'childIsVorschueler'
     ) {
       (formData as any)[key] = false;
     } else {
-      (formData as any)[key] = "";
+      (formData as any)[key] = '';
     }
   });
 
   Object.keys(formErrors).forEach((key) => delete formErrors[key]);
-  serverError.value = "";
+  serverError.value = '';
   showSuccess.value = false;
-  reservationId.value = "";
+  reservationId.value = '';
 };
 
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("de-DE", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
+  return date.toLocaleDateString('de-DE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
   });
 };
 
@@ -1159,7 +1159,7 @@ onMounted(() => {
 
 const fetchMagazines = async () => {
   try {
-    const response = await fetch("/api/magazines");
+    const response = await fetch('/api/magazines');
     if (response.ok) {
       const result = await response.json();
       availableMagazines.value = result.data || [];

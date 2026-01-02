@@ -59,7 +59,7 @@
 }
 
 .nautical-bg::before {
-  content: "";
+  content: '';
   position: fixed;
   width: 100%;
   height: 100%;
@@ -133,7 +133,7 @@
 }
 
 .lighthouse-beacon::after {
-  content: "";
+  content: '';
   position: absolute;
   top: -20%;
   left: 50%;
@@ -308,7 +308,7 @@
 }
 
 .nautical-card::before {
-  content: "⚓";
+  content: '⚓';
   position: absolute;
   top: -20px;
   right: -20px;
@@ -337,7 +337,7 @@
 }
 
 .porthole::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 10%;
   left: 10%;
@@ -360,7 +360,7 @@
 }
 
 .rope-border::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 0;
@@ -393,7 +393,7 @@
 }
 
 .btn-nautical::before {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: -100%;
@@ -449,7 +449,7 @@
 }
 
 .compass-rose::before {
-  content: "⊹";
+  content: '⊹';
   position: absolute;
   top: 50%;
   left: 50%;
@@ -569,7 +569,7 @@
 
 .ship-wheel-loader::before,
 .ship-wheel-loader::after {
-  content: "";
+  content: '';
   position: absolute;
   background: var(--wood-dark);
 }
@@ -731,7 +731,7 @@
 }
 
 .message-bottle::before {
-  content: "🍾";
+  content: '🍾';
   position: absolute;
   top: -15px;
   right: 20px;
