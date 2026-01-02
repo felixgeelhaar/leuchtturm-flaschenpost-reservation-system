@@ -1,31 +1,31 @@
-import { vi } from 'vitest';
-import { config } from '@vue/test-utils';
+import { vi } from "vitest";
+import { config } from "@vue/test-utils";
 
 // Set up mock environment variables before anything else
-vi.stubGlobal('import', {
+vi.stubGlobal("import", {
   meta: {
     env: {
-      PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
-      PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
-      SUPABASE_SERVICE_ROLE_KEY: 'test-service-key',
-      SMTP_HOST: 'smtp.test.com',
-      SMTP_PORT: '587',
-      SMTP_SECURE: 'false',
-      SMTP_USER: 'test@example.com',
-      SMTP_PASS: 'password123',
-      SMTP_FROM: 'noreply@example.com',
-      MODE: 'test',
-      NODE_ENV: 'test',
+      PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+      PUBLIC_SUPABASE_ANON_KEY: "test-anon-key",
+      SUPABASE_SERVICE_ROLE_KEY: "test-service-key",
+      SMTP_HOST: "smtp.test.com",
+      SMTP_PORT: "587",
+      SMTP_SECURE: "false",
+      SMTP_USER: "test@example.com",
+      SMTP_PASS: "password123",
+      SMTP_FROM: "noreply@example.com",
+      MODE: "test",
+      NODE_ENV: "test",
     },
   },
 });
 
 // Mock global objects
-Object.defineProperty(window, 'fetch', {
+Object.defineProperty(window, "fetch", {
   value: vi.fn(),
 });
 
-Object.defineProperty(window, 'localStorage', {
+Object.defineProperty(window, "localStorage", {
   value: {
     getItem: vi.fn(),
     setItem: vi.fn(),
@@ -67,7 +67,7 @@ const createMockChain = () => {
 };
 
 // Mock Supabase
-vi.mock('@/lib/supabase', () => ({
+vi.mock("@/lib/supabase", () => ({
   supabase: {
     from: vi.fn(() => createMockChain()),
   },
@@ -80,17 +80,17 @@ vi.mock('@/lib/supabase', () => ({
 }));
 
 // Mock nodemailer
-vi.mock('nodemailer', () => ({
+vi.mock("nodemailer", () => ({
   default: {
     createTransport: vi.fn().mockReturnValue({
-      sendMail: vi.fn().mockResolvedValue({ messageId: 'test-message-id' }),
+      sendMail: vi.fn().mockResolvedValue({ messageId: "test-message-id" }),
       verify: vi.fn().mockResolvedValue(true),
     }),
   },
 }));
 
 // Mock the email service to prevent actual emails during tests
-vi.mock('@/lib/email/email-service', () => ({
+vi.mock("@/lib/email/email-service", () => ({
   emailService: {
     sendReservationConfirmation: vi.fn().mockResolvedValue(undefined),
     sendCancellationConfirmation: vi.fn().mockResolvedValue(undefined),

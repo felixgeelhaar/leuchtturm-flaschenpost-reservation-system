@@ -3,6 +3,7 @@
 ## ✅ Pre-Deployment Status
 
 ### Build & Tests
+
 - ✅ **Production Build**: Successfully completed (20.35s)
   - Server-side rendering configured
   - Netlify Functions generated
@@ -13,14 +14,17 @@
 - ✅ **Code Quality**: 0 ESLint errors
 
 ### Environment Variables Required
+
 The following environment variables must be set in Netlify Dashboard:
 
 #### 🔐 Database (Supabase)
+
 - [ ] `PUBLIC_SUPABASE_URL` - Your Supabase project URL
 - [ ] `PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
 - [ ] `SUPABASE_SERVICE_ROLE_KEY` - Service role key (keep secret!)
 
 #### 📧 Email Service (SMTP)
+
 - [ ] `SMTP_HOST` - SMTP server (e.g., smtp.gmail.com)
 - [ ] `SMTP_PORT` - SMTP port (typically 587)
 - [ ] `SMTP_SECURE` - Use TLS (true/false)
@@ -29,12 +33,14 @@ The following environment variables must be set in Netlify Dashboard:
 - [ ] `SMTP_FROM` - From email address
 
 #### 🔒 Security Keys
+
 - [ ] `JWT_SECRET` - JWT signing secret (generate 32+ chars)
 - [ ] `SESSION_SECRET` - Session encryption key
 - [ ] `ENCRYPTION_KEY` - Data encryption key
 - [ ] `CSRF_SECRET` - CSRF token secret
 
 #### 📊 Optional Services
+
 - [ ] `SENTRY_DSN` - Error tracking (optional)
 - [ ] `GA_MEASUREMENT_ID` - Google Analytics (optional)
 
@@ -59,6 +65,7 @@ The following environment variables must be set in Netlify Dashboard:
 ### 2. Database Setup (Supabase)
 
 1. **Create Tables** - Run these migrations in Supabase SQL Editor:
+
 ```sql
 -- Users table with GDPR fields
 CREATE TABLE users (
@@ -133,18 +140,19 @@ CREATE POLICY "Public can read active magazines" ON magazines
 
 CREATE POLICY "Service role full access" ON users
   FOR ALL USING (true);
-  
+
 CREATE POLICY "Service role full access" ON reservations
   FOR ALL USING (true);
-  
+
 CREATE POLICY "Service role full access" ON user_consents
   FOR ALL USING (true);
 ```
 
 2. **Add Sample Magazine Data**:
+
 ```sql
 INSERT INTO magazines (title, issue_number, publish_date, description, available_copies, total_copies, is_active)
-VALUES 
+VALUES
   ('Flaschenpost Frühjahr 2024', '01/2024', '2024-03-01', 'Die Frühjahrsausgabe mit tollen Geschichten', 100, 100, true),
   ('Flaschenpost Sommer 2024', '02/2024', '2024-06-01', 'Sommergeschichten und Abenteuer', 100, 100, true);
 ```
@@ -152,11 +160,13 @@ VALUES
 ### 3. Post-Deployment Verification
 
 #### Health Check
+
 ```bash
 curl https://your-domain.netlify.app/api/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "healthy",
@@ -170,6 +180,7 @@ Expected response:
 ```
 
 #### Test Reservation Flow
+
 1. Visit homepage
 2. Fill out reservation form
 3. Submit test reservation
@@ -187,12 +198,14 @@ Expected response:
 ## 🔍 Monitoring & Maintenance
 
 ### Setup Monitoring
+
 - [ ] Configure Sentry for error tracking
 - [ ] Set up uptime monitoring (e.g., UptimeRobot)
 - [ ] Enable Netlify Analytics
 - [ ] Configure email alerts for failures
 
 ### Regular Maintenance
+
 - [ ] Weekly: Check error logs
 - [ ] Monthly: Review database growth
 - [ ] Monthly: Update dependencies (`npm audit`)
@@ -223,6 +236,7 @@ If issues occur after deployment:
 ## ✅ Final Deployment Checklist
 
 Before clicking "Deploy":
+
 - [ ] All environment variables set in Netlify
 - [ ] Database tables created and tested
 - [ ] Email service credentials verified

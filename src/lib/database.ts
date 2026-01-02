@@ -1,5 +1,5 @@
 // Database utility functions for reservation system
-import { createServerSupabaseClient } from './supabase';
+import { createServerSupabaseClient } from "./supabase";
 import type {
   User,
   Magazine,
@@ -8,7 +8,7 @@ import type {
   DataProcessingLog,
   ReservationFormData,
   ConsentData,
-} from '@/types';
+} from "@/types";
 
 // Server-side database operations
 export class DatabaseService {
@@ -35,7 +35,7 @@ export class DatabaseService {
     consentVersion: string;
   }): Promise<User> {
     const { data, error } = await this.supabase
-      .from('users')
+      .from("users")
       .insert({
         email: userData.email,
         first_name: userData.firstName,
@@ -61,13 +61,13 @@ export class DatabaseService {
 
   async getUserByEmail(email: string): Promise<User | null> {
     const { data, error } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
+      .from("users")
+      .select("*")
+      .eq("email", email)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') return null; // No rows returned
+      if (error.code === "PGRST116") return null; // No rows returned
       throw new Error(`Failed to get user: ${error.message}`);
     }
 
@@ -94,10 +94,10 @@ export class DatabaseService {
   // Magazine operations
   async getActiveMagazines(): Promise<Magazine[]> {
     const { data, error } = await this.supabase
-      .from('magazines')
-      .select('*')
-      .gt('available_copies', 0)
-      .order('publish_date', { ascending: false });
+      .from("magazines")
+      .select("*")
+      .gt("available_copies", 0)
+      .order("publish_date", { ascending: false });
 
     if (error) throw new Error(`Failed to get magazines: ${error.message}`);
     return data.map(this.mapMagazineFromDB);
@@ -105,13 +105,13 @@ export class DatabaseService {
 
   async getMagazineById(id: string): Promise<Magazine | null> {
     const { data, error } = await this.supabase
-      .from('magazines')
-      .select('*')
-      .eq('id', id)
+      .from("magazines")
+      .select("*")
+      .eq("id", id)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') return null;
+      if (error.code === "PGRST116") return null;
       throw new Error(`Failed to get magazine: ${error.message}`);
     }
 
@@ -131,8 +131,8 @@ export class DatabaseService {
         lastName: formData.lastName,
         // phone: formData.phone, // phone column doesn't exist
         address:
-          formData.deliveryMethod === 'shipping' ? formData.address : undefined,
-        consentVersion: '1.0',
+          formData.deliveryMethod === "shipping" ? formData.address : undefined,
+        consentVersion: "1.0",
       });
     }
 
@@ -142,41 +142,41 @@ export class DatabaseService {
     // expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
 
     const { data, error } = await this.supabase
-      .from('reservations')
+      .from("reservations")
       .insert({
         user_id: user.id,
         magazine_id: formData.magazineId,
         quantity: formData.quantity,
         delivery_method: formData.deliveryMethod,
         pickup_location:
-          formData.deliveryMethod === 'pickup' ? formData.pickupLocation : null,
+          formData.deliveryMethod === "pickup" ? formData.pickupLocation : null,
         pickup_date: formData.pickupDate || null,
         // Set payment_method only for shipping (PayPal), null for pickup
         payment_method:
-          formData.deliveryMethod === 'shipping' ? 'paypal' : null,
+          formData.deliveryMethod === "shipping" ? "paypal" : null,
         // Shipping address fields (only for shipping)
         street:
-          formData.deliveryMethod === 'shipping'
+          formData.deliveryMethod === "shipping"
             ? formData.address?.street
             : null,
         house_number:
-          formData.deliveryMethod === 'shipping'
+          formData.deliveryMethod === "shipping"
             ? formData.address?.houseNumber
             : null,
         address_line2:
-          formData.deliveryMethod === 'shipping'
+          formData.deliveryMethod === "shipping"
             ? formData.address?.addressLine2
             : null,
         postal_code:
-          formData.deliveryMethod === 'shipping'
+          formData.deliveryMethod === "shipping"
             ? formData.address?.postalCode
             : null,
         city:
-          formData.deliveryMethod === 'shipping'
+          formData.deliveryMethod === "shipping"
             ? formData.address?.city
             : null,
         country:
-          formData.deliveryMethod === 'shipping'
+          formData.deliveryMethod === "shipping"
             ? formData.address?.country
             : null,
         // Notes field
@@ -217,9 +217,9 @@ export class DatabaseService {
     // Log the data processing action
     await this.logDataProcessing({
       userId: user.id,
-      action: 'reservation_created',
-      dataType: 'reservation',
-      legalBasis: 'consent',
+      action: "reservation_created",
+      dataType: "reservation",
+      legalBasis: "consent",
       details: JSON.stringify({
         reservationId: data.id,
         magazineId: formData.magazineId,
@@ -232,7 +232,7 @@ export class DatabaseService {
 
   async getUserReservations(userId: string): Promise<Reservation[]> {
     const { data, error } = await this.supabase
-      .from('reservations')
+      .from("reservations")
       .select(
         `
         *,
@@ -245,8 +245,8 @@ export class DatabaseService {
         )
       `,
       )
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
     if (error) throw new Error(`Failed to get reservations: ${error.message}`);
     return data.map(this.mapReservationFromDB);
@@ -257,19 +257,19 @@ export class DatabaseService {
     userId: string,
   ): Promise<void> {
     const { error } = await this.supabase
-      .from('reservations')
-      .update({ status: 'cancelled' })
-      .eq('id', reservationId)
-      .eq('user_id', userId);
+      .from("reservations")
+      .update({ status: "cancelled" })
+      .eq("id", reservationId)
+      .eq("user_id", userId);
 
     if (error)
       throw new Error(`Failed to cancel reservation: ${error.message}`);
 
     await this.logDataProcessing({
       userId,
-      action: 'reservation_cancelled',
-      dataType: 'reservation',
-      legalBasis: 'user_request',
+      action: "reservation_cancelled",
+      dataType: "reservation",
+      legalBasis: "user_request",
       details: JSON.stringify({ reservationId }),
     });
   }
@@ -284,7 +284,7 @@ export class DatabaseService {
       user_id: userId,
       consent_type: type as keyof ConsentData,
       consent_given: given,
-      consent_version: '1.0',
+      consent_version: "1.0",
       // Temporarily disable IP address to avoid inet format issues
       // ip_address: metadata.ipAddress || null,
       // user_agent column doesn't exist in the database
@@ -292,16 +292,16 @@ export class DatabaseService {
     }));
 
     const { error } = await this.supabase
-      .from('user_consents')
+      .from("user_consents")
       .insert(consentRecords);
 
     if (error) throw new Error(`Failed to record consent: ${error.message}`);
 
     await this.logDataProcessing({
       userId,
-      action: 'consent_given',
-      dataType: 'consent',
-      legalBasis: 'consent',
+      action: "consent_given",
+      dataType: "consent",
+      legalBasis: "consent",
       ipAddress: metadata.ipAddress,
       details: JSON.stringify(consents),
     });
@@ -309,10 +309,10 @@ export class DatabaseService {
 
   async getUserConsents(userId: string): Promise<ConsentRecord[]> {
     const { data, error } = await this.supabase
-      .from('user_consents')
-      .select('*')
-      .eq('user_id', userId)
-      .order('timestamp', { ascending: false });
+      .from("user_consents")
+      .select("*")
+      .eq("user_id", userId)
+      .order("timestamp", { ascending: false });
 
     if (error) throw new Error(`Failed to get consents: ${error.message}`);
     return data.map(this.mapConsentFromDB);
@@ -323,23 +323,23 @@ export class DatabaseService {
     consentType: keyof ConsentData,
   ): Promise<void> {
     const { error } = await this.supabase
-      .from('user_consents')
+      .from("user_consents")
       .update({
         consent_given: false,
         // withdrawal_timestamp column might not exist
         // withdrawal_timestamp: new Date().toISOString(),
       })
-      .eq('user_id', userId)
-      .eq('consent_type', consentType);
+      .eq("user_id", userId)
+      .eq("consent_type", consentType);
     // .is('withdrawal_timestamp', null);
 
     if (error) throw new Error(`Failed to withdraw consent: ${error.message}`);
 
     await this.logDataProcessing({
       userId,
-      action: 'consent_withdrawn',
-      dataType: 'consent',
-      legalBasis: 'user_request',
+      action: "consent_withdrawn",
+      dataType: "consent",
+      legalBasis: "user_request",
       details: JSON.stringify({ consentType }),
     });
   }
@@ -348,27 +348,27 @@ export class DatabaseService {
   async exportUserData(userId: string): Promise<Record<string, unknown>> {
     // Get user data
     const { data: userData } = await this.supabase
-      .from('users')
-      .select('*')
-      .eq('id', userId)
+      .from("users")
+      .select("*")
+      .eq("id", userId)
       .single();
 
     // Get reservations
     const { data: reservations } = await this.supabase
-      .from('reservations')
+      .from("reservations")
       .select(
         `
         *,
         magazines (title, issue_number)
       `,
       )
-      .eq('user_id', userId);
+      .eq("user_id", userId);
 
     // Get consents
     const { data: consents } = await this.supabase
-      .from('user_consents')
-      .select('*')
-      .eq('user_id', userId);
+      .from("user_consents")
+      .select("*")
+      .eq("user_id", userId);
 
     const exportData = {
       exportDate: new Date().toISOString(),
@@ -380,9 +380,9 @@ export class DatabaseService {
     // Log the data export
     await this.logDataProcessing({
       userId,
-      action: 'exported',
-      dataType: 'user_data',
-      legalBasis: 'user_request',
+      action: "exported",
+      dataType: "user_data",
+      legalBasis: "user_request",
       details: JSON.stringify({
         exportSize: JSON.stringify(exportData).length,
       }),
@@ -393,37 +393,37 @@ export class DatabaseService {
 
   async deleteUserData(
     userId: string,
-    reason: string = 'user_request',
+    reason: string = "user_request",
   ): Promise<void> {
     // Export data before deletion for compliance records
     await this.exportUserData(userId);
 
     // Delete in correct order due to foreign key constraints
-    await this.supabase.from('user_consents').delete().eq('user_id', userId);
-    await this.supabase.from('reservations').delete().eq('user_id', userId);
+    await this.supabase.from("user_consents").delete().eq("user_id", userId);
+    await this.supabase.from("reservations").delete().eq("user_id", userId);
 
     // Anonymize processing logs (keep for legal compliance)
     await this.supabase
-      .from('data_processing_activity')
+      .from("data_processing_activity")
       .update({
         user_id: null,
         details: JSON.stringify({ anonymized: true, reason }),
       })
-      .eq('user_id', userId);
+      .eq("user_id", userId);
 
     // Delete user record
     const { error } = await this.supabase
-      .from('users')
+      .from("users")
       .delete()
-      .eq('id', userId);
+      .eq("id", userId);
 
     if (error) throw new Error(`Failed to delete user: ${error.message}`);
 
     // Final deletion log
     await this.logDataProcessing({
-      action: 'deleted',
-      dataType: 'user_data',
-      legalBasis: 'user_request',
+      action: "deleted",
+      dataType: "user_data",
+      legalBasis: "user_request",
       details: JSON.stringify({ originalUserId: userId, reason }),
     });
   }
@@ -431,9 +431,9 @@ export class DatabaseService {
   // Data processing logging
   async logDataProcessing(log: {
     userId?: string;
-    action: DataProcessingLog['action'];
-    dataType: DataProcessingLog['dataType'];
-    legalBasis: DataProcessingLog['legalBasis'];
+    action: DataProcessingLog["action"];
+    dataType: DataProcessingLog["dataType"];
+    legalBasis: DataProcessingLog["legalBasis"];
     processorId?: string;
     ipAddress?: string;
     details?: string;
@@ -442,7 +442,7 @@ export class DatabaseService {
     // This is a temporary fix - the table should be created in production
     try {
       const { error } = await this.supabase
-        .from('data_processing_activity')
+        .from("data_processing_activity")
         .insert({
           user_id: log.userId || null,
           action: log.action,
@@ -456,19 +456,19 @@ export class DatabaseService {
 
       if (error) {
         // Silently skip if table doesn't exist (not critical for main flow)
-        if (error.code !== '42P01') {
+        if (error.code !== "42P01") {
           // Only log non-table-missing errors
           console.error(
-            'Data processing log error:',
-            error?.message || error?.code || 'Unknown',
+            "Data processing log error:",
+            error?.message || error?.code || "Unknown",
           );
         }
       }
     } catch (err) {
       // Silently fail to not break the main flow
       console.warn(
-        'GDPR logging failed silently:',
-        err instanceof Error ? err.message : 'Unknown error',
+        "GDPR logging failed silently:",
+        err instanceof Error ? err.message : "Unknown error",
       );
     }
   }
@@ -520,7 +520,7 @@ export class DatabaseService {
       quantity: data.quantity,
       status: data.status,
       reservationDate: data.reservation_date,
-      deliveryMethod: data.delivery_method || 'pickup',
+      deliveryMethod: data.delivery_method || "pickup",
       pickupDate: data.pickup_date,
       pickupLocation: data.pickup_location,
       paymentMethod: data.payment_method,
@@ -536,7 +536,7 @@ export class DatabaseService {
           }
         : undefined,
       notes: data.notes, // notes column now exists
-      consentReference: 'legacy', // Column doesn't exist
+      consentReference: "legacy", // Column doesn't exist
       // Picture order fields - now exist in database
       orderGroupPicture: data.order_group_picture || false,
       childGroupName: data.child_group_name,
@@ -558,7 +558,7 @@ export class DatabaseService {
       consentVersion: data.consent_version,
       timestamp: data.timestamp,
       ipAddress: data.ip_address,
-      userAgent: '', // Default empty string
+      userAgent: "", // Default empty string
       withdrawalTimestamp: undefined, // Column doesn't exist in database
     };
   }
@@ -585,14 +585,14 @@ export class DatabaseService {
 
     // Clean users past retention date
     const { data: expiredUsers } = await this.supabase
-      .from('users')
-      .select('id')
-      .lt('data_retention_until', now);
+      .from("users")
+      .select("id")
+      .lt("data_retention_until", now);
 
     let deletedUsersCount = 0;
     if (expiredUsers) {
       for (const user of expiredUsers) {
-        await this.deleteUserData(user.id, 'retention_period_expired');
+        await this.deleteUserData(user.id, "retention_period_expired");
         deletedUsersCount++;
       }
     }
@@ -602,10 +602,10 @@ export class DatabaseService {
     cutoffDate.setFullYear(cutoffDate.getFullYear() - 7);
 
     const { data: cleanedLogs } = await this.supabase
-      .from('data_processing_activity')
+      .from("data_processing_activity")
       .delete()
-      .lt('timestamp', cutoffDate.toISOString())
-      .select('id');
+      .lt("timestamp", cutoffDate.toISOString())
+      .select("id");
 
     return {
       expiredReservations: expiredReservations?.length || 0,

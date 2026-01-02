@@ -1,20 +1,20 @@
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { DatabaseService } from '@/lib/database';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { DatabaseService } from "@/lib/database";
 
 // Mark this route as server-side only (not to be prerendered)
 export const prerender = false;
 
 // Validation schema for consent data
 const consentSchema = z.object({
-  userId: z.string().uuid('Ungültige Benutzer-ID').optional(),
+  userId: z.string().uuid("Ungültige Benutzer-ID").optional(),
   consents: z.object({
     essential: z.boolean(),
     functional: z.boolean(),
     analytics: z.boolean(),
     marketing: z.boolean(),
   }),
-  timestamp: z.string().datetime('Ungültiger Zeitstempel'),
+  timestamp: z.string().datetime("Ungültiger Zeitstempel"),
   ipAddress: z.string().optional(),
   userAgent: z.string().optional(),
 });
@@ -25,10 +25,10 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     // Get client information
     const clientIP =
-      request.headers.get('x-forwarded-for') ||
-      request.headers.get('x-real-ip') ||
-      'unknown';
-    const userAgent = request.headers.get('user-agent') || 'unknown';
+      request.headers.get("x-forwarded-for") ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+    const userAgent = request.headers.get("user-agent") || "unknown";
 
     // Parse request body
     let body;
@@ -38,12 +38,12 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Invalid JSON',
-          message: 'Ungültiger JSON-Body.',
+          error: "Invalid JSON",
+          message: "Ungültiger JSON-Body.",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
       );
     }
@@ -60,20 +60,20 @@ export const POST: APIRoute = async ({ request }) => {
         validationResult.error.errors ||
         []
       ).map((err) => ({
-        field: err.path.join('.'),
+        field: err.path.join("."),
         message: err.message,
       }));
 
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Validation failed',
-          message: 'Eingabedaten sind ungültig.',
+          error: "Validation failed",
+          message: "Eingabedaten sind ungültig.",
           errors,
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
       );
     }
@@ -90,9 +90,9 @@ export const POST: APIRoute = async ({ request }) => {
     if (!userId) {
       // For anonymous consent, we just log the action
       await db.logDataProcessing({
-        action: 'consent_given',
-        dataType: 'consent',
-        legalBasis: 'consent',
+        action: "consent_given",
+        dataType: "consent",
+        legalBasis: "consent",
         ipAddress,
         details: JSON.stringify({
           consents,
@@ -104,11 +104,11 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: true,
-          message: 'Anonyme Einwilligung erfolgreich gespeichert.',
+          message: "Anonyme Einwilligung erfolgreich gespeichert.",
         }),
         {
           status: 200,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
       );
     }
@@ -122,25 +122,25 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Einwilligung erfolgreich gespeichert.',
+        message: "Einwilligung erfolgreich gespeichert.",
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
     );
   } catch (error) {
-    console.error('Consent recording error:', error);
+    console.error("Consent recording error:", error);
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Internal server error',
-        message: 'Fehler beim Speichern der Einwilligung.',
+        error: "Internal server error",
+        message: "Fehler beim Speichern der Einwilligung.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
     );
   }
@@ -148,9 +148,9 @@ export const POST: APIRoute = async ({ request }) => {
 
 // Consent withdrawal endpoint
 const withdrawalSchema = z.object({
-  userId: z.string().uuid('Ungültige Benutzer-ID'),
-  consentType: z.enum(['essential', 'functional', 'analytics', 'marketing']),
-  timestamp: z.string().datetime('Ungültiger Zeitstempel'),
+  userId: z.string().uuid("Ungültige Benutzer-ID"),
+  consentType: z.enum(["essential", "functional", "analytics", "marketing"]),
+  timestamp: z.string().datetime("Ungültiger Zeitstempel"),
 });
 
 export const DELETE: APIRoute = async ({ request }) => {
@@ -162,12 +162,12 @@ export const DELETE: APIRoute = async ({ request }) => {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Validation failed',
-          message: 'Ungültige Eingabedaten.',
+          error: "Validation failed",
+          message: "Ungültige Eingabedaten.",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
       );
     }
@@ -175,16 +175,16 @@ export const DELETE: APIRoute = async ({ request }) => {
     const { userId, consentType } = validationResult.data;
 
     // Essential consent cannot be withdrawn
-    if (consentType === 'essential') {
+    if (consentType === "essential") {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Cannot withdraw essential consent',
-          message: 'Grundlegende Einwilligung kann nicht widerrufen werden.',
+          error: "Cannot withdraw essential consent",
+          message: "Grundlegende Einwilligung kann nicht widerrufen werden.",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
       );
     }
@@ -198,21 +198,21 @@ export const DELETE: APIRoute = async ({ request }) => {
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
     );
   } catch (error) {
-    console.error('Consent withdrawal error:', error);
+    console.error("Consent withdrawal error:", error);
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Internal server error',
-        message: 'Fehler beim Widerrufen der Einwilligung.',
+        error: "Internal server error",
+        message: "Fehler beim Widerrufen der Einwilligung.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
     );
   }
@@ -223,18 +223,18 @@ export const GET: APIRoute = async ({ url }) => {
   const db = new DatabaseService();
 
   try {
-    const userId = url.searchParams.get('userId');
+    const userId = url.searchParams.get("userId");
 
     if (!userId) {
       return new Response(
         JSON.stringify({
           success: false,
-          error: 'Missing userId parameter',
-          message: 'Benutzer-ID ist erforderlich.',
+          error: "Missing userId parameter",
+          message: "Benutzer-ID ist erforderlich.",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         },
       );
     }
@@ -248,21 +248,21 @@ export const GET: APIRoute = async ({ url }) => {
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
     );
   } catch (error) {
-    console.error('Error fetching consents:', error);
+    console.error("Error fetching consents:", error);
 
     return new Response(
       JSON.stringify({
         success: false,
-        error: 'Internal server error',
-        message: 'Fehler beim Laden der Einwilligungen.',
+        error: "Internal server error",
+        message: "Fehler beim Laden der Einwilligungen.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       },
     );
   }

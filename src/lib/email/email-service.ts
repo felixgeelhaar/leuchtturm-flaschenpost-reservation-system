@@ -1,11 +1,11 @@
-import nodemailer from 'nodemailer';
-import type { Reservation, Magazine, User } from '@/types';
+import nodemailer from "nodemailer";
+import type { Reservation, Magazine, User } from "@/types";
 import {
   paymentConfig,
   generatePaymentReference,
   formatCurrency,
-} from '@/config/payment';
-import { websiteContent } from '@/config/content';
+} from "@/config/payment";
+import { websiteContent } from "@/config/content";
 
 const kindergarten = websiteContent.kindergarten;
 const pricing = websiteContent.pricing;
@@ -37,14 +37,14 @@ export class EmailService {
     // Use environment variables for configuration
     // In Astro, use import.meta.env instead of process.env
     const emailConfig2 = config || {
-      host: import.meta.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(import.meta.env.SMTP_PORT || '587'),
-      secure: import.meta.env.SMTP_SECURE === 'true',
+      host: import.meta.env.SMTP_HOST || "smtp.gmail.com",
+      port: parseInt(import.meta.env.SMTP_PORT || "587"),
+      secure: import.meta.env.SMTP_SECURE === "true",
       auth: {
-        user: import.meta.env.SMTP_USER || '',
-        pass: import.meta.env.SMTP_PASS || '',
+        user: import.meta.env.SMTP_USER || "",
+        pass: import.meta.env.SMTP_PASS || "",
       },
-      from: import.meta.env.SMTP_FROM || 'noreply@example.com',
+      from: import.meta.env.SMTP_FROM || "noreply@example.com",
     };
 
     this.fromAddress = emailConfig2.from;
@@ -52,15 +52,15 @@ export class EmailService {
     // Check if SMTP credentials are configured
     if (!emailConfig2.auth.user || !emailConfig2.auth.pass) {
       throw new Error(
-        'SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.',
+        "SMTP credentials not configured. Please set SMTP_USER and SMTP_PASS environment variables.",
       );
     }
 
     // Create transporter - simple configuration that works with Gmail
-    if (emailConfig2.host.includes('gmail')) {
+    if (emailConfig2.host.includes("gmail")) {
       // Use Gmail service mode which handles all the configuration
       this.transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         auth: {
           user: emailConfig2.auth.user,
           pass: emailConfig2.auth.pass,
@@ -103,7 +103,7 @@ export class EmailService {
       await this.transporter.verify();
     } catch (error) {
       throw new Error(
-        `Email service verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Email service verification failed: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -127,8 +127,8 @@ export class EmailService {
       html,
       text,
       headers: {
-        'X-Reservation-ID': reservation.id,
-        'X-Priority': '1',
+        "X-Reservation-ID": reservation.id,
+        "X-Priority": "1",
       },
     };
 
@@ -136,7 +136,7 @@ export class EmailService {
       // Add timeout to email sending (10 seconds)
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-          reject(new Error('Email send timeout after 10 seconds'));
+          reject(new Error("Email send timeout after 10 seconds"));
         }, 10000);
       });
 
@@ -144,20 +144,20 @@ export class EmailService {
       const info = await Promise.race([sendPromise, timeoutPromise]);
 
       // Log success only in development
-      if (import.meta.env.MODE === 'development' && info) {
+      if (import.meta.env.MODE === "development" && info) {
         console.log(
           `Email sent to ${user.email} (${(info as Record<string, unknown>).messageId})`,
         );
       }
     } catch (error) {
       // Log error with essential details only
-      console.error('Email send failed:', {
+      console.error("Email send failed:", {
         to: user.email,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         code: (error as any)?.code,
       });
       throw new Error(
-        `Failed to send confirmation email: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to send confirmation email: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -189,16 +189,16 @@ export class EmailService {
       html,
       text,
       headers: {
-        'X-Reservation-ID': reservation.id,
+        "X-Reservation-ID": reservation.id,
       },
     };
 
     try {
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      console.error('Failed to send cancellation email:', error);
+      console.error("Failed to send cancellation email:", error);
       throw new Error(
-        `Failed to send cancellation email: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to send cancellation email: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -220,16 +220,16 @@ export class EmailService {
       html,
       text,
       headers: {
-        'X-Reservation-ID': reservation.id,
+        "X-Reservation-ID": reservation.id,
       },
     };
 
     try {
       await this.transporter.sendMail(mailOptions);
     } catch (error) {
-      console.error('Failed to send reminder email:', error);
+      console.error("Failed to send reminder email:", error);
       throw new Error(
-        `Failed to send reminder email: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to send reminder email: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
   }
@@ -246,24 +246,24 @@ export class EmailService {
     // This prevents "Cannot read properties of undefined" errors
     const safeReservation = {
       ...reservation,
-      pickupLocation: reservation.pickupLocation || 'Kindergarten Leuchtturm',
+      pickupLocation: reservation.pickupLocation || "Kindergarten Leuchtturm",
       pickupDate: reservation.pickupDate,
       paymentMethod: reservation.paymentMethod || null,
       orderGroupPicture: reservation.orderGroupPicture || false,
       orderVorschulPicture: reservation.orderVorschulPicture || false,
-      childGroupName: reservation.childGroupName || '',
-      childName: reservation.childName || '',
+      childGroupName: reservation.childGroupName || "",
+      childName: reservation.childName || "",
       quantity: reservation.quantity || 1,
       id: reservation.id,
       deliveryMethod: reservation.deliveryMethod,
     };
 
-    const pickupDate = 'Wir melden uns in Kürze bezüglich eines Abholtermins';
+    const pickupDate = "Wir melden uns in Kürze bezüglich eines Abholtermins";
 
     // Calculate total cost - add shipping for shipping orders
     const magazineCost = pricing.magazinePrice * safeReservation.quantity;
     const shippingCost =
-      safeReservation.deliveryMethod === 'shipping' ? pricing.shippingCost : 0;
+      safeReservation.deliveryMethod === "shipping" ? pricing.shippingCost : 0;
     const totalCost = magazineCost + shippingCost;
     const paymentReference = generatePaymentReference(safeReservation.id);
 
@@ -384,14 +384,14 @@ export class EmailService {
         </div>
         <div class="info-row">
           <span class="info-label">Anzahl:</span>
-          <span class="info-value">${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}</span>
+          <span class="info-value">${reservation.quantity} ${reservation.quantity === 1 ? "Exemplar" : "Exemplare"}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Preis pro Exemplar:</span>
           <span class="info-value">${formatCurrency(pricing.magazinePrice)}</span>
         </div>
         ${
-          reservation.deliveryMethod === 'shipping'
+          reservation.deliveryMethod === "shipping"
             ? `
         <div class="info-row">
           <span class="info-label">Zwischensumme:</span>
@@ -402,7 +402,7 @@ export class EmailService {
           <span class="info-value">${formatCurrency(shippingCost)}</span>
         </div>
         `
-            : ''
+            : ""
         }
         <div class="info-row">
           <span class="info-label">Gesamtpreis:</span>
@@ -411,13 +411,13 @@ export class EmailService {
       </div>
 
       ${
-        reservation.deliveryMethod === 'pickup'
+        reservation.deliveryMethod === "pickup"
           ? `
         <div class="info-box">
           <h3>Abholung:</h3>
           <div class="info-row">
             <span class="info-label">Ort:</span>
-            <span class="info-value">${reservation.pickupLocation || 'Kindergarten Leuchtturm'}</span>
+            <span class="info-value">${reservation.pickupLocation || "Kindergarten Leuchtturm"}</span>
           </div>
           <div class="info-row">
             <span class="info-label">Termin:</span>
@@ -439,19 +439,19 @@ export class EmailService {
         </div>
         
         ${
-          reservation.paymentMethod === 'paypal'
+          reservation.paymentMethod === "paypal"
             ? `
           <div class="payment-info">
             <h3>💳 PayPal-Zahlung</h3>
             <p>Bitte überweisen Sie den Betrag von <strong>${formatCurrency(totalCost)}</strong> via PayPal:</p>
             <p>
-              <a href="${paymentConfig.paypal.paypalMeLink}/${totalCost.toFixed(2).replace('.', ',')}EUR" style="color: #0066cc; font-weight: bold; text-decoration: none; display: inline-block; padding: 8px 16px; background-color: #0070ba; color: white; border-radius: 4px;">💳 Mit PayPal bezahlen (${formatCurrency(totalCost)})</a><br><br>
+              <a href="${paymentConfig.paypal.paypalMeLink}/${totalCost.toFixed(2).replace(".", ",")}EUR" style="color: #0066cc; font-weight: bold; text-decoration: none; display: inline-block; padding: 8px 16px; background-color: #0070ba; color: white; border-radius: 4px;">💳 Mit PayPal bezahlen (${formatCurrency(totalCost)})</a><br><br>
               <strong>Verwendungszweck:</strong> ${paymentReference}
             </p>
             <p class="important">Bitte geben Sie unbedingt den Verwendungszweck an!</p>
           </div>
         `
-            : ''
+            : ""
         }
       `
       }
@@ -469,7 +469,7 @@ export class EmailService {
               <span class="info-value">✓ Bestellt (${reservation.childGroupName})</span>
             </div>
           `
-              : ''
+              : ""
           }
           ${
             reservation.orderVorschulPicture
@@ -479,7 +479,7 @@ export class EmailService {
               <span class="info-value">✓ Bestellt</span>
             </div>
           `
-              : ''
+              : ""
           }
           ${
             reservation.childName
@@ -489,11 +489,11 @@ export class EmailService {
               <span class="info-value">${reservation.childName}</span>
             </div>
           `
-              : ''
+              : ""
           }
         </div>
       `
-          : ''
+          : ""
       }
 
       <p>Bei Fragen können Sie uns gerne kontaktieren:</p>
@@ -525,13 +525,13 @@ export class EmailService {
     // Ensure safe access to all fields
     const safeReservation = {
       ...reservation,
-      pickupLocation: reservation.pickupLocation || 'Kindergarten Leuchtturm',
+      pickupLocation: reservation.pickupLocation || "Kindergarten Leuchtturm",
       pickupDate: reservation.pickupDate,
       paymentMethod: reservation.paymentMethod || null,
       orderGroupPicture: reservation.orderGroupPicture || false,
       orderVorschulPicture: reservation.orderVorschulPicture || false,
-      childGroupName: reservation.childGroupName || '',
-      childName: reservation.childName || '',
+      childGroupName: reservation.childGroupName || "",
+      childName: reservation.childName || "",
       quantity: reservation.quantity || 1,
       id: reservation.id,
       deliveryMethod: reservation.deliveryMethod,
@@ -539,12 +539,12 @@ export class EmailService {
 
     reservation = safeReservation as any;
 
-    const pickupDate = 'Wir melden uns in Kürze bezüglich eines Abholtermins';
+    const pickupDate = "Wir melden uns in Kürze bezüglich eines Abholtermins";
 
     // Calculate total cost - add shipping for shipping orders
     const magazineCost = pricing.magazinePrice * reservation.quantity;
     const shippingCost =
-      reservation.deliveryMethod === 'shipping' ? pricing.shippingCost : 0;
+      reservation.deliveryMethod === "shipping" ? pricing.shippingCost : 0;
     const totalCost = magazineCost + shippingCost;
     const paymentReference = generatePaymentReference(reservation.id);
 
@@ -560,22 +560,22 @@ RESERVIERUNGSDETAILS:
 --------------------
 Reservierungsnummer: ${reservation.id.slice(0, 8).toUpperCase()}
 Magazin: ${magazine.title} - ${magazine.issueNumber}
-Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
+Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? "Exemplar" : "Exemplare"}
 Preis pro Exemplar: ${formatCurrency(pricing.magazinePrice)}${
-      reservation.deliveryMethod === 'shipping'
+      reservation.deliveryMethod === "shipping"
         ? `
 Zwischensumme: ${formatCurrency(magazineCost)}
 Versandkostenpauschale: ${formatCurrency(shippingCost)}`
-        : ''
+        : ""
     }
 Gesamtpreis: ${formatCurrency(totalCost)}
 `;
 
-    if (reservation.deliveryMethod === 'pickup') {
+    if (reservation.deliveryMethod === "pickup") {
       text += `
 ABHOLUNG:
 ---------
-Ort: ${reservation.pickupLocation || 'Kindergarten Leuchtturm'}
+Ort: ${reservation.pickupLocation || "Kindergarten Leuchtturm"}
 Termin: ${pickupDate}
 
 ZAHLUNG:
@@ -591,12 +591,12 @@ VERSAND:
 Die Lieferadresse wurde gespeichert.
 Die Versandkosten werden separat berechnet.
 `;
-      if (reservation.paymentMethod === 'paypal') {
+      if (reservation.paymentMethod === "paypal") {
         text += `
 PAYPAL-ZAHLUNG:
 --------------
 Bitte überweisen Sie ${formatCurrency(totalCost)} via PayPal:
-PayPal.Me Link: ${paymentConfig.paypal.paypalMeLink}/${totalCost.toFixed(2).replace('.', ',')}EUR
+PayPal.Me Link: ${paymentConfig.paypal.paypalMeLink}/${totalCost.toFixed(2).replace(".", ",")}EUR
 Verwendungszweck: ${paymentReference}
 WICHTIG: Bitte geben Sie unbedingt den Verwendungszweck an!
 `;
@@ -699,8 +699,8 @@ ${kindergarten.name}
     magazine: Magazine,
   ): string {
     const pickupDate = reservation.pickupDate
-      ? new Date(reservation.pickupDate).toLocaleDateString('de-DE')
-      : 'heute';
+      ? new Date(reservation.pickupDate).toLocaleDateString("de-DE")
+      : "heute";
 
     return `
 <!DOCTYPE html>
@@ -715,8 +715,8 @@ ${kindergarten.name}
     <h1 style="color: #0066cc;">Erinnerung: Abholung ${magazine.title}</h1>
     <p>Hallo ${user.firstName} ${user.lastName},</p>
     <p>Dies ist eine freundliche Erinnerung, dass Sie ${pickupDate} Ihre reservierte <strong>${magazine.title}</strong> abholen können.</p>
-    <p><strong>Abholort:</strong> ${reservation.pickupLocation || 'Kindergarten Leuchtturm'}</p>
-    <p><strong>Anzahl:</strong> ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}</p>
+    <p><strong>Abholort:</strong> ${reservation.pickupLocation || "Kindergarten Leuchtturm"}</p>
+    <p><strong>Anzahl:</strong> ${reservation.quantity} ${reservation.quantity === 1 ? "Exemplar" : "Exemplare"}</p>
     <p>Bitte denken Sie daran, den Betrag in bar mitzubringen.</p>
     <p>Mit freundlichen Grüßen<br>${kindergarten.name}</p>
   </div>
@@ -734,8 +734,8 @@ ${kindergarten.name}
     magazine: Magazine,
   ): string {
     const pickupDate = reservation.pickupDate
-      ? new Date(reservation.pickupDate).toLocaleDateString('de-DE')
-      : 'heute';
+      ? new Date(reservation.pickupDate).toLocaleDateString("de-DE")
+      : "heute";
 
     return `
 Erinnerung: Abholung ${magazine.title}
@@ -745,8 +745,8 @@ Hallo ${user.firstName} ${user.lastName},
 
 Dies ist eine freundliche Erinnerung, dass Sie ${pickupDate} Ihre reservierte ${magazine.title} abholen können.
 
-Abholort: ${reservation.pickupLocation || 'Kindergarten Leuchtturm'}
-Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? 'Exemplar' : 'Exemplare'}
+Abholort: ${reservation.pickupLocation || "Kindergarten Leuchtturm"}
+Anzahl: ${reservation.quantity} ${reservation.quantity === 1 ? "Exemplar" : "Exemplare"}
 
 Bitte denken Sie daran, den Betrag in bar mitzubringen.
 
@@ -764,7 +764,7 @@ export const getEmailService = (): EmailService => {
     try {
       emailServiceInstance = new EmailService();
     } catch (error) {
-      console.error('Failed to initialize email service:', error);
+      console.error("Failed to initialize email service:", error);
       throw error;
     }
   }
@@ -776,20 +776,20 @@ export const emailService = (() => {
   try {
     return getEmailService();
   } catch (error) {
-    console.error('Email service not available:', error);
+    console.error("Email service not available:", error);
     // Return a stub that throws meaningful errors
     return {
       sendReservationConfirmation: async () => {
-        throw new Error('Email service not configured');
+        throw new Error("Email service not configured");
       },
       sendCancellationConfirmation: async () => {
-        throw new Error('Email service not configured');
+        throw new Error("Email service not configured");
       },
       sendPickupReminder: async () => {
-        throw new Error('Email service not configured');
+        throw new Error("Email service not configured");
       },
       verifyConnection: async () => {
-        throw new Error('Email service not configured');
+        throw new Error("Email service not configured");
       },
     };
   }

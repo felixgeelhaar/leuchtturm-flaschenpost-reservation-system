@@ -1,41 +1,41 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from "vitest";
 // Using inline test data instead of mock fixtures
 const mockUser = {
-  id: 'user-123',
-  email: 'test@example.com',
-  firstName: 'Test',
-  lastName: 'User',
-  consentVersion: '1.0',
-  consentTimestamp: '2024-01-01T00:00:00Z',
-  lastActivity: '2024-01-01T00:00:00Z',
-  createdAt: '2024-01-01T00:00:00Z',
-  updatedAt: '2024-01-01T00:00:00Z',
+  id: "user-123",
+  email: "test@example.com",
+  firstName: "Test",
+  lastName: "User",
+  consentVersion: "1.0",
+  consentTimestamp: "2024-01-01T00:00:00Z",
+  lastActivity: "2024-01-01T00:00:00Z",
+  createdAt: "2024-01-01T00:00:00Z",
+  updatedAt: "2024-01-01T00:00:00Z",
 };
 
 const mockMagazines = [
   {
-    id: '123e4567-e89b-12d3-a456-426614174000',
-    title: 'Test Magazine',
-    issueNumber: '2024-01',
-    publishDate: '2024-01-01T00:00:00Z',
-    description: 'Test Magazine',
-    coverImageUrl: 'https://example.com/cover.jpg',
+    id: "123e4567-e89b-12d3-a456-426614174000",
+    title: "Test Magazine",
+    issueNumber: "2024-01",
+    publishDate: "2024-01-01T00:00:00Z",
+    description: "Test Magazine",
+    coverImageUrl: "https://example.com/cover.jpg",
     availableCopies: 10,
     totalCopies: 100,
     isActive: true,
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
 ];
 
 const validFormDataPickup = {
-  firstName: 'John',
-  lastName: 'Doe',
-  email: 'john@example.com',
-  magazineId: '123e4567-e89b-12d3-a456-426614174000',
+  firstName: "John",
+  lastName: "Doe",
+  email: "john@example.com",
+  magazineId: "123e4567-e89b-12d3-a456-426614174000",
   quantity: 1,
-  deliveryMethod: 'pickup',
-  pickupLocation: 'Berlin Mitte',
+  deliveryMethod: "pickup",
+  pickupLocation: "Berlin Mitte",
   consents: {
     essential: true,
     functional: false,
@@ -45,18 +45,18 @@ const validFormDataPickup = {
 };
 
 const validFormDataShipping = {
-  firstName: 'Jane',
-  lastName: 'Smith',
-  email: 'jane@example.com',
-  magazineId: '123e4567-e89b-12d3-a456-426614174000',
+  firstName: "Jane",
+  lastName: "Smith",
+  email: "jane@example.com",
+  magazineId: "123e4567-e89b-12d3-a456-426614174000",
   quantity: 2,
-  deliveryMethod: 'shipping',
+  deliveryMethod: "shipping",
   address: {
-    street: 'Test Street',
-    houseNumber: '123',
-    postalCode: '10115',
-    city: 'Berlin',
-    country: 'DE',
+    street: "Test Street",
+    houseNumber: "123",
+    postalCode: "10115",
+    city: "Berlin",
+    country: "DE",
   },
   consents: {
     essential: true,
@@ -79,7 +79,7 @@ const mockDb = {
 };
 
 // Mock the database service at the module level
-vi.mock('@/lib/database', () => ({
+vi.mock("@/lib/database", () => ({
   DatabaseService: vi.fn().mockImplementation(() => mockDb),
 }));
 
@@ -90,7 +90,7 @@ const mockEmailService = {
   sendPickupReminder: vi.fn().mockResolvedValue(undefined),
 };
 
-vi.mock('@/lib/email/email-service', () => ({
+vi.mock("@/lib/email/email-service", () => ({
   emailService: mockEmailService,
 }));
 
@@ -102,12 +102,12 @@ const createValidPickupData = (
   futureDate.setDate(futureDate.getDate() + 2); // 2 days from now to be safe
   return {
     ...validFormDataPickup,
-    pickupDate: futureDate.toISOString().split('T')[0],
+    pickupDate: futureDate.toISOString().split("T")[0],
     ...overrides,
   };
 };
 
-describe('/api/reservations', () => {
+describe("/api/reservations", () => {
   let POST: any;
   let GET: any;
 
@@ -121,7 +121,7 @@ describe('/api/reservations', () => {
     vi.resetModules();
 
     // Re-import the API functions
-    const apiModule = await import('@/pages/api/reservations');
+    const apiModule = await import("@/pages/api/reservations");
     POST = apiModule.POST;
     GET = apiModule.GET;
 
@@ -135,9 +135,9 @@ describe('/api/reservations', () => {
     mockDb.getUserByEmail.mockResolvedValue(null);
     mockDb.createUser.mockResolvedValue(mockUser);
     mockDb.createReservation.mockResolvedValue({
-      id: 'test-reservation-123',
-      status: 'pending',
-      expiresAt: '2024-12-22T00:00:00Z',
+      id: "test-reservation-123",
+      status: "pending",
+      expiresAt: "2024-12-22T00:00:00Z",
       userId: mockUser.id,
       magazineId: validFormDataPickup.magazineId,
     });
@@ -147,16 +147,16 @@ describe('/api/reservations', () => {
     mockDb.logDataProcessing.mockResolvedValue(undefined);
   });
 
-  describe('POST /api/reservations', () => {
-    it('creates reservation with pickup delivery method', async () => {
+  describe("POST /api/reservations", () => {
+    it("creates reservation with pickup delivery method", async () => {
       const testData = createValidPickupData();
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.100',
-          'user-agent': 'test-agent',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.100",
+          "user-agent": "test-agent",
         },
         body: JSON.stringify(testData),
       });
@@ -173,7 +173,7 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(201);
       expect(result.success).toBe(true);
-      expect(result.data.id).toBe('test-reservation-123');
+      expect(result.data.id).toBe("test-reservation-123");
 
       // Verify database calls
       expect(mockDb.getMagazineById).toHaveBeenCalledWith(testData.magazineId);
@@ -183,34 +183,34 @@ describe('/api/reservations', () => {
         firstName: testData.firstName,
         lastName: testData.lastName,
         address: undefined,
-        consentVersion: '1.0',
+        consentVersion: "1.0",
       });
       expect(mockDb.createReservation).toHaveBeenCalledWith(testData);
       expect(mockDb.recordConsent).toHaveBeenCalledWith(
         mockUser.id,
         testData.consents,
         expect.objectContaining({
-          ipAddress: '192.168.1.100',
-          userAgent: 'test-agent',
+          ipAddress: "192.168.1.100",
+          userAgent: "test-agent",
         }),
       );
       expect(mockDb.logDataProcessing).toHaveBeenCalledWith(
         expect.objectContaining({
           userId: mockUser.id,
-          action: 'reservation_created',
-          dataType: 'reservation',
-          legalBasis: 'consent',
+          action: "reservation_created",
+          dataType: "reservation",
+          legalBasis: "consent",
         }),
       );
     });
 
-    it('creates reservation with shipping delivery method', async () => {
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+    it("creates reservation with shipping delivery method", async () => {
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.101',
-          'user-agent': 'test-agent',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.101",
+          "user-agent": "test-agent",
         },
         body: JSON.stringify(validFormDataShipping),
       });
@@ -228,19 +228,19 @@ describe('/api/reservations', () => {
         lastName: validFormDataShipping.lastName,
         // phone removed from form data
         address: validFormDataShipping.address,
-        consentVersion: '1.0',
+        consentVersion: "1.0",
       });
     });
 
-    it('handles existing user', async () => {
+    it("handles existing user", async () => {
       mockDb.getUserByEmail.mockResolvedValue(mockUser);
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.102',
-          'user-agent': 'test-agent',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.102",
+          "user-agent": "test-agent",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -256,14 +256,14 @@ describe('/api/reservations', () => {
       expect(mockDb.updateUserActivity).toHaveBeenCalledWith(mockUser.id);
     });
 
-    it('validates required fields', async () => {
+    it("validates required fields", async () => {
       const invalidData = {
-        firstName: '',
-        lastName: '',
-        email: 'invalid-email',
-        magazineId: '',
+        firstName: "",
+        lastName: "",
+        email: "invalid-email",
+        magazineId: "",
         quantity: 0,
-        deliveryMethod: 'pickup',
+        deliveryMethod: "pickup",
         consents: {
           essential: false,
           functional: false,
@@ -272,11 +272,11 @@ describe('/api/reservations', () => {
         },
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.103',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.103",
         },
         body: JSON.stringify(invalidData),
       });
@@ -286,22 +286,22 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Validation failed');
+      expect(result.error).toBe("Validation failed");
       expect(result.errors).toBeInstanceOf(Array);
       expect(result.errors.length).toBeGreaterThan(0);
     });
 
-    it('validates pickup location for pickup delivery', async () => {
+    it("validates pickup location for pickup delivery", async () => {
       const invalidPickupData = {
         ...validFormDataPickup,
-        pickupLocation: '',
+        pickupLocation: "",
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.104',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.104",
         },
         body: JSON.stringify(invalidPickupData),
       });
@@ -311,25 +311,25 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.errors.some((e: any) => e.field === 'pickupLocation')).toBe(
+      expect(result.errors.some((e: any) => e.field === "pickupLocation")).toBe(
         true,
       );
     });
 
-    it('validates address for shipping delivery', async () => {
+    it("validates address for shipping delivery", async () => {
       const invalidShippingData = {
         ...validFormDataShipping,
         address: {
           ...validFormDataShipping.address,
-          street: '',
+          street: "",
         },
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.105',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.105",
         },
         body: JSON.stringify(invalidShippingData),
       });
@@ -341,20 +341,20 @@ describe('/api/reservations', () => {
       expect(result.success).toBe(false);
     });
 
-    it('validates supported countries for shipping', async () => {
+    it("validates supported countries for shipping", async () => {
       const invalidCountryData = {
         ...validFormDataShipping,
         address: {
           ...validFormDataShipping.address,
-          country: 'US',
+          country: "US",
         },
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.106',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.106",
         },
         body: JSON.stringify(invalidCountryData),
       });
@@ -366,17 +366,17 @@ describe('/api/reservations', () => {
       expect(result.success).toBe(false);
     });
 
-    it('checks magazine availability', async () => {
+    it("checks magazine availability", async () => {
       mockDb.getMagazineById.mockResolvedValue({
         ...mockMagazines[0],
         availableCopies: 1,
       });
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.107',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.107",
         },
         body: JSON.stringify({
           ...validFormDataPickup,
@@ -389,18 +389,18 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(409);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Insufficient copies');
-      expect(result.message).toContain('Nur noch 1 Exemplare verfügbar');
+      expect(result.error).toBe("Insufficient copies");
+      expect(result.message).toContain("Nur noch 1 Exemplare verfügbar");
     });
 
-    it('handles non-existent magazine', async () => {
+    it("handles non-existent magazine", async () => {
       mockDb.getMagazineById.mockResolvedValue(null);
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.108',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.108",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -410,15 +410,15 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(404);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Magazine not found');
+      expect(result.error).toBe("Magazine not found");
     });
 
-    it('validates content type', async () => {
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+    it("validates content type", async () => {
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'text/plain',
-          'x-forwarded-for': '192.168.1.109',
+          "Content-Type": "text/plain",
+          "x-forwarded-for": "192.168.1.109",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -428,17 +428,17 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Invalid content type');
+      expect(result.error).toBe("Invalid content type");
     });
 
-    it('handles invalid JSON', async () => {
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+    it("handles invalid JSON", async () => {
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.110',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.110",
         },
-        body: 'invalid json',
+        body: "invalid json",
       });
 
       const response = await POST({ request } as any);
@@ -446,19 +446,19 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Invalid JSON');
+      expect(result.error).toBe("Invalid JSON");
     });
 
-    it('handles database errors gracefully', async () => {
+    it("handles database errors gracefully", async () => {
       mockDb.getMagazineById.mockRejectedValue(
-        new Error('Database connection failed'),
+        new Error("Database connection failed"),
       );
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.111',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.111",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -468,40 +468,40 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(500);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Internal server error');
+      expect(result.error).toBe("Internal server error");
 
       expect(mockDb.logDataProcessing).toHaveBeenCalled();
     });
 
-    it('includes security headers in response', async () => {
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+    it("includes security headers in response", async () => {
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.112',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.112",
         },
         body: JSON.stringify(validFormDataPickup),
       });
 
       const response = await POST({ request } as any);
 
-      expect(response.headers.get('X-Content-Type-Options')).toBe('nosniff');
-      expect(response.headers.get('X-Frame-Options')).toBe('DENY');
+      expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
+      expect(response.headers.get("X-Frame-Options")).toBe("DENY");
     });
 
     // Phone validation test removed - phone field no longer in form
 
-    it('validates quantity limits', async () => {
+    it("validates quantity limits", async () => {
       const invalidQuantityData = {
         ...validFormDataPickup,
         quantity: 10,
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.114',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.114",
         },
         body: JSON.stringify(invalidQuantityData),
       });
@@ -511,20 +511,20 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.errors.some((e: any) => e.field === 'quantity')).toBe(true);
+      expect(result.errors.some((e: any) => e.field === "quantity")).toBe(true);
     });
 
-    it('validates magazine ID format', async () => {
+    it("validates magazine ID format", async () => {
       const invalidMagazineData = {
         ...validFormDataPickup,
-        magazineId: 'not-a-uuid',
+        magazineId: "not-a-uuid",
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.115',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.115",
         },
         body: JSON.stringify(invalidMagazineData),
       });
@@ -534,25 +534,25 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.errors.some((e: any) => e.field === 'magazineId')).toBe(
+      expect(result.errors.some((e: any) => e.field === "magazineId")).toBe(
         true,
       );
     });
 
-    it('validates pickup date must be in future', async () => {
+    it("validates pickup date must be in future", async () => {
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate() - 1);
 
       const invalidDateData = {
         ...validFormDataPickup,
-        pickupDate: yesterday.toISOString().split('T')[0],
+        pickupDate: yesterday.toISOString().split("T")[0],
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.116',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.116",
         },
         body: JSON.stringify(invalidDateData),
       });
@@ -562,22 +562,22 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.errors.some((e: any) => e.field === 'pickupDate')).toBe(
+      expect(result.errors.some((e: any) => e.field === "pickupDate")).toBe(
         true,
       );
     });
 
-    it('handles missing shipping address when delivery method is shipping', async () => {
+    it("handles missing shipping address when delivery method is shipping", async () => {
       const missingAddressData = {
         ...validFormDataShipping,
         address: undefined,
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.117',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.117",
         },
         body: JSON.stringify(missingAddressData),
       });
@@ -587,23 +587,23 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.errors.some((e: any) => e.field === 'address')).toBe(true);
+      expect(result.errors.some((e: any) => e.field === "address")).toBe(true);
     });
 
-    it('validates postal code format', async () => {
+    it("validates postal code format", async () => {
       const invalidPostalCodeData = {
         ...validFormDataShipping,
         address: {
           ...validFormDataShipping.address!,
-          postalCode: '123',
+          postalCode: "123",
         },
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.118',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.118",
         },
         body: JSON.stringify(invalidPostalCodeData),
       });
@@ -615,24 +615,24 @@ describe('/api/reservations', () => {
       expect(result.success).toBe(false);
     });
 
-    it('handles existing user with valid consent', async () => {
+    it("handles existing user with valid consent", async () => {
       mockDb.getUserByEmail.mockResolvedValue(mockUser);
       mockDb.getUserConsents.mockResolvedValue([
         {
-          id: 'consent-1',
+          id: "consent-1",
           userId: mockUser.id,
-          consentType: 'essential',
+          consentType: "essential",
           consentGiven: true,
           timestamp: new Date().toISOString(),
         },
       ]);
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.119',
-          'user-agent': 'test-agent',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.119",
+          "user-agent": "test-agent",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -648,14 +648,14 @@ describe('/api/reservations', () => {
       expect(mockDb.updateUserActivity).toHaveBeenCalledWith(mockUser.id);
     });
 
-    it('handles database errors in user creation gracefully', async () => {
-      mockDb.createUser.mockRejectedValue(new Error('User creation failed'));
+    it("handles database errors in user creation gracefully", async () => {
+      mockDb.createUser.mockRejectedValue(new Error("User creation failed"));
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.120',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.120",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -665,19 +665,19 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(500);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Internal server error');
+      expect(result.error).toBe("Internal server error");
     });
 
-    it('handles database errors in reservation creation gracefully', async () => {
+    it("handles database errors in reservation creation gracefully", async () => {
       mockDb.createReservation.mockRejectedValue(
-        new Error('Reservation creation failed'),
+        new Error("Reservation creation failed"),
       );
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.121',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.121",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -687,19 +687,19 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(500);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Internal server error');
+      expect(result.error).toBe("Internal server error");
     });
 
-    it('handles consent recording errors gracefully', async () => {
+    it("handles consent recording errors gracefully", async () => {
       mockDb.recordConsent.mockRejectedValue(
-        new Error('Consent recording failed'),
+        new Error("Consent recording failed"),
       );
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.122',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.122",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -709,14 +709,14 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(500);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Internal server error');
+      expect(result.error).toBe("Internal server error");
     });
 
-    it('handles missing client IP address', async () => {
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+    it("handles missing client IP address", async () => {
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           // No IP headers
         },
         body: JSON.stringify(validFormDataPickup),
@@ -732,22 +732,22 @@ describe('/api/reservations', () => {
         mockUser.id,
         validFormDataPickup.consents,
         expect.objectContaining({
-          ipAddress: 'unknown',
+          ipAddress: "unknown",
         }),
       );
     });
 
-    it('handles notes field properly', async () => {
+    it("handles notes field properly", async () => {
       const dataWithNotes = {
         ...validFormDataPickup,
-        notes: '  Important delivery instructions  ',
+        notes: "  Important delivery instructions  ",
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.123',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.123",
         },
         body: JSON.stringify(dataWithNotes),
       });
@@ -760,23 +760,23 @@ describe('/api/reservations', () => {
 
       expect(mockDb.createReservation).toHaveBeenCalledWith(
         expect.objectContaining({
-          notes: 'Important delivery instructions',
+          notes: "Important delivery instructions",
         }),
       );
     });
 
-    it('validates maximum notes length', async () => {
-      const longNotes = 'a'.repeat(501);
+    it("validates maximum notes length", async () => {
+      const longNotes = "a".repeat(501);
       const dataWithLongNotes = {
         ...validFormDataPickup,
         notes: longNotes,
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.124',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.124",
         },
         body: JSON.stringify(dataWithLongNotes),
       });
@@ -786,10 +786,10 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.errors.some((e: any) => e.field === 'notes')).toBe(true);
+      expect(result.errors.some((e: any) => e.field === "notes")).toBe(true);
     });
 
-    it('handles edge case with exactly available copies', async () => {
+    it("handles edge case with exactly available copies", async () => {
       mockDb.getMagazineById.mockResolvedValue({
         ...mockMagazines[0],
         availableCopies: 2,
@@ -800,11 +800,11 @@ describe('/api/reservations', () => {
         quantity: 2,
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.125',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.125",
         },
         body: JSON.stringify(dataWithQuantity),
       });
@@ -816,7 +816,7 @@ describe('/api/reservations', () => {
       expect(result.success).toBe(true);
     });
 
-    it('handles address line 2 optional field', async () => {
+    it("handles address line 2 optional field", async () => {
       const dataWithoutAddressLine2 = {
         ...validFormDataShipping,
         address: {
@@ -825,11 +825,11 @@ describe('/api/reservations', () => {
         },
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.126',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.126",
         },
         body: JSON.stringify(dataWithoutAddressLine2),
       });
@@ -841,17 +841,17 @@ describe('/api/reservations', () => {
       expect(result.success).toBe(true);
     });
 
-    it('validates deliveryMethod enum', async () => {
+    it("validates deliveryMethod enum", async () => {
       const invalidDeliveryMethod = {
         ...validFormDataPickup,
-        deliveryMethod: 'invalid-method',
+        deliveryMethod: "invalid-method",
       };
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.127',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.127",
         },
         body: JSON.stringify(invalidDeliveryMethod),
       });
@@ -861,20 +861,20 @@ describe('/api/reservations', () => {
 
       expect(response.status).toBe(400);
       expect(result.success).toBe(false);
-      expect(result.errors.some((e: any) => e.field === 'deliveryMethod')).toBe(
+      expect(result.errors.some((e: any) => e.field === "deliveryMethod")).toBe(
         true,
       );
     });
 
-    it('logs data processing on error', async () => {
+    it("logs data processing on error", async () => {
       mockDb.logDataProcessing.mockClear();
-      mockDb.getMagazineById.mockRejectedValue(new Error('Database error'));
+      mockDb.getMagazineById.mockRejectedValue(new Error("Database error"));
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.128',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.128",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -885,24 +885,24 @@ describe('/api/reservations', () => {
 
       expect(mockDb.logDataProcessing).toHaveBeenCalledWith(
         expect.objectContaining({
-          action: 'created',
-          dataType: 'processing_log',
-          legalBasis: 'legitimate_interest',
-          details: expect.stringContaining('Database error'),
+          action: "created",
+          dataType: "processing_log",
+          legalBasis: "legitimate_interest",
+          details: expect.stringContaining("Database error"),
         }),
       );
     });
 
-    it('handles logging errors gracefully', async () => {
+    it("handles logging errors gracefully", async () => {
       mockDb.logDataProcessing
         .mockResolvedValueOnce(undefined)
-        .mockRejectedValueOnce(new Error('Logging failed'));
+        .mockRejectedValueOnce(new Error("Logging failed"));
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': '192.168.1.129',
+          "Content-Type": "application/json",
+          "x-forwarded-for": "192.168.1.129",
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -915,18 +915,18 @@ describe('/api/reservations', () => {
     });
 
     // Rate limiting tests using isolated IPs
-    it('implements rate limiting', async () => {
+    it("implements rate limiting", async () => {
       // Use a unique timestamp-based IP to avoid interference
       const testIP = `192.168.${Date.now() % 255}.${Date.now() % 255}`;
 
       // Make exactly 5 requests (the rate limit)
       let successCount = 0;
       for (let i = 0; i < 5; i++) {
-        const request = new Request('http://localhost/api/reservations', {
-          method: 'POST',
+        const request = new Request("http://localhost/api/reservations", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'x-forwarded-for': testIP,
+            "Content-Type": "application/json",
+            "x-forwarded-for": testIP,
           },
           body: JSON.stringify(validFormDataPickup),
         });
@@ -939,11 +939,11 @@ describe('/api/reservations', () => {
       expect(successCount).toBeGreaterThan(0);
 
       // 6th request should be rate limited
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'POST',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'x-forwarded-for': testIP,
+          "Content-Type": "application/json",
+          "x-forwarded-for": testIP,
         },
         body: JSON.stringify(validFormDataPickup),
       });
@@ -957,21 +957,21 @@ describe('/api/reservations', () => {
       // If it's rate limited, check the error message
       if (rateLimitedResponse.status === 429) {
         const result = await rateLimitedResponse.json();
-        expect(result.error).toBe('Rate limit exceeded');
+        expect(result.error).toBe("Rate limit exceeded");
       }
     });
 
-    it('handles different IP addresses for rate limiting', async () => {
-      const ip1 = '10.0.0.2';
-      const ip2 = '10.0.0.3';
+    it("handles different IP addresses for rate limiting", async () => {
+      const ip1 = "10.0.0.2";
+      const ip2 = "10.0.0.3";
 
       // Make 5 requests from IP1
       for (let i = 0; i < 5; i++) {
-        const request = new Request('http://localhost/api/reservations', {
-          method: 'POST',
+        const request = new Request("http://localhost/api/reservations", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'x-forwarded-for': ip1,
+            "Content-Type": "application/json",
+            "x-forwarded-for": ip1,
           },
           body: JSON.stringify(validFormDataPickup),
         });
@@ -981,12 +981,12 @@ describe('/api/reservations', () => {
 
       // 6th request from IP1 should be rate limited
       const rateLimitedRequest = new Request(
-        'http://localhost/api/reservations',
+        "http://localhost/api/reservations",
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'x-forwarded-for': ip1,
+            "Content-Type": "application/json",
+            "x-forwarded-for": ip1,
           },
           body: JSON.stringify(validFormDataPickup),
         },
@@ -998,12 +998,12 @@ describe('/api/reservations', () => {
 
       // But request from different IP should work
       const differentIpRequest = new Request(
-        'http://localhost/api/reservations',
+        "http://localhost/api/reservations",
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
-            'x-forwarded-for': ip2,
+            "Content-Type": "application/json",
+            "x-forwarded-for": ip2,
           },
           body: JSON.stringify(validFormDataPickup),
         },
@@ -1015,65 +1015,65 @@ describe('/api/reservations', () => {
     });
   });
 
-  describe('GET /api/reservations', () => {
-    it('returns authentication required message', async () => {
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'GET',
+  describe("GET /api/reservations", () => {
+    it("returns authentication required message", async () => {
+      const request = new Request("http://localhost/api/reservations", {
+        method: "GET",
         headers: {
-          'x-forwarded-for': '192.168.1.200',
+          "x-forwarded-for": "192.168.1.200",
         },
       });
 
       const response = await GET({
         request,
-        url: new URL('http://localhost/api/reservations'),
+        url: new URL("http://localhost/api/reservations"),
       } as any);
       const result = await response.json();
 
       expect(response.status).toBe(200);
       expect(result.success).toBe(true);
       expect(result.data).toEqual([]);
-      expect(result.message).toContain('Authentication required');
+      expect(result.message).toContain("Authentication required");
 
       expect(mockDb.logDataProcessing).toHaveBeenCalledWith({
-        action: 'accessed',
-        dataType: 'reservation',
-        legalBasis: 'legitimate_interest',
-        ipAddress: '192.168.1.200',
-        details: expect.stringContaining('GET'),
+        action: "accessed",
+        dataType: "reservation",
+        legalBasis: "legitimate_interest",
+        ipAddress: "192.168.1.200",
+        details: expect.stringContaining("GET"),
       });
     });
 
-    it('handles errors in GET endpoint', async () => {
-      mockDb.logDataProcessing.mockRejectedValue(new Error('Logging failed'));
+    it("handles errors in GET endpoint", async () => {
+      mockDb.logDataProcessing.mockRejectedValue(new Error("Logging failed"));
 
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'GET',
+      const request = new Request("http://localhost/api/reservations", {
+        method: "GET",
         headers: {
-          'x-forwarded-for': '192.168.1.201',
+          "x-forwarded-for": "192.168.1.201",
         },
       });
 
       const response = await GET({
         request,
-        url: new URL('http://localhost/api/reservations'),
+        url: new URL("http://localhost/api/reservations"),
       } as any);
       const result = await response.json();
 
       expect(response.status).toBe(500);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Internal server error');
+      expect(result.error).toBe("Internal server error");
     });
 
-    it('handles missing IP in GET request', async () => {
-      const request = new Request('http://localhost/api/reservations', {
-        method: 'GET',
+    it("handles missing IP in GET request", async () => {
+      const request = new Request("http://localhost/api/reservations", {
+        method: "GET",
         // No IP headers
       });
 
       const response = await GET({
         request,
-        url: new URL('http://localhost/api/reservations'),
+        url: new URL("http://localhost/api/reservations"),
       } as any);
       const result = await response.json();
 
@@ -1082,7 +1082,7 @@ describe('/api/reservations', () => {
 
       expect(mockDb.logDataProcessing).toHaveBeenCalledWith(
         expect.objectContaining({
-          ipAddress: 'unknown',
+          ipAddress: "unknown",
         }),
       );
     });

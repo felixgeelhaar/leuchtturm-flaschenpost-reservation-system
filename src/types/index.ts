@@ -45,7 +45,7 @@ export interface Reservation {
   quantity: number;
   status: ReservationStatus;
   reservationDate: string;
-  deliveryMethod: 'pickup' | 'shipping';
+  deliveryMethod: "pickup" | "shipping";
   pickupDate?: string;
   pickupLocation?: string;
   paymentMethod?: string;
@@ -64,18 +64,18 @@ export interface Reservation {
 }
 
 export type ReservationStatus =
-  | 'pending'
-  | 'confirmed'
-  | 'cancelled'
-  | 'completed'
-  | 'expired';
+  | "pending"
+  | "confirmed"
+  | "cancelled"
+  | "completed"
+  | "expired";
 
 // Picture claim tracking
 export interface PictureClaim {
   id: string;
   familyEmail: string; // Email used to identify family
   groupName: string; // Which kindergarten group
-  pictureType: 'group' | 'vorschul';
+  pictureType: "group" | "vorschul";
   childName: string;
   claimedAt: string;
   reservationId: string; // Link to the reservation
@@ -90,8 +90,8 @@ export interface ReservationFormData {
   quantity: number;
   pickupLocation: string;
   pickupDate?: string;
-  deliveryMethod: 'pickup' | 'shipping';
-  paymentMethod?: 'paypal' | '';
+  deliveryMethod: "pickup" | "shipping";
+  paymentMethod?: "paypal" | "";
   notes?: string;
   consents: ConsentData;
   // Picture order fields
@@ -135,28 +135,28 @@ export interface DataProcessingLog {
 }
 
 export type DataProcessingAction =
-  | 'created'
-  | 'updated'
-  | 'accessed'
-  | 'exported'
-  | 'deleted'
-  | 'consent_given'
-  | 'consent_withdrawn'
-  | 'reservation_created'
-  | 'reservation_updated'
-  | 'reservation_cancelled';
+  | "created"
+  | "updated"
+  | "accessed"
+  | "exported"
+  | "deleted"
+  | "consent_given"
+  | "consent_withdrawn"
+  | "reservation_created"
+  | "reservation_updated"
+  | "reservation_cancelled";
 
 export type DataType =
-  | 'user_data'
-  | 'reservation'
-  | 'consent'
-  | 'processing_log';
+  | "user_data"
+  | "reservation"
+  | "consent"
+  | "processing_log";
 
 export type LegalBasis =
-  | 'consent'
-  | 'contract'
-  | 'legitimate_interest'
-  | 'user_request';
+  | "consent"
+  | "contract"
+  | "legitimate_interest"
+  | "user_request";
 
 // API Response Types
 export interface ApiResponse<T> {
@@ -192,7 +192,7 @@ export interface FormState {
 
 // Environment Variables
 export interface EnvironmentConfig {
-  NODE_ENV: 'development' | 'production' | 'test';
+  NODE_ENV: "development" | "production" | "test";
   SITE_URL: string;
 
   // Supabase
@@ -264,28 +264,28 @@ export interface Database {
     Tables: {
       users: {
         Row: User;
-        Insert: Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
-        Update: Partial<Omit<User, 'id' | 'createdAt'>>;
+        Insert: Omit<User, "id" | "createdAt" | "updatedAt">;
+        Update: Partial<Omit<User, "id" | "createdAt">>;
       };
       magazines: {
         Row: Magazine;
-        Insert: Omit<Magazine, 'id' | 'createdAt' | 'updatedAt'>;
-        Update: Partial<Omit<Magazine, 'id' | 'createdAt'>>;
+        Insert: Omit<Magazine, "id" | "createdAt" | "updatedAt">;
+        Update: Partial<Omit<Magazine, "id" | "createdAt">>;
       };
       reservations: {
         Row: Reservation;
-        Insert: Omit<Reservation, 'id' | 'createdAt' | 'updatedAt'>;
-        Update: Partial<Omit<Reservation, 'id' | 'createdAt'>>;
+        Insert: Omit<Reservation, "id" | "createdAt" | "updatedAt">;
+        Update: Partial<Omit<Reservation, "id" | "createdAt">>;
       };
       user_consents: {
         Row: ConsentRecord;
-        Insert: Omit<ConsentRecord, 'id'>;
-        Update: Partial<Omit<ConsentRecord, 'id'>>;
+        Insert: Omit<ConsentRecord, "id">;
+        Update: Partial<Omit<ConsentRecord, "id">>;
       };
       data_processing_logs: {
         Row: DataProcessingLog;
-        Insert: Omit<DataProcessingLog, 'id'>;
-        Update: Partial<Omit<DataProcessingLog, 'id'>>;
+        Insert: Omit<DataProcessingLog, "id">;
+        Update: Partial<Omit<DataProcessingLog, "id">>;
       };
     };
   };
