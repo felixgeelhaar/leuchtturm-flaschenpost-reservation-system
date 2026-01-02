@@ -1,12 +1,12 @@
 // Test email templates to verify fixes
 import { config } from 'dotenv';
-import type { Reservation, User, Magazine } from './src/types';
+import type { Reservation, User, Magazine } from '../../src/types';
 
 // Load environment variables
 config();
 
 // Import after loading env vars
-import('./src/lib/email/email-service.js')
+import('../../src/lib/email/email-service.js')
   .then(async ({ EmailService }) => {
     // Mock data for testing
     const mockUser: User = {
@@ -21,6 +21,7 @@ import('./src/lib/email/email-service.js')
       dataRetentionUntil: new Date(
         Date.now() + 365 * 24 * 60 * 60 * 1000,
       ).toISOString(),
+      lastActivity: new Date().toISOString(),
     };
 
     const mockMagazine: Magazine = {
@@ -47,7 +48,7 @@ import('./src/lib/email/email-service.js')
       deliveryMethod: 'pickup', // PICKUP method
       pickupLocation: 'Kindergarten Leuchtturm',
       pickupDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      paymentMethod: null, // NULL for pickup (cash payment)
+      paymentMethod: undefined, // undefined for pickup (cash payment)
       orderGroupPicture: true,
       childGroupName: 'Seesterne',
       childName: 'Emma Mustermann',
@@ -68,8 +69,8 @@ import('./src/lib/email/email-service.js')
       status: 'confirmed',
       reservationDate: new Date().toISOString(),
       deliveryMethod: 'shipping', // SHIPPING method
-      pickupLocation: null,
-      pickupDate: null,
+      pickupLocation: undefined,
+      pickupDate: undefined,
       paymentMethod: 'paypal', // PayPal for shipping
       shippingAddress: {
         street: 'Musterstraße',

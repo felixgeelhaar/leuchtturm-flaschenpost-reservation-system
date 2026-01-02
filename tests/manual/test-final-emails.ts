@@ -21,6 +21,7 @@ import('../../src/lib/email/email-service.js')
       dataRetentionUntil: new Date(
         Date.now() + 365 * 24 * 60 * 60 * 1000,
       ).toISOString(),
+      lastActivity: new Date().toISOString(),
     };
 
     const mockMagazine: Magazine = {
@@ -46,8 +47,8 @@ import('../../src/lib/email/email-service.js')
       reservationDate: new Date().toISOString(),
       deliveryMethod: 'pickup',
       pickupLocation: 'Kindergarten Leuchtturm',
-      pickupDate: null,
-      paymentMethod: null, // Cash on pickup
+      pickupDate: undefined,
+      paymentMethod: undefined, // Cash on pickup
       orderGroupPicture: true,
       childGroupName: 'Seesterne',
       childName: 'Emma Schmidt',
@@ -68,8 +69,8 @@ import('../../src/lib/email/email-service.js')
       status: 'confirmed',
       reservationDate: new Date().toISOString(),
       deliveryMethod: 'shipping',
-      pickupLocation: null,
-      pickupDate: null,
+      pickupLocation: undefined,
+      pickupDate: undefined,
       paymentMethod: 'paypal',
       shippingAddress: {
         street: 'Leopoldstraße',
@@ -100,8 +101,8 @@ import('../../src/lib/email/email-service.js')
       reservationDate: new Date().toISOString(),
       deliveryMethod: 'pickup',
       pickupLocation: 'Kindergarten Leuchtturm',
-      pickupDate: null,
-      paymentMethod: null,
+      pickupDate: undefined,
+      paymentMethod: undefined,
       orderGroupPicture: false,
       orderVorschulPicture: false,
       childIsVorschueler: false,
@@ -120,8 +121,8 @@ import('../../src/lib/email/email-service.js')
       status: 'confirmed',
       reservationDate: new Date().toISOString(),
       deliveryMethod: 'shipping',
-      pickupLocation: null,
-      pickupDate: null,
+      pickupLocation: undefined,
+      pickupDate: undefined,
       paymentMethod: 'paypal',
       shippingAddress: {
         street: 'Marienplatz',

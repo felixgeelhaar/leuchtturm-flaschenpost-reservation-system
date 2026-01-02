@@ -39,11 +39,15 @@
     "src/**/*",
     "src/**/*.vue",
     "src/**/*.astro",
-    ".astro/types.d.ts",
-    "tests/**/*",
-    "tests/**/*.ts",
+    ".astro/types.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".astro",
+    "dimensional-debris",
+    "tests",
     "vitest.config.ts",
     "playwright.config.ts"
-  ],
-  "exclude": ["node_modules", "dist", ".astro", "dimensional-debris"]
+  ]
 }

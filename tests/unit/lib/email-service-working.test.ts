@@ -113,7 +113,7 @@ describe('EmailService - Working Tests', () => {
     deliveryMethod: 'pickup',
     pickupDate: '2024-01-15T10:00:00Z',
     pickupLocation: 'Test Kindergarten',
-    paymentMethod: null,
+    paymentMethod: undefined,
     consentReference: 'consent-123',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
@@ -329,7 +329,7 @@ describe('EmailService - Working Tests', () => {
     it('handles missing pickup location gracefully', async () => {
       const reservationWithoutLocation = {
         ...mockReservationPickup,
-        pickupLocation: null,
+        pickupLocation: undefined,
       };
 
       await emailService.sendReservationConfirmation({

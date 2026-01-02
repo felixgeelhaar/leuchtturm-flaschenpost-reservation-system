@@ -21,6 +21,7 @@ import('../../src/lib/email/email-service.js')
       dataRetentionUntil: new Date(
         Date.now() + 365 * 24 * 60 * 60 * 1000,
       ).toISOString(),
+      lastActivity: new Date().toISOString(),
     };
 
     const mockMagazine: Magazine = {
@@ -46,8 +47,8 @@ import('../../src/lib/email/email-service.js')
       reservationDate: new Date().toISOString(),
       deliveryMethod: 'pickup',
       pickupLocation: 'Kindergarten Leuchtturm',
-      pickupDate: null, // No specific date
-      paymentMethod: null, // Cash on pickup
+      pickupDate: undefined, // No specific date
+      paymentMethod: undefined, // Cash on pickup
       orderGroupPicture: false,
       orderVorschulPicture: false,
       childIsVorschueler: false,
@@ -66,8 +67,8 @@ import('../../src/lib/email/email-service.js')
       status: 'confirmed',
       reservationDate: new Date().toISOString(),
       deliveryMethod: 'shipping',
-      pickupLocation: null,
-      pickupDate: null,
+      pickupLocation: undefined,
+      pickupDate: undefined,
       paymentMethod: 'paypal',
       shippingAddress: {
         street: 'Teststraße',

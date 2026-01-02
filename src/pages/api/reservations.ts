@@ -21,10 +21,8 @@ const addressSchema = z
     city: z.string().max(100, 'Stadt ist zu lang').trim().optional(),
     country: z
       .enum(['DE', 'AT', 'CH'], {
-        errorMap: () => ({
-          message:
-            'Wir liefern nur nach Deutschland, Österreich und in die Schweiz',
-        }),
+        message:
+          'Wir liefern nur nach Deutschland, Österreich und in die Schweiz',
       })
       .optional(),
     addressLine2: z
@@ -74,7 +72,7 @@ const reservationSchema = z
       .min(1, 'Mindestens 1 Exemplar erforderlich')
       .max(5, 'Maximal 5 Exemplare pro Reservierung'),
     deliveryMethod: z.enum(['pickup', 'shipping'], {
-      errorMap: () => ({ message: 'Ungültige Liefermethode' }),
+      message: 'Ungültige Liefermethode',
     }),
     pickupLocation: z.string().max(200, 'Abholort ist zu lang').optional(),
     pickupDate: z
@@ -300,11 +298,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Validate data with Zod
     const validationResult = reservationSchema.safeParse(body);
     if (!validationResult.success) {
-      const errors = (
-        validationResult.error.issues ||
-        validationResult.error.errors ||
-        []
-      ).map((err) => ({
+      const errors = validationResult.error.issues.map((err) => ({
         field: err.path.join('.'),
         message: err.message,
       }));

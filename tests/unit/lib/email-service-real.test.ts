@@ -114,7 +114,7 @@ describe('EmailService - Real Implementation', () => {
     deliveryMethod: 'pickup',
     pickupDate: '2024-01-15T10:00:00Z',
     pickupLocation: 'Test Kindergarten',
-    paymentMethod: null,
+    paymentMethod: undefined,
     consentReference: 'consent-123',
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
@@ -342,8 +342,8 @@ describe('EmailService - Real Implementation', () => {
     it('sends reminder even when pickup details are missing', async () => {
       const reservationWithoutPickup = {
         ...mockReservationPickup,
-        pickupLocation: null,
-        pickupDate: null,
+        pickupLocation: undefined,
+        pickupDate: undefined,
       };
 
       await emailService.sendPickupReminder({

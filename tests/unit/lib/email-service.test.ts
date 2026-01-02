@@ -110,7 +110,7 @@ describe('EmailService', () => {
     deliveryMethod: 'pickup',
     pickupLocation: 'Berlin Mitte',
     pickupDate: new Date().toISOString(),
-    paymentMethod: null,
+    paymentMethod: undefined,
     orderGroupPicture: false,
     orderVorschulPicture: false,
     childGroupName: '',

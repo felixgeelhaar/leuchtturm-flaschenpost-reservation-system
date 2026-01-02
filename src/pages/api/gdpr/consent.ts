@@ -55,11 +55,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Validate data
     const validationResult = consentSchema.safeParse(body);
     if (!validationResult.success) {
-      const errors = (
-        validationResult.error.issues ||
-        validationResult.error.errors ||
-        []
-      ).map((err) => ({
+      const errors = validationResult.error.issues.map((err) => ({
         field: err.path.join('.'),
         message: err.message,
       }));
@@ -154,6 +150,8 @@ const withdrawalSchema = z.object({
 });
 
 export const DELETE: APIRoute = async ({ request }) => {
+  const db = new DatabaseService();
+
   try {
     const body = await request.json();
     const validationResult = withdrawalSchema.safeParse(body);
