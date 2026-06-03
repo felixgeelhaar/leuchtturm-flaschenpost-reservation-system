@@ -37,7 +37,7 @@
     "security:scan": "snyk test"
   },
   "dependencies": {
-    "@astrojs/netlify": "6.5.6",
+    "@astrojs/netlify": "6.6.5",
     "@astrojs/tailwind": "6.0.2",
     "@astrojs/vue": "5.1.0",
     "@heroicons/vue": "2.2.0",
